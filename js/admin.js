@@ -205,25 +205,23 @@ class AdminDashboard {
 		$(document).on('click', '.edit-cause', async (e) => {
 			const id = $(e.target).data('id');
 			try {
-				const cause = await window.API.causeAPI.getById(id);
-				const form = document.getElementById('causeForm');
-				form.elements['title'].value = cause.title;
-				form.elements['description'].value = cause.description;
-				form.elements['targetAmount'].value = cause.targetAmount;
+				const response = await window.API.causeAPI.getById(id);
+				const cause = response.data || response;
+
 				$('#causeModalLabel').text('Edit Cause');
+				$('#causeForm')[0].reset();
+				$('#causeForm input[name="title"]').val(cause.title);
+				$('#causeForm textarea[name="description"]').val(cause.description);
+				$('#causeForm input[name="targetAmount"]').val(cause.targetAmount);
+				$('#causeForm input[name="raisedAmount"]').val(cause.raisedAmount);
+				$('#causeForm input[name="image"]').prop('required', false);
+				$('#causeModal .modal-footer button[type="submit"]')
+					.data('action', 'edit')
+					.data('id', id);
 				$('#causeModal').modal('show');
-				form.onsubmit = async (e) => {
-					e.preventDefault();
-					const formData = new FormData(form);
-					await window.API.causeAPI.update(id, formData);
-					this.showSuccess('Cause updated successfully');
-					$('#causeModal').modal('hide');
-					form.reset();
-					await this.loadCausesData();
-				};
 			} catch (error) {
-				console.error('Error editing cause:', error);
-				this.showError('Failed to edit cause: ' + error.message);
+				console.error('Error loading cause for edit:', error);
+				this.showError('Failed to load cause data: ' + error.message);
 			}
 		});
 
@@ -622,6 +620,22 @@ class AdminDashboard {
 			const form = document.getElementById('blogForm');
 			const formData = new FormData(form);
 
+			// Check for file size if a file is included
+			const fileInput = form.querySelector('input[type="file"]');
+			if (fileInput && fileInput.files.length > 0) {
+				const file = fileInput.files[0];
+				const maxSizeInBytes = 8 * 1024 * 1024; // 8MB limit as a safe default
+				if (file.size > maxSizeInBytes) {
+					this.showError(
+						`File size too large. Maximum allowed size is 8MB. Your file is ${(
+							file.size /
+							(1024 * 1024)
+						).toFixed(2)}MB.`
+					);
+					return;
+				}
+			}
+
 			if (!formData.get('title') || !formData.get('content')) {
 				this.showError('Title and content are required');
 				return;
@@ -773,28 +787,27 @@ class AdminDashboard {
 			const form = document.getElementById('causeForm');
 			const formData = new FormData(form);
 
+			// Validate required fields
 			const title = formData.get('title');
 			const description = formData.get('description');
 			const targetAmount = formData.get('targetAmount');
+			const raisedAmount = formData.get('raisedAmount');
 
 			if (!title || !description || !targetAmount) {
 				this.showError('Title, description, and target amount are required');
 				return;
 			}
 
-			// Create a new FormData instance with the form data
-			const newFormData = new FormData();
-			newFormData.append('title', title);
-			newFormData.append('description', description);
-			newFormData.append('targetAmount', targetAmount);
-
-			// Get the image file
-			const imageFile = form.querySelector('input[type="file"]').files[0];
-			if (imageFile) {
-				newFormData.append('image', imageFile);
+			// Ensure raisedAmount is a number
+			if (raisedAmount && isNaN(parseFloat(raisedAmount))) {
+				this.showError('Raised amount must be a valid number');
+				return;
 			}
 
-			const response = await window.API.causeAPI.create(newFormData);
+			// Set raisedAmount explicitly
+			formData.set('raisedAmount', parseFloat(raisedAmount) || 0);
+
+			const response = await window.API.causeAPI.create(formData);
 
 			if (response) {
 				this.showSuccess('Cause added successfully');
