@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Buyesi Admin Dashboard</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <link href="https://fonts.googleapis.com/css?family=Dosis:200,300,400,500,700" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Overpass:300,400,400i,600,700" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .admin-sidebar {
+            background: #333;
+            min-height: 100vh;
+            padding: 20px;
+            color: white;
+        }
+        .admin-content {
+            padding: 20px;
+        }
+        .admin-nav {
+            list-style: none;
+            padding: 0;
+        }
+        .admin-nav li {
+            margin-bottom: 10px;
+        }
+        .admin-nav a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .admin-nav a:hover {
+            background: #444;
+        }
+        .admin-nav a.active {
+            background: #007bff;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .preview-image {
+            max-width: 200px;
+            max-height: 200px;
+            margin-top: 10px;
+        }
+        .user-info {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #444;
+        }
+        .user-info img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 admin-sidebar">
+                <div class="text-center mb-4">
+                    <img src="./images/buyesi-logo.svg" alt="Buyesi Logo" height="80">
+                    <h4 class="mt-3">Admin Dashboard</h4>
+                </div>
+                <div class="user-info">
+                    <img src="images/person_1.jpg" alt="User" id="userAvatar">
+                    <h5 id="userName">Loading...</h5>
+                    <button class="btn btn-sm btn-danger" id="logoutButton">Logout</button>
+                </div>
+                <ul class="admin-nav">
+                    <li><a href="#" class="active" data-section="dashboard"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li><a href="#" data-section="team"><i class="fas fa-users"></i> Team Management</a></li>
+                    <li><a href="#" data-section="blog"><i class="fas fa-blog"></i> Blog Management</a></li>
+                    <li><a href="#" data-section="events"><i class="fas fa-calendar"></i> Events Management</a></li>
+                    <li><a href="#" data-section="gallery"><i class="fas fa-images"></i> Gallery Management</a></li>
+                    <li><a href="#" data-section="causes"><i class="fas fa-hand-holding-heart"></i> Causes Management</a></li>
+                    <li><a href="#" data-section="donations"><i class="fas fa-donate"></i> Donations</a></li>
+                    <li><a href="#" data-section="volunteers"><i class="fas fa-hands-helping"></i> Volunteers</a></li>
+                </ul>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 admin-content">
+                <!-- Dashboard Section -->
+                <div id="dashboard-section" class="section">
+                    <h2>Dashboard Overview</h2>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Total Donations</h5>
+                                    <h2 id="total-donations">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Active Volunteers</h5>
+                                    <h2 id="total-volunteers">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Active Causes</h5>
+                                    <h2 id="total-causes">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Team Management Section -->
+                <div id="team-section" class="section" style="display: none;">
+                    <h2>Team Management</h2>
+                    <button class="btn btn-primary mb-3" data-toggle="modal" data-target="#teamModal">Add Team Member</button>
+                    <div class="table-responsive">
+                        <table class="table" id="team-table">
+                            <thead>
+                                <tr>
+                                    <th>Image</th>
+                                    <th>Name</th>
+                                    <th>Position</th>
+                                    <th>Email</th>
+                                    <th>Created Date</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Blog Management Section -->
+                <div id="blog-section" class="section" style="display: none;">
+                    <h2>Blog Management</h2>
+                    <button class="btn btn-primary mb-3" data-toggle="modal" data-target="#blogModal">Add Blog Post</button>
+                    <div class="table-responsive">
+                        <table class="table" id="blog-table">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Events Management Section -->
+                <div id="events-section" class="section" style="display: none;">
+                    <h2>Events Management</h2>
+                    <button class="btn btn-primary mb-3" data-toggle="modal" data-target="#eventModal">Add Event</button>
+                    <div class="table-responsive">
+                        <table class="table" id="events-table">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Date</th>
+                                    <th>Location</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Gallery Management Section -->
+                <div id="gallery-section" class="section" style="display: none;">
+                    <h2>Gallery Management</h2>
+                    <button class="btn btn-primary mb-3" data-toggle="modal" data-target="#galleryModal">Add Image</button>
+                    <div class="row" id="gallery-grid"></div>
+                </div>
+
+                <!-- Causes Management Section -->
+                <div id="causes-section" class="section" style="display: none;">
+                    <h2>Causes Management</h2>
+                    <button class="btn btn-primary mb-3" data-toggle="modal" data-target="#causeModal">Add Cause</button>
+                    <div class="table-responsive">
+                        <table class="table" id="causes-table">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Target Amount</th>
+                                    <th>Raised Amount</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Donations Section -->
+                <div id="donations-section" class="section" style="display: none;">
+                    <h2>Donations</h2>
+                    <div class="table-responsive">
+                        <table class="table" id="donations-table">
+                            <thead>
+                                <tr>
+                                    <th>Donor</th>
+                                    <th>Amount</th>
+                                    <th>Date</th>
+                                    <th>Cause</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Volunteers Section -->
+                <div id="volunteers-section" class="section" style="display: none;">
+                    <h2>Volunteers</h2>
+                    <div class="table-responsive">
+                        <table class="table" id="volunteers-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Date Joined</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Team Modal -->
+    <div class="modal fade" id="teamModal" tabindex="-1" role="dialog" aria-labelledby="teamModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="teamModalLabel">Add Team Member</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="teamForm">
+                        <div class="form-group">
+                            <label>Name</label>
+                            <input type="text" class="form-control" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Position</label>
+                            <input type="text" class="form-control" name="position" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Bio/Description</label>
+                            <textarea class="form-control" name="description" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" class="form-control" name="email">
+                        </div>
+                        <div class="form-group">
+                            <label>Phone</label>
+                            <input type="text" class="form-control" name="phone">
+                        </div>
+                        <div class="form-group">
+                            <label>Image <span class="text-danger">*</span></label>
+                            <input type="file" class="form-control" name="image" accept="image/*" required>
+                            <small class="text-muted">This field is required</small>
+                            <img class="preview-image" style="display: none;">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" form="teamForm" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Blog Modal -->
+    <div class="modal fade" id="blogModal" tabindex="-1" role="dialog" aria-labelledby="blogModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="blogModalLabel">Add Blog Post</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="blogForm">
+                        <div class="form-group">
+                            <label>Title</label>
+                            <input type="text" class="form-control" name="title" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Excerpt</label>
+                            <textarea class="form-control" name="excerpt" rows="3" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Content</label>
+                            <textarea class="form-control" name="content" rows="5" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Featured Image</label>
+                            <input type="file" class="form-control" name="image" accept="image/*" required>
+                            <img class="preview-image" style="display: none;">
+                        </div>
+                        <div class="form-group">
+                            <label>Categories (comma separated)</label>
+                            <input type="text" class="form-control" name="categories">
+                        </div>
+                        <div class="form-group">
+                            <label>Tags (comma separated)</label>
+                            <input type="text" class="form-control" name="tags">
+                        </div>
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select class="form-control" name="status">
+                                <option value="draft">Draft</option>
+                                <option value="published">Published</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" name="featured" id="featured">
+                                <label class="custom-control-label" for="featured">Featured Post</label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" form="blogForm" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Event Modal -->
+    <div class="modal fade" id="eventModal" tabindex="-1" role="dialog" aria-labelledby="eventModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="eventModalLabel">Add Event</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="eventForm">
+                        <div class="form-group">
+                            <label>Title</label>
+                            <input type="text" class="form-control" name="title" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Start Date</label>
+                            <input type="datetime-local" class="form-control" name="startDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label>End Date</label>
+                            <input type="datetime-local" class="form-control" name="endDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Location</label>
+                            <input type="text" class="form-control" name="location" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Address (optional)</label>
+                            <input type="text" class="form-control" name="address">
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea class="form-control" name="description" rows="3" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Organizer</label>
+                            <input type="text" class="form-control" name="organizer" value="Buyesi Youth Initiative">
+                        </div>
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select class="form-control" name="status">
+                                <option value="upcoming">Upcoming</option>
+                                <option value="ongoing">Ongoing</option>
+                                <option value="completed">Completed</option>
+                                <option value="canceled">Canceled</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" name="featured" id="eventFeatured">
+                                <label class="custom-control-label" for="eventFeatured">Featured Event</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" name="registrationRequired" id="registrationRequired">
+                                <label class="custom-control-label" for="registrationRequired">Registration Required</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Maximum Attendees (0 = unlimited)</label>
+                            <input type="number" class="form-control" name="maximumAttendees" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Image</label>
+                            <input type="file" class="form-control" name="image" accept="image/*" required>
+                            <img class="preview-image" style="display: none;">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" form="eventForm" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gallery Modal -->
+    <div class="modal fade" id="galleryModal" tabindex="-1" role="dialog" aria-labelledby="galleryModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="galleryModalLabel">Add Image</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="galleryForm">
+                        <div class="form-group">
+                            <label>Title</label>
+                            <input type="text" class="form-control" name="title" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea class="form-control" name="description" rows="3" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Image</label>
+                            <input type="file" class="form-control" name="image" accept="image/*" required>
+                            <img class="preview-image" style="display: none;">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" form="galleryForm" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cause Modal -->
+    <div class="modal fade" id="causeModal" tabindex="-1" role="dialog" aria-labelledby="causeModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="causeModalLabel">Add Cause</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="causeForm">
+                        <div class="form-group">
+                            <label>Title</label>
+                            <input type="text" class="form-control" name="title" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea class="form-control" name="description" rows="3" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Target Amount</label>
+                            <input type="number" class="form-control" name="targetAmount" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Image</label>
+                            <input type="file" class="form-control" name="image" accept="image/*" required>
+                            <img class="preview-image" style="display: none;">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" form="causeForm" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html> 

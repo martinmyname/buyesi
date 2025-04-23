@@ -1,0 +1,27 @@
+{
+	"name": "buyesi-frontend",
+	"version": "1.0.0",
+	"description": "This is the frontend for the Buyesi Youth Initiative website. The frontend has been integrated with the backend API to display dynamic content.",
+	"main": "index.js",
+	"scripts": {
+		"minify:js": "uglifyjs js/main.js -o js/main.min.js; uglifyjs js/api.js -o js/api.min.js; uglifyjs js/home.js -o js/home.min.js; uglifyjs js/footer.js -o js/footer.min.js",
+		"minify:css": "cleancss -o css/style.min.css css/style.css",
+		"build": "npm run minify:js; npm run minify:css",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/martinmyname/buyesi.git"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/martinmyname/buyesi/issues"
+	},
+	"homepage": "https://github.com/martinmyname/buyesi#readme",
+	"devDependencies": {
+		"clean-css-cli": "^5.6.3",
+		"uglify-js": "^3.19.3"
+	}
+}

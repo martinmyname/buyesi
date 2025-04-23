@@ -6,6 +6,14 @@
  */
 /* Define CSS custom properties with your brand colors and modern defaults */
 :root {
+  --primary-color: #2C5F2D;
+  --secondary-color: #97BC62;
+  --accent-color: #F5B700;
+  --text-color: #333333;
+  --light-bg: #F8F9FA;
+  --white: #FFFFFF;
+  --dark-overlay: rgba(0, 0, 0, 0.5);
+
   /* Updated Core Colors */
   --primary: #2E8B57;
   /* Sea green (previously updated) */
@@ -59,6 +67,16 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+}
+.navbar-brand img {
+  height: 40px;
+}
+
+@media (max-width: 576px) {
+  .navbar-brand img {
+    height: 32px;
+    /* Slightly smaller on mobile */
+  }
 }
 
 /* Base HTML styles */
@@ -2004,86 +2022,6 @@ select.form-control-lg:not([size]):not([multiple]), .input-group-lg > select.for
 .was-validated .custom-file-input:valid ~ .custom-file-label, .custom-file-input.is-valid ~ .custom-file-label {
   border-color: #28a745; }
   .was-validated .custom-file-input:valid ~ .custom-file-label::before, .custom-file-input.is-valid ~ .custom-file-label::before {
-    border-color: inherit; }
-
-.was-validated .custom-file-input:valid ~ .valid-feedback,
-.was-validated .custom-file-input:valid ~ .valid-tooltip, .custom-file-input.is-valid ~ .valid-feedback,
-.custom-file-input.is-valid ~ .valid-tooltip {
-  display: block; }
-
-.was-validated .custom-file-input:valid:focus ~ .custom-file-label, .custom-file-input.is-valid:focus ~ .custom-file-label {
-  -webkit-box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
-  box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25); }
-
-.invalid-feedback {
-  display: none;
-  width: 100%;
-  margin-top: 0.25rem;
-  font-size: 80%;
-  color: #dc3545; }
-
-.invalid-tooltip {
-  position: absolute;
-  top: 100%;
-  z-index: 5;
-  display: none;
-  max-width: 100%;
-  padding: .5rem;
-  margin-top: .1rem;
-  font-size: .875rem;
-  line-height: 1;
-  color: #fff;
-  background-color: rgba(220, 53, 69, 0.8);
-  border-radius: .2rem; }
-
-.was-validated .form-control:invalid, .form-control.is-invalid, .was-validated
-.custom-select:invalid,
-.custom-select.is-invalid {
-  border-color: #dc3545; }
-  .was-validated .form-control:invalid:focus, .form-control.is-invalid:focus, .was-validated
-  .custom-select:invalid:focus,
-  .custom-select.is-invalid:focus {
-    border-color: #dc3545;
-    -webkit-box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
-    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25); }
-  .was-validated .form-control:invalid ~ .invalid-feedback,
-  .was-validated .form-control:invalid ~ .invalid-tooltip, .form-control.is-invalid ~ .invalid-feedback,
-  .form-control.is-invalid ~ .invalid-tooltip, .was-validated
-  .custom-select:invalid ~ .invalid-feedback,
-  .was-validated
-  .custom-select:invalid ~ .invalid-tooltip,
-  .custom-select.is-invalid ~ .invalid-feedback,
-  .custom-select.is-invalid ~ .invalid-tooltip {
-    display: block; }
-
-.was-validated .form-check-input:invalid ~ .form-check-label, .form-check-input.is-invalid ~ .form-check-label {
-  color: #dc3545; }
-
-.was-validated .form-check-input:invalid ~ .invalid-feedback,
-.was-validated .form-check-input:invalid ~ .invalid-tooltip, .form-check-input.is-invalid ~ .invalid-feedback,
-.form-check-input.is-invalid ~ .invalid-tooltip {
-  display: block; }
-
-.was-validated .custom-control-input:invalid ~ .custom-control-label, .custom-control-input.is-invalid ~ .custom-control-label {
-  color: #dc3545; }
-  .was-validated .custom-control-input:invalid ~ .custom-control-label::before, .custom-control-input.is-invalid ~ .custom-control-label::before {
-    background-color: #efa2a9; }
-
-.was-validated .custom-control-input:invalid ~ .invalid-feedback,
-.was-validated .custom-control-input:invalid ~ .invalid-tooltip, .custom-control-input.is-invalid ~ .invalid-feedback,
-.custom-control-input.is-invalid ~ .invalid-tooltip {
-  display: block; }
-
-.was-validated .custom-control-input:invalid:checked ~ .custom-control-label::before, .custom-control-input.is-invalid:checked ~ .custom-control-label::before {
-  background-color: #e4606d; }
-
-.was-validated .custom-control-input:invalid:focus ~ .custom-control-label::before, .custom-control-input.is-invalid:focus ~ .custom-control-label::before {
-  -webkit-box-shadow: 0 0 0 1px #fff, 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
-  box-shadow: 0 0 0 1px #fff, 0 0 0 0.2rem rgba(220, 53, 69, 0.25); }
-
-.was-validated .custom-file-input:invalid ~ .custom-file-label, .custom-file-input.is-invalid ~ .custom-file-label {
-  border-color: #dc3545; }
-  .was-validated .custom-file-input:invalid ~ .custom-file-label::before, .custom-file-input.is-invalid ~ .custom-file-label::before {
     border-color: inherit; }
 
 .was-validated .custom-file-input:invalid ~ .invalid-feedback,
@@ -7810,33 +7748,25 @@ h1, h2, h3, h4, h5,
   bottom: 0;
   content: '';
   opacity: 0.6;
-  /* Increased opacity for better contrast */
   background: rgba(0, 0, 0, 0.7);
-  /* Darker background */
 }
 
 .hero-wrap h1 {
   color: #F4C430 ;
-  /* Gold color */
   font-size: 3rem;
-  /* Larger text */
   font-weight: bold;
   text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.8);
-  /* Strong shadow for better visibility */
 }
 
 .hero-wrap p {
   color: #F4C430 !important;
-  /* Gold color */
   font-size: 1.4rem;
   font-weight: 600;
   text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.8);
-  /* Shadow to ensure readability */
 }
 
 .hero-wrap .text-container {
   background: rgba(0, 0, 0, 0.5);
-  /* Semi-transparent black background for contrast */
   padding: 20px;
   border-radius: 10px;
   display: inline-block;
@@ -8051,10 +7981,8 @@ h1, h2, h3, h4, h5,
 /* Intro Section (ftco-intro) */
 .ftco-intro {
   margin-top: calc(var(--spacing-unit) * -5);
-  /* Using spacing unit for consistency */
   position: relative;
   z-index: 1;
-  /* Ensure it layers correctly with other sections */
 }
 
 /* Override margin for ftco-intro-2 */
@@ -8069,60 +7997,44 @@ h1, h2, h3, h4, h5,
   justify-content: center;
   width: 100%;
   padding: calc(var(--spacing-unit) * 2);
-  /* Consistent padding using spacing unit */
   color: var(--gray-dark);
-  /* Default text color from your modernized palette */
   border-radius: 0.75rem;
-  /* Softer, modern corners */
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  /* Subtle shadow for depth */
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  /* Smooth hover effect */
 }
 
 /* Hover Effect for Blocks */
 .ftco-intro .block-18:hover {
   transform: translateY(-5px);
-  /* Slight lift on hover */
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  /* Enhanced shadow on hover */
 }
 
 /* Color Variations with Brand Colors */
 .ftco-intro .block-18.color-1 {
   background: var(--primary);
-  /* #2E8B57 */
   color: var(--white);
-  /* White text for contrast */
 }
 
 .ftco-intro .block-18.color-2 {
   background: var(--secondary);
-  /* #468B7A*/
   color: var(--white);
 }
 
 .ftco-intro .block-18.color-3 {
   background: var(--accent);
-  /* #F4C430 */
   color: var(--gray-dark);
-  /* Darker text for contrast on the lighter accent color */
 }
 
 /* Text Styling Inside Blocks */
 .ftco-intro .block-18 .text {
   text-align: center;
-  /* Keep text centered as per original design */
 }
 
 /* Counter Number */
 .ftco-intro .block-18 .text strong {
   font-size: clamp(2.5rem, 6vw, 4rem);
-  /* Responsive font size */
   font-weight: 700;
-  /* Bolder for emphasis */
   color: inherit;
-  /* Inherit color from parent for consistency */
   display: block;
   margin: 0.5rem 0;
   line-height: 1;
@@ -8132,12 +8044,9 @@ h1, h2, h3, h4, h5,
 .ftco-intro .block-18 .text span {
   display: block;
   font-size: clamp(1rem, 2.5vw, 1.25rem);
-  /* Responsive font size */
   font-weight: 400;
   color: inherit;
-  /* Inherit color from parent */
   opacity: 0.9;
-  /* Slightly faded for hierarchy */
 }
 
 /* Paragraphs Inside Blocks */
@@ -8150,7 +8059,6 @@ h1, h2, h3, h4, h5,
 /* Headings Inside Blocks */
 .ftco-intro .block-18 .text h3 {
   font-size: clamp(1.25rem, 3vw, 1.5rem);
-  /* Responsive heading size */
   font-weight: 600;
   color: inherit;
   margin-bottom: calc(var(--spacing-unit) * 0.75);
@@ -8160,9 +8068,7 @@ h1, h2, h3, h4, h5,
 .ftco-intro .block-18 .btn.btn-white {
   background: var(--white);
   color: var(--primary);
-  /* Use primary color for text */
   border: 1px solid rgba(0, 0, 0, 0.1);
-  /* Subtle border */
   border-radius: 0.5rem;
   font-weight: 500;
   transition: background-color 0.3s ease, color 0.3s ease, transform 0.1s ease;
@@ -8170,49 +8076,40 @@ h1, h2, h3, h4, h5,
 
 .ftco-intro .block-18 .btn.btn-white:hover {
   background: var(--accent);
-  /* #F4C430 on hover */
   color: var(--gray-dark);
   transform: translateY(-2px);
-  /* Slight lift on hover */
 }
 
 .ftco-intro .block-18 .btn.btn-white:active {
   transform: translateY(0);
-  /* Reset on click */
 }
 
 /* Responsive Adjustments */
 @media (max-width: var(--breakpoint-md)) {
   .ftco-intro {
     margin-top: calc(var(--spacing-unit) * -3);
-    /* Less aggressive margin on smaller screens */
   }
 
   .ftco-intro .block-18 {
     padding: calc(var(--spacing-unit) * 1.5);
-    /* Slightly less padding on mobile */
   }
 
   .ftco-intro .block-18 .text strong {
     font-size: clamp(2rem, 5vw, 3rem);
-    /* Smaller counter on mobile */
   }
 
   .ftco-intro .block-18 .text span {
     font-size: clamp(0.875rem, 2vw, 1rem);
-    /* Smaller span text on mobile */
   }
 }
 
 @media (max-width: var(--breakpoint-sm)) {
   .ftco-intro .block-18 {
     padding: var(--spacing-unit);
-    /* Even less padding on very small screens */
   }
 
   .ftco-intro .block-18 .text h3 {
     font-size: clamp(1rem, 2.5vw, 1.25rem);
-    /* Smaller headings on mobile */
   }
 }
 .services .icon {

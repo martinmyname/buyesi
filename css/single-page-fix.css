@@ -1,0 +1,52 @@
+/* CSS fixes for single page content visibility */
+
+/* Ensure visibility of content on single pages */
+.blog-entry, .cause-entry, .event-entry {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    min-height: auto !important;
+    overflow: visible !important;
+}
+
+.blog-image, .cause-image, .event-image {
+    display: block !important;
+    visibility: visible !important;
+    height: 300px !important;
+    background-size: cover !important;
+    background-position: center !important;
+}
+
+.blog-meta, .event-details {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.blog-content, .cause-description, .event-description {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    min-height: auto !important;
+}
+
+.donation-time, .fund-raised, .progress {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.event-date, .event-location, .event-time {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Ensure containers don't hide content */
+.blog-container, .cause-container, .event-container {
+    display: block !important;
+    visibility: visible !important;
+    min-height: auto !important;
+    height: auto !important;
+    overflow: visible !important;
+} 

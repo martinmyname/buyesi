@@ -1,0 +1,151 @@
+/* Custom Gallery Styles */
+.gallery-filters {
+  margin-bottom: 30px;
+}
+
+.filter-buttons .btn {
+  margin: 0 5px;
+  border-radius: 30px;
+  padding: 8px 20px;
+  transition: all 0.3s ease;
+}
+
+.filter-buttons .btn.active,
+.filter-buttons .btn:hover {
+  background-color: #f86f2d;
+  border-color: #f86f2d;
+  box-shadow: 0 5px 15px rgba(248, 111, 45, 0.3);
+}
+
+/* New Gallery Layout */
+.gallery-items-container {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0;
+}
+
+.gallery-item {
+  padding: 0;
+  margin: 0;
+  transition: all 0.3s ease;
+}
+
+.gallery-box {
+  display: block;
+  overflow: hidden;
+  position: relative;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.gallery-box img {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+  display: block;
+  margin: 0;
+  border: none;
+}
+
+.gallery-box:hover img {
+  transform: scale(1.05);
+}
+
+.gallery-item .card {
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  border: none;
+  height: 100%;
+}
+
+.gallery-item .card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+}
+
+.gallery-image {
+  border-radius: 10px 10px 0 0;
+  position: relative;
+  transition: all 0.5s ease;
+}
+
+.gallery-item .card:hover .gallery-image {
+  opacity: 0.9;
+}
+
+.gallery-item .card-body {
+  padding: 20px;
+}
+
+.gallery-item .card-title {
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.gallery-item .card-text {
+  color: #6c757d;
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+.gallery-item .badge {
+  font-size: 11px;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-weight: 500;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  display: inline-block;
+}
+
+.badge-primary {
+  background-color: #f86f2d;
+}
+
+.badge-secondary {
+  background-color: #6c757d;
+}
+
+/* Magnific Popup customization */
+.mfp-title {
+  font-size: 16px;
+  line-height: 1.4;
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .filter-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .filter-buttons .btn {
+    margin: 0 2px 5px;
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+  
+  .gallery-box img {
+    height: 250px;
+  }
+}
+
+@media (max-width: 576px) {
+  .gallery-item {
+    width: 50%;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .gallery-box img {
+    height: 180px;
+  }
+} 
