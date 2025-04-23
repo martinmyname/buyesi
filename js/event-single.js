@@ -168,8 +168,7 @@ function setupRegisterForm(form, event) {
 		submitBtn.disabled = true;
 
 		try {
-			// Use the window.API object and API_BASE_URL constant
-			const API_BASE_URL = 'http://localhost:5000/api';
+			// const API_BASE_URL = 'http://localhost:5000/api';
 			const response = await fetch(
 				`${API_BASE_URL}/events/${event._id}/register`,
 				{

@@ -37,6 +37,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
 		// Fetch blog details from the API
 		console.log('Fetching blog with ID:', blogId);
+		// const API_BASE_URL = 'http://localhost:5000/api';
 		const response = await window.API.blogAPI.getById(blogId);
 		console.log('API Response:', response);
 
@@ -181,7 +182,7 @@ function setupCommentForm(form, blog) {
 
 		try {
 			// Use the window.API object and API_BASE_URL constant
-			const API_BASE_URL = 'http://localhost:5000/api';
+			// const API_BASE_URL = 'http://localhost:5000/api';
 			const response = await fetch(
 				`${API_BASE_URL}/blogs/${blog._id}/comments`,
 				{
