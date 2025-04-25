@@ -13,27 +13,40 @@ const handleResponse = async (response) => {
 
 	if (!response.ok) {
 		try {
-			const error = await response.json();
-			console.error('API Error:', error);
+			const contentType = response.headers.get('content-type');
+			if (contentType && contentType.includes('application/json')) {
+				const error = await response.json();
+				console.error('API Error:', error);
 
-			// For volunteer registration with email errors, signal a special type of error
-			if (
-				isVolunteerRegistration &&
-				error.message &&
-				(error.message.includes('email') ||
-					error.message.includes('mail') ||
-					error.message.includes('login') ||
-					error.message.includes('smtp'))
-			) {
-				// Modify the error message to indicate that the volunteer was registered
-				// but we couldn't send the email
+				// For volunteer registration with email errors, signal a special type of error
+				if (
+					isVolunteerRegistration &&
+					error.message &&
+					(error.message.includes('email') ||
+						error.message.includes('mail') ||
+						error.message.includes('login') ||
+						error.message.includes('smtp'))
+				) {
+					// Modify the error message to indicate that the volunteer was registered
+					// but we couldn't send the email
+					throw new Error(
+						'EMAIL_ERROR:' +
+							(error.message || 'Failed to send email notification')
+					);
+				}
+
+				throw new Error(error.message || 'Something went wrong');
+			} else {
+				// Non-JSON response
+				const text = await response.text();
+				console.error(
+					'Non-JSON response received:',
+					text.slice(0, 100) + (text.length > 100 ? '...' : '')
+				);
 				throw new Error(
-					'EMAIL_ERROR:' +
-						(error.message || 'Failed to send email notification')
+					`HTTP error ${response.status}: ${response.statusText}`
 				);
 			}
-
-			throw new Error(error.message || 'Something went wrong');
 		} catch (e) {
 			console.error('Error parsing error response:', e);
 			throw new Error(`HTTP error ${response.status}: ${response.statusText}`);
@@ -41,15 +54,27 @@ const handleResponse = async (response) => {
 	}
 
 	try {
-		const data = await response.json();
-		console.log('API Response Data Structure:', {
-			hasData: data.hasOwnProperty('data'),
-			dataType: data.data ? typeof data.data : 'undefined',
-			isArray: data.data ? Array.isArray(data.data) : false,
-			length: data.data && Array.isArray(data.data) ? data.data.length : 'N/A',
-			fullResponse: data,
-		});
-		return data;
+		const contentType = response.headers.get('content-type');
+		if (contentType && contentType.includes('application/json')) {
+			const data = await response.json();
+			console.log('API Response Data Structure:', {
+				hasData: data.hasOwnProperty('data'),
+				dataType: data.data ? typeof data.data : 'undefined',
+				isArray: data.data ? Array.isArray(data.data) : false,
+				length:
+					data.data && Array.isArray(data.data) ? data.data.length : 'N/A',
+				fullResponse: data,
+			});
+			return data;
+		} else {
+			// Non-JSON response for successful request
+			const text = await response.text();
+			console.log(
+				'Non-JSON response for successful request:',
+				text.slice(0, 100) + (text.length > 100 ? '...' : '')
+			);
+			throw new Error('Expected JSON response but received non-JSON content');
+		}
 	} catch (e) {
 		console.error('Error parsing JSON response:', e);
 		throw new Error('Failed to parse response data');

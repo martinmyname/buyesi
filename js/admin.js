@@ -319,28 +319,48 @@ class AdminDashboard {
 	async loadDashboardData() {
 		try {
 			// Load donations
-			const donationsResponse = await window.API.donationAPI.getAll();
-			const donations = Array.isArray(donationsResponse)
-				? donationsResponse
-				: donationsResponse.data || [];
+			let donations = [];
+			try {
+				const donationsResponse = await window.API.donationAPI.getAll();
+				donations = Array.isArray(donationsResponse)
+					? donationsResponse
+					: donationsResponse.data || [];
+			} catch (error) {
+				console.error('Error loading donations:', error);
+				this.showError('Failed to load donations data: ' + error.message);
+			}
 			$('#total-donations').text(donations.length);
 
 			// Load volunteers
-			const volunteersResponse = await window.API.volunteerAPI.getAll();
-			const volunteers = Array.isArray(volunteersResponse)
-				? volunteersResponse
-				: volunteersResponse.data || [];
+			let volunteers = [];
+			try {
+				const volunteersResponse = await window.API.volunteerAPI.getAll();
+				volunteers = Array.isArray(volunteersResponse)
+					? volunteersResponse
+					: volunteersResponse.data || [];
+			} catch (error) {
+				console.error('Error loading volunteers:', error);
+				this.showError('Failed to load volunteers data: ' + error.message);
+			}
 			$('#total-volunteers').text(volunteers.length);
 
 			// Load causes
-			const causesResponse = await window.API.causeAPI.getAll();
-			const causes = Array.isArray(causesResponse)
-				? causesResponse
-				: causesResponse.data || [];
+			let causes = [];
+			try {
+				const causesResponse = await window.API.causeAPI.getAll();
+				causes = Array.isArray(causesResponse)
+					? causesResponse
+					: causesResponse.data || [];
+			} catch (error) {
+				console.error('Error loading causes:', error);
+				this.showError('Failed to load causes data: ' + error.message);
+			}
 			$('#total-causes').text(causes.length);
 		} catch (error) {
-			console.error('Error loading dashboard data:', error);
-			this.showError('Failed to load dashboard data: ' + error.message);
+			console.error('Unexpected error loading dashboard data:', error);
+			this.showError(
+				'Unexpected error loading dashboard data: ' + error.message
+			);
 		}
 	}
 
