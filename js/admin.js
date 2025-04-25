@@ -73,6 +73,13 @@ class AdminDashboard {
 					return;
 				}
 
+				// Convert image to base64 if present
+				if (image instanceof File && image.name !== '') {
+					const base64Image = await this.convertFileToBase64(image);
+					formData.delete('image');
+					formData.append('imageBase64', base64Image);
+				}
+
 				await window.API.teamAPI.create(formData);
 				$('#teamModal').modal('hide');
 				form.reset();
@@ -620,38 +627,31 @@ class AdminDashboard {
 			const form = document.getElementById('blogForm');
 			const formData = new FormData(form);
 
-			// Check for file size if a file is included
-			const fileInput = form.querySelector('input[type="file"]');
-			if (fileInput && fileInput.files.length > 0) {
-				const file = fileInput.files[0];
-				const maxSizeInBytes = 8 * 1024 * 1024; // 8MB limit as a safe default
-				if (file.size > maxSizeInBytes) {
-					this.showError(
-						`File size too large. Maximum allowed size is 8MB. Your file is ${(
-							file.size /
-							(1024 * 1024)
-						).toFixed(2)}MB.`
-					);
-					return;
-				}
-			}
+			// Validate required fields
+			const title = formData.get('title');
+			const content = formData.get('content');
+			const image = formData.get('image');
 
-			if (!formData.get('title') || !formData.get('content')) {
-				this.showError('Title and content are required');
+			if (!title || !content) {
+				this.showError('Title and Content are required fields');
 				return;
 			}
 
-			const response = await window.API.blogAPI.create(formData);
-
-			if (response) {
-				this.showSuccess('Blog post added successfully');
-				$('#blogModal').modal('hide');
-				form.reset();
-				await this.loadBlogsData();
+			// Convert image to base64 if present
+			if (image instanceof File && image.name !== '') {
+				const base64Image = await this.convertFileToBase64(image);
+				formData.delete('image');
+				formData.append('imageBase64', base64Image);
 			}
+
+			await window.API.blogAPI.create(formData);
+			$('#blogModal').modal('hide');
+			form.reset();
+			this.loadBlogsData();
+			this.showSuccess('Blog post added successfully');
 		} catch (error) {
-			console.error('Error adding blog:', error);
-			this.showError('Failed to add blog: ' + error.message);
+			console.error('Error adding blog post:', error);
+			this.showError('Failed to add blog post: ' + error.message);
 		}
 	}
 
@@ -659,14 +659,6 @@ class AdminDashboard {
 		try {
 			const form = document.getElementById('eventForm');
 			const formData = new FormData(form);
-
-			// Debug: log each field being sent
-			console.log('Event form data being submitted:');
-			for (let [key, value] of formData.entries()) {
-				console.log(
-					`${key}: ${value instanceof File ? `File: ${value.name}` : value}`
-				);
-			}
 
 			// Validate required fields
 			const title = formData.get('title');
@@ -676,82 +668,25 @@ class AdminDashboard {
 			const description = formData.get('description');
 			const image = formData.get('image');
 
-			// Basic validation
 			if (!title || !startDate || !endDate || !location || !description) {
-				this.showError('Please fill in all required fields');
-				return;
-			}
-
-			// Image is required on the model, so check if it's a File with a name
-			if (image instanceof File && image.name === '') {
-				this.showError('Please select an image file');
-				return;
-			}
-
-			// Handle checkbox and boolean fields
-			const featured = form.querySelector('input[name="featured"]').checked;
-			const registrationRequired = form.querySelector(
-				'input[name="registrationRequired"]'
-			).checked;
-
-			// Create a new FormData to ensure all fields are included correctly
-			const newFormData = new FormData();
-			newFormData.append('title', title);
-
-			// Generate a slug from the title
-			const slug =
-				title
-					.toLowerCase()
-					.replace(/[^\w\s-]/g, '')
-					.replace(/[\s_-]+/g, '-')
-					.replace(/^-+|-+$/g, '') +
-				'-' +
-				Date.now().toString().slice(-4);
-			newFormData.append('slug', slug);
-
-			newFormData.append('startDate', startDate);
-			newFormData.append('endDate', endDate);
-			newFormData.append('location', location);
-			newFormData.append('description', description);
-			newFormData.append(
-				'organizer',
-				formData.get('organizer') || 'Buyesi Youth Initiative'
-			);
-			newFormData.append('status', formData.get('status') || 'upcoming');
-			newFormData.append('address', formData.get('address') || '');
-			newFormData.append('featured', featured ? 'true' : 'false');
-			newFormData.append(
-				'registrationRequired',
-				registrationRequired ? 'true' : 'false'
-			);
-			newFormData.append(
-				'maximumAttendees',
-				formData.get('maximumAttendees') || '0'
-			);
-
-			// Add the image file - ensure it's appended correctly
-			if (image instanceof File && image.name !== '') {
-				newFormData.append('image', image);
-			}
-
-			console.log('Sending event data to API...');
-			// Debug the final FormData before sending
-			for (let [key, value] of newFormData.entries()) {
-				console.log(
-					`Final ${key}: ${
-						value instanceof File ? `File: ${value.name}` : value
-					}`
+				this.showError(
+					'Title, Start Date, End Date, Location, and Description are required fields'
 				);
+				return;
 			}
 
-			const response = await window.API.eventAPI.create(newFormData);
-
-			if (response) {
-				this.showSuccess('Event added successfully');
-				$('#eventModal').modal('hide');
-				form.reset();
-				await this.loadEventsData();
+			// Convert image to base64 if present
+			if (image instanceof File && image.name !== '') {
+				const base64Image = await this.convertFileToBase64(image);
+				formData.delete('image');
+				formData.append('imageBase64', base64Image);
 			}
+
+			await window.API.eventAPI.create(formData);
+			$('#eventModal').modal('hide');
+			form.reset();
+			this.loadEventsData();
+			this.showSuccess('Event added successfully');
 		} catch (error) {
 			console.error('Error adding event:', error);
 			this.showError('Failed to add event: ' + error.message);
@@ -763,19 +698,32 @@ class AdminDashboard {
 			const form = document.getElementById('galleryForm');
 			const formData = new FormData(form);
 
-			if (!formData.get('title') || !formData.get('image').size === 0) {
-				this.showError('Title and image are required');
+			// Validate required fields
+			const title = formData.get('title');
+			const description = formData.get('description');
+			const image = formData.get('image');
+
+			if (!title || !description) {
+				this.showError('Title and Description are required fields');
 				return;
 			}
 
-			const response = await window.API.galleryAPI.create(formData);
-
-			if (response) {
-				this.showSuccess('Gallery item added successfully');
-				$('#galleryModal').modal('hide');
-				form.reset();
-				await this.loadGalleryData();
+			// Image is required, so check if it's a File with a name
+			if (!(image instanceof File) || image.name === '') {
+				this.showError('Please select an image file');
+				return;
 			}
+
+			// Convert image to base64
+			const base64Image = await this.convertFileToBase64(image);
+			formData.delete('image');
+			formData.append('imageBase64', base64Image);
+
+			await window.API.galleryAPI.create(formData);
+			$('#galleryModal').modal('hide');
+			form.reset();
+			this.loadGalleryData();
+			this.showSuccess('Gallery item added successfully');
 		} catch (error) {
 			console.error('Error adding gallery item:', error);
 			this.showError('Failed to add gallery item: ' + error.message);
@@ -791,30 +739,27 @@ class AdminDashboard {
 			const title = formData.get('title');
 			const description = formData.get('description');
 			const targetAmount = formData.get('targetAmount');
-			const raisedAmount = formData.get('raisedAmount');
+			const image = formData.get('image');
 
 			if (!title || !description || !targetAmount) {
-				this.showError('Title, description, and target amount are required');
+				this.showError(
+					'Title, Description, and Target Amount are required fields'
+				);
 				return;
 			}
 
-			// Ensure raisedAmount is a number
-			if (raisedAmount && isNaN(parseFloat(raisedAmount))) {
-				this.showError('Raised amount must be a valid number');
-				return;
+			// Convert image to base64 if present
+			if (image instanceof File && image.name !== '') {
+				const base64Image = await this.convertFileToBase64(image);
+				formData.delete('image');
+				formData.append('imageBase64', base64Image);
 			}
 
-			// Set raisedAmount explicitly
-			formData.set('raisedAmount', parseFloat(raisedAmount) || 0);
-
-			const response = await window.API.causeAPI.create(formData);
-
-			if (response) {
-				this.showSuccess('Cause added successfully');
-				$('#causeModal').modal('hide');
-				form.reset();
-				await this.loadCausesData();
-			}
+			await window.API.causeAPI.create(formData);
+			$('#causeModal').modal('hide');
+			form.reset();
+			this.loadCausesData();
+			this.showSuccess('Cause added successfully');
 		} catch (error) {
 			console.error('Error adding cause:', error);
 			this.showError('Failed to add cause: ' + error.message);
@@ -845,6 +790,15 @@ class AdminDashboard {
 		}
 		successAlert.text(message).show();
 		setTimeout(() => successAlert.hide(), 5000);
+	}
+
+	convertFileToBase64(file) {
+		return new Promise((resolve, reject) => {
+			const reader = new FileReader();
+			reader.readAsDataURL(file);
+			reader.onload = () => resolve(reader.result);
+			reader.onerror = (error) => reject(error);
+		});
 	}
 }
 
