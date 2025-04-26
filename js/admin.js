@@ -8,6 +8,26 @@ class AdminDashboard {
 	async initialize() {
 		// Check authentication
 		if (!window.API.auth.isAuthenticated()) {
+			try {
+				// Attempt to check if auth endpoint is available
+				const response = await fetch('https://buyesi.onrender.com/auth/check', {
+					method: 'GET',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+				});
+				if (!response.ok && response.status === 404) {
+					console.error('Authentication endpoint not found.');
+					alert(
+						'Authentication system is currently unavailable. Please contact support.'
+					);
+				}
+			} catch (error) {
+				console.error('Error checking auth endpoint:', error);
+				alert(
+					'Unable to connect to authentication system. Please try again later.'
+				);
+			}
 			window.location.href = 'login.html';
 			return;
 		}

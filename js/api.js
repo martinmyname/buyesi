@@ -1,4 +1,8 @@
-const API_BASE_URL = 'https://buyesi.onrender.com';
+const API_BASE_URL =
+	window.location.hostname === 'localhost' ||
+	window.location.hostname === '127.0.0.1'
+		? 'http://localhost:5000/api'
+		: 'https://buyesi.onrender.com/api';
 
 // Helper function to handle API responses
 const handleResponse = async (response) => {
@@ -43,9 +47,15 @@ const handleResponse = async (response) => {
 					'Non-JSON response received:',
 					text.slice(0, 100) + (text.length > 100 ? '...' : '')
 				);
-				throw new Error(
-					`HTTP error ${response.status}: ${response.statusText}`
-				);
+				if (response.status === 404 && response.url.includes('/auth/')) {
+					throw new Error(
+						'Authentication endpoint not found on the server. Please check backend configuration.'
+					);
+				} else {
+					throw new Error(
+						`HTTP error ${response.status}: ${response.statusText}`
+					);
+				}
 			}
 		} catch (e) {
 			console.error('Error parsing error response:', e);
@@ -373,137 +383,4 @@ const galleryAPI = {
 		});
 		return handleResponse(response);
 	},
-};
-
-// Team API
-const teamAPI = {
-	getAll: async () => {
-		const token = localStorage.getItem('token');
-		const response = await fetch(`${API_BASE_URL}/teams`, {
-			method: 'GET',
-			headers: {
-				Authorization: token ? `Bearer ${token}` : '',
-			},
-		});
-		return handleResponse(response);
-	},
-
-	getById: async (id) => {
-		const token = localStorage.getItem('token');
-		const response = await fetch(`${API_BASE_URL}/teams/${id}`, {
-			method: 'GET',
-			headers: {
-				Authorization: token ? `Bearer ${token}` : '',
-			},
-		});
-		return handleResponse(response);
-	},
-
-	create: async (formData) => {
-		const token = localStorage.getItem('token');
-		const response = await fetch(`${API_BASE_URL}/teams`, {
-			method: 'POST',
-			headers: {
-				Authorization: token ? `Bearer ${token}` : '',
-			},
-			body: formData,
-		});
-		return handleResponse(response);
-	},
-
-	update: async (id, formData) => {
-		const token = localStorage.getItem('token');
-		const response = await fetch(`${API_BASE_URL}/teams/${id}`, {
-			method: 'PUT',
-			headers: {
-				Authorization: token ? `Bearer ${token}` : '',
-			},
-			body: formData,
-		});
-		return handleResponse(response);
-	},
-
-	delete: async (id) => {
-		const token = localStorage.getItem('token');
-		const response = await fetch(`${API_BASE_URL}/teams/${id}`, {
-			method: 'DELETE',
-			headers: {
-				Authorization: token ? `Bearer ${token}` : '',
-			},
-		});
-		return handleResponse(response);
-	},
-};
-
-// Cause API
-const causeAPI = {
-	getAll: async () => {
-		const token = localStorage.getItem('token');
-		const response = await fetch(`${API_BASE_URL}/causes`, {
-			method: 'GET',
-			headers: {
-				Authorization: token ? `Bearer ${token}` : '',
-			},
-		});
-		return handleResponse(response);
-	},
-
-	getById: async (id) => {
-		const token = localStorage.getItem('token');
-		const response = await fetch(`${API_BASE_URL}/causes/${id}`, {
-			method: 'GET',
-			headers: {
-				Authorization: token ? `Bearer ${token}` : '',
-			},
-		});
-		return handleResponse(response);
-	},
-
-	create: async (formData) => {
-		const token = localStorage.getItem('token');
-		const response = await fetch(`${API_BASE_URL}/causes`, {
-			method: 'POST',
-			headers: {
-				Authorization: token ? `Bearer ${token}` : '',
-			},
-			body: formData,
-		});
-		return handleResponse(response);
-	},
-
-	update: async (id, formData) => {
-		const token = localStorage.getItem('token');
-		const response = await fetch(`${API_BASE_URL}/causes/${id}`, {
-			method: 'PUT',
-			headers: {
-				Authorization: token ? `Bearer ${token}` : '',
-			},
-			body: formData,
-		});
-		return handleResponse(response);
-	},
-
-	delete: async (id) => {
-		const token = localStorage.getItem('token');
-		const response = await fetch(`${API_BASE_URL}/causes/${id}`, {
-			method: 'DELETE',
-			headers: {
-				Authorization: token ? `Bearer ${token}` : '',
-			},
-		});
-		return handleResponse(response);
-	},
-};
-
-// Export all API modules
-window.API = {
-	auth: authAPI,
-	donationAPI: donationAPI,
-	contactAPI: contactAPI,
-	volunteerAPI: volunteerAPI,
-	eventAPI: eventAPI,
-	blogAPI: blogAPI,
-	galleryAPI: galleryAPI,
-	teamAPI: teamAPI,
-	causeAPI: causeAPI,
 };

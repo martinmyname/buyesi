@@ -86,7 +86,7 @@
 
     <script src="js/jquery.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
-    <script src="js/api.js"></script>
+    <script src="js/api.min.js"></script>
     <script>
         $(document).ready(function() {
             // Check if user is already logged in
@@ -115,7 +115,11 @@
                     // Redirect to admin page
                     window.location.href = 'admin.html';
                 } catch (error) {
-                    $('#errorAlert').text(error.message || 'Invalid email or password').show();
+                    if (error.message.includes('Authentication endpoint not found')) {
+                        $('#errorAlert').text('Authentication system is currently unavailable. Please contact support.').show();
+                    } else {
+                        $('#errorAlert').text(error.message || 'Invalid email or password').show();
+                    }
                 } finally {
                     $('#loadingSpinner').hide();
                     $('#loginButton').prop('disabled', false);
