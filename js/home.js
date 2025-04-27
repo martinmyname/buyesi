@@ -39,12 +39,181 @@ document.addEventListener('DOMContentLoaded', async function () {
 	}
 });
 
+// Initialize carousels
+function initializeCausesCarousel() {
+	$('.carousel-cause').owlCarousel({
+		autoplay: true,
+		center: true,
+		loop: true,
+		items: 1,
+		margin: 30,
+		stagePadding: 0,
+		nav: true,
+		navText: [
+			'<span class="ion-ios-arrow-back">',
+			'<span class="ion-ios-arrow-forward">',
+		],
+		responsive: {
+			0: {
+				items: 1,
+				stagePadding: 0,
+			},
+			600: {
+				items: 2,
+				stagePadding: 50,
+			},
+			1000: {
+				items: 3,
+				stagePadding: 100,
+			},
+		},
+	});
+}
+
+function initializeBlogCarousel() {
+	$('.carousel-blog').owlCarousel({
+		autoplay: true,
+		center: true,
+		loop: true,
+		items: 1,
+		margin: 30,
+		stagePadding: 0,
+		nav: true,
+		navText: [
+			'<span class="ion-ios-arrow-back">',
+			'<span class="ion-ios-arrow-forward">',
+		],
+		responsive: {
+			0: {
+				items: 1,
+				stagePadding: 0,
+			},
+			600: {
+				items: 2,
+				stagePadding: 50,
+			},
+			1000: {
+				items: 3,
+				stagePadding: 100,
+			},
+		},
+	});
+}
+
+function initializeTeamCarousel() {
+	$('.carousel-team').owlCarousel({
+		autoplay: true,
+		center: true,
+		loop: true,
+		items: 1,
+		margin: 30,
+		stagePadding: 0,
+		nav: true,
+		navText: [
+			'<span class="ion-ios-arrow-back">',
+			'<span class="ion-ios-arrow-forward">',
+		],
+		responsive: {
+			0: {
+				items: 1,
+				stagePadding: 0,
+			},
+			600: {
+				items: 2,
+				stagePadding: 50,
+			},
+			1000: {
+				items: 3,
+				stagePadding: 100,
+			},
+		},
+	});
+}
+
+function initializeGalleryCarousel() {
+	$('.carousel-gallery').owlCarousel({
+		autoplay: true,
+		center: true,
+		loop: true,
+		items: 1,
+		margin: 30,
+		stagePadding: 0,
+		nav: true,
+		navText: [
+			'<span class="ion-ios-arrow-back">',
+			'<span class="ion-ios-arrow-forward">',
+		],
+		responsive: {
+			0: {
+				items: 1,
+				stagePadding: 0,
+			},
+			600: {
+				items: 2,
+				stagePadding: 50,
+			},
+			1000: {
+				items: 3,
+				stagePadding: 100,
+			},
+		},
+	});
+
+	// Initialize the lightbox for gallery images
+	$('.image-popup').magnificPopup({
+		type: 'image',
+		closeOnContentClick: true,
+		closeBtnInside: false,
+		fixedContentPos: true,
+		mainClass: 'mfp-no-margins mfp-with-zoom',
+		image: {
+			verticalFit: true,
+		},
+		zoom: {
+			enabled: true,
+			duration: 300,
+		},
+	});
+}
+
+function initializeEventsCarousel() {
+	$('.carousel-events').owlCarousel({
+		autoplay: true,
+		center: true,
+		loop: true,
+		items: 1,
+		margin: 30,
+		stagePadding: 0,
+		nav: true,
+		navText: [
+			'<span class="ion-ios-arrow-back">',
+			'<span class="ion-ios-arrow-forward">',
+		],
+		responsive: {
+			0: {
+				items: 1,
+				stagePadding: 0,
+			},
+			600: {
+				items: 2,
+				stagePadding: 50,
+			},
+			1000: {
+				items: 3,
+				stagePadding: 100,
+			},
+		},
+	});
+}
+
+// Load latest causes
 async function loadLatestCauses() {
 	try {
 		const response = await fetchFromApi(ENDPOINTS.CAUSES);
 		if (response && response.data) {
 			const causesContainer = document.querySelector('.carousel-cause');
 			if (causesContainer) {
+				causesContainer.innerHTML = ''; // Clear existing content
 				response.data.forEach((cause) => {
 					// Construct the image URL properly
 					let imageUrl;
@@ -98,12 +267,14 @@ async function loadLatestCauses() {
 	}
 }
 
+// Load latest blogs
 async function loadLatestBlogs() {
 	try {
 		const response = await fetchFromApi(ENDPOINTS.BLOGS);
 		if (response && response.data) {
 			const blogContainer = document.querySelector('.carousel-blog');
 			if (blogContainer) {
+				blogContainer.innerHTML = ''; // Clear existing content
 				response.data.forEach((blog) => {
 					// Construct the image URL properly
 					let imageUrl;
@@ -157,12 +328,14 @@ async function loadLatestBlogs() {
 	}
 }
 
+// Load team members
 async function loadTeamMembers() {
 	try {
 		const response = await fetchFromApi(ENDPOINTS.TEAM);
 		if (response && response.data) {
 			const teamContainer = document.querySelector('.carousel-team');
 			if (teamContainer) {
+				teamContainer.innerHTML = ''; // Clear existing content
 				response.data.forEach((member) => {
 					// Construct the image URL properly
 					let imageUrl;
@@ -236,12 +409,14 @@ async function loadTeamMembers() {
 	}
 }
 
+// Load gallery images
 async function loadGalleryImages() {
 	try {
 		const response = await fetchFromApi(ENDPOINTS.GALLERY);
 		if (response && response.data) {
 			const galleryContainer = document.querySelector('.carousel-gallery');
 			if (galleryContainer) {
+				galleryContainer.innerHTML = ''; // Clear existing content
 				response.data.forEach((image) => {
 					// Construct the image URL properly
 					let imageUrl;
@@ -280,12 +455,14 @@ async function loadGalleryImages() {
 	}
 }
 
+// Load latest events
 async function loadLatestEvents() {
 	try {
 		const response = await fetchFromApi(ENDPOINTS.EVENTS);
 		if (response && response.data) {
 			const eventsContainer = document.querySelector('.carousel-events');
 			if (eventsContainer) {
+				eventsContainer.innerHTML = ''; // Clear existing content
 				response.data.forEach((event) => {
 					// Construct the image URL properly
 					let imageUrl;
