@@ -1,5 +1,5 @@
-// Import API modules
-import { API_BASE_URL, ENDPOINTS, fetchFromApi } from './api.js';
+// Access the API objects from the window.API namespace instead of redeclaring them
+const { BASE_URL: API_BASE_URL, ENDPOINTS, fetchFromApi } = window.API;
 
 // Load recent blog posts for footer
 const loadRecentBlogs = async () => {

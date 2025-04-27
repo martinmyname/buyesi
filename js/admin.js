@@ -42,6 +42,218 @@ if (!window.API) {
 				return response.json();
 			},
 		},
+		teamAPI: {
+			getAll: async () => {
+				const token = localStorage.getItem('token');
+				const response = await fetch('https://buyesi.onrender.com/team', {
+					headers: {
+						Authorization: token ? `Bearer ${token}` : '',
+					},
+				});
+				return response.json();
+			},
+			getById: async (id) => {
+				const token = localStorage.getItem('token');
+				const response = await fetch(`https://buyesi.onrender.com/team/${id}`, {
+					headers: {
+						Authorization: token ? `Bearer ${token}` : '',
+					},
+				});
+				return response.json();
+			},
+			create: async (formData) => {
+				const token = localStorage.getItem('token');
+				const response = await fetch('https://buyesi.onrender.com/team', {
+					method: 'POST',
+					headers: {
+						Authorization: token ? `Bearer ${token}` : '',
+					},
+					body: formData,
+				});
+				return response.json();
+			},
+			update: async (id, formData) => {
+				const token = localStorage.getItem('token');
+				const response = await fetch(`https://buyesi.onrender.com/team/${id}`, {
+					method: 'PUT',
+					headers: {
+						Authorization: token ? `Bearer ${token}` : '',
+					},
+					body: formData,
+				});
+				return response.json();
+			},
+			delete: async (id) => {
+				const token = localStorage.getItem('token');
+				const response = await fetch(`https://buyesi.onrender.com/team/${id}`, {
+					method: 'DELETE',
+					headers: {
+						Authorization: token ? `Bearer ${token}` : '',
+					},
+				});
+				return response.json();
+			},
+		},
+		blogAPI: {
+			getAll: async () => {
+				const token = localStorage.getItem('token');
+				const response = await fetch('https://buyesi.onrender.com/blog', {
+					headers: {
+						Authorization: token ? `Bearer ${token}` : '',
+					},
+				});
+				return response.json();
+			},
+			getById: async (id) => {
+				const token = localStorage.getItem('token');
+				const response = await fetch(`https://buyesi.onrender.com/blog/${id}`, {
+					headers: {
+						Authorization: token ? `Bearer ${token}` : '',
+					},
+				});
+				return response.json();
+			},
+			create: async (formData) => {
+				const token = localStorage.getItem('token');
+				const response = await fetch('https://buyesi.onrender.com/blog', {
+					method: 'POST',
+					headers: {
+						Authorization: token ? `Bearer ${token}` : '',
+					},
+					body: formData,
+				});
+				return response.json();
+			},
+			update: async (id, formData) => {
+				const token = localStorage.getItem('token');
+				const response = await fetch(`https://buyesi.onrender.com/blog/${id}`, {
+					method: 'PUT',
+					headers: {
+						Authorization: token ? `Bearer ${token}` : '',
+					},
+					body: formData,
+				});
+				return response.json();
+			},
+			delete: async (id) => {
+				const token = localStorage.getItem('token');
+				const response = await fetch(`https://buyesi.onrender.com/blog/${id}`, {
+					method: 'DELETE',
+					headers: {
+						Authorization: token ? `Bearer ${token}` : '',
+					},
+				});
+				return response.json();
+			},
+		},
+		eventAPI: {
+			getAll: async () => {
+				const token = localStorage.getItem('token');
+				const response = await fetch('https://buyesi.onrender.com/events', {
+					headers: {
+						Authorization: token ? `Bearer ${token}` : '',
+					},
+				});
+				return response.json();
+			},
+			getById: async (id) => {
+				const token = localStorage.getItem('token');
+				const response = await fetch(
+					`https://buyesi.onrender.com/events/${id}`,
+					{
+						headers: {
+							Authorization: token ? `Bearer ${token}` : '',
+						},
+					}
+				);
+				return response.json();
+			},
+			create: async (formData) => {
+				const token = localStorage.getItem('token');
+				const response = await fetch('https://buyesi.onrender.com/events', {
+					method: 'POST',
+					headers: {
+						Authorization: token ? `Bearer ${token}` : '',
+					},
+					body: formData,
+				});
+				return response.json();
+			},
+			update: async (id, formData) => {
+				const token = localStorage.getItem('token');
+				const response = await fetch(
+					`https://buyesi.onrender.com/events/${id}`,
+					{
+						method: 'PUT',
+						headers: {
+							Authorization: token ? `Bearer ${token}` : '',
+						},
+						body: formData,
+					}
+				);
+				return response.json();
+			},
+			delete: async (id) => {
+				const token = localStorage.getItem('token');
+				const response = await fetch(
+					`https://buyesi.onrender.com/events/${id}`,
+					{
+						method: 'DELETE',
+						headers: {
+							Authorization: token ? `Bearer ${token}` : '',
+						},
+					}
+				);
+				return response.json();
+			},
+		},
+		galleryAPI: {
+			getAll: async () => {
+				const token = localStorage.getItem('token');
+				const response = await fetch('https://buyesi.onrender.com/gallery', {
+					headers: {
+						Authorization: token ? `Bearer ${token}` : '',
+					},
+				});
+				return response.json();
+			},
+			getById: async (id) => {
+				const token = localStorage.getItem('token');
+				const response = await fetch(
+					`https://buyesi.onrender.com/gallery/${id}`,
+					{
+						headers: {
+							Authorization: token ? `Bearer ${token}` : '',
+						},
+					}
+				);
+				return response.json();
+			},
+			create: async (formData) => {
+				const token = localStorage.getItem('token');
+				const response = await fetch('https://buyesi.onrender.com/gallery', {
+					method: 'POST',
+					headers: {
+						Authorization: token ? `Bearer ${token}` : '',
+					},
+					body: formData,
+				});
+				return response.json();
+			},
+			delete: async (id) => {
+				const token = localStorage.getItem('token');
+				const response = await fetch(
+					`https://buyesi.onrender.com/gallery/${id}`,
+					{
+						method: 'DELETE',
+						headers: {
+							Authorization: token ? `Bearer ${token}` : '',
+						},
+					}
+				);
+				return response.json();
+			},
+		},
 	};
 }
 

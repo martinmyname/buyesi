@@ -1,16 +1,16 @@
-// Import API modules
-import {
-	causeAPI,
-	blogAPI,
-	teamAPI,
-	galleryAPI,
-	eventAPI,
-	volunteerAPI,
-	donationAPI,
+// Access the API objects from the window.API namespace instead of redeclaring them
+const {
+	cause: causeAPI,
+	blog: blogAPI,
+	team: teamAPI,
+	gallery: galleryAPI,
+	event: eventAPI,
+	volunteer: volunteerAPI,
+	donation: donationAPI,
 	ENDPOINTS,
 	fetchFromApi,
-} from './api.js';
-import { API_BASE_URL } from './api.js';
+	BASE_URL: API_BASE_URL,
+} = window.API;
 
 document.addEventListener('DOMContentLoaded', async function () {
 	try {
