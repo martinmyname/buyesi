@@ -39,145 +39,10 @@ document.addEventListener('DOMContentLoaded', async function () {
 	}
 });
 
-// Initialize carousels
-function initializeCausesCarousel() {
-	$('.carousel-cause').owlCarousel({
-		autoplay: true,
-		center: true,
-		loop: true,
-		items: 1,
-		margin: 30,
-		stagePadding: 0,
-		nav: true,
-		navText: [
-			'<span class="ion-ios-arrow-back">',
-			'<span class="ion-ios-arrow-forward">',
-		],
-		responsive: {
-			0: {
-				items: 1,
-				stagePadding: 0,
-			},
-			600: {
-				items: 2,
-				stagePadding: 50,
-			},
-			1000: {
-				items: 3,
-				stagePadding: 100,
-			},
-		},
-	});
-}
-
-function initializeBlogCarousel() {
-	$('.carousel-blog').owlCarousel({
-		autoplay: true,
-		center: true,
-		loop: true,
-		items: 1,
-		margin: 30,
-		stagePadding: 0,
-		nav: true,
-		navText: [
-			'<span class="ion-ios-arrow-back">',
-			'<span class="ion-ios-arrow-forward">',
-		],
-		responsive: {
-			0: {
-				items: 1,
-				stagePadding: 0,
-			},
-			600: {
-				items: 2,
-				stagePadding: 50,
-			},
-			1000: {
-				items: 3,
-				stagePadding: 100,
-			},
-		},
-	});
-}
-
-function initializeTeamCarousel() {
-	$('.carousel-team').owlCarousel({
-		autoplay: true,
-		center: true,
-		loop: true,
-		items: 1,
-		margin: 30,
-		stagePadding: 0,
-		nav: true,
-		navText: [
-			'<span class="ion-ios-arrow-back">',
-			'<span class="ion-ios-arrow-forward">',
-		],
-		responsive: {
-			0: {
-				items: 1,
-				stagePadding: 0,
-			},
-			600: {
-				items: 2,
-				stagePadding: 50,
-			},
-			1000: {
-				items: 3,
-				stagePadding: 100,
-			},
-		},
-	});
-}
-
-function initializeGalleryCarousel() {
-	$('.carousel-gallery').owlCarousel({
-		autoplay: true,
-		center: true,
-		loop: true,
-		items: 1,
-		margin: 30,
-		stagePadding: 0,
-		nav: true,
-		navText: [
-			'<span class="ion-ios-arrow-back">',
-			'<span class="ion-ios-arrow-forward">',
-		],
-		responsive: {
-			0: {
-				items: 1,
-				stagePadding: 0,
-			},
-			600: {
-				items: 2,
-				stagePadding: 50,
-			},
-			1000: {
-				items: 3,
-				stagePadding: 100,
-			},
-		},
-	});
-
-	// Initialize the lightbox for gallery images
-	$('.image-popup').magnificPopup({
-		type: 'image',
-		closeOnContentClick: true,
-		closeBtnInside: false,
-		fixedContentPos: true,
-		mainClass: 'mfp-no-margins mfp-with-zoom',
-		image: {
-			verticalFit: true,
-		},
-		zoom: {
-			enabled: true,
-			duration: 300,
-		},
-	});
-}
-
-function initializeEventsCarousel() {
-	$('.carousel-events').owlCarousel({
+// Initialize carousel
+function initializeCarousel(selector) {
+	console.log(`Initializing carousel for ${selector}`);
+	$(selector).owlCarousel({
 		autoplay: true,
 		center: true,
 		loop: true,
@@ -209,12 +74,18 @@ function initializeEventsCarousel() {
 // Load latest causes
 async function loadLatestCauses() {
 	try {
+		console.log('Loading causes...');
 		const response = await fetchFromApi(ENDPOINTS.CAUSES);
+		console.log('Causes response:', response);
+
 		if (response && response.data) {
 			const causesContainer = document.querySelector('.carousel-cause');
+			console.log('Causes container:', causesContainer);
+
 			if (causesContainer) {
 				causesContainer.innerHTML = ''; // Clear existing content
 				response.data.forEach((cause) => {
+					console.log('Processing cause:', cause);
 					// Construct the image URL properly
 					let imageUrl;
 					if (cause.image) {
@@ -258,7 +129,7 @@ async function loadLatestCauses() {
 					`;
 					causesContainer.appendChild(causeElement);
 				});
-				initializeCausesCarousel();
+				initializeCarousel('.carousel-cause');
 			}
 		}
 	} catch (error) {
@@ -270,12 +141,18 @@ async function loadLatestCauses() {
 // Load latest blogs
 async function loadLatestBlogs() {
 	try {
+		console.log('Loading blogs...');
 		const response = await fetchFromApi(ENDPOINTS.BLOGS);
+		console.log('Blogs response:', response);
+
 		if (response && response.data) {
 			const blogContainer = document.querySelector('.carousel-blog');
+			console.log('Blog container:', blogContainer);
+
 			if (blogContainer) {
 				blogContainer.innerHTML = ''; // Clear existing content
 				response.data.forEach((blog) => {
+					console.log('Processing blog:', blog);
 					// Construct the image URL properly
 					let imageUrl;
 					if (blog.image) {
@@ -319,7 +196,7 @@ async function loadLatestBlogs() {
 					`;
 					blogContainer.appendChild(blogElement);
 				});
-				initializeBlogCarousel();
+				initializeCarousel('.carousel-blog');
 			}
 		}
 	} catch (error) {
@@ -331,12 +208,18 @@ async function loadLatestBlogs() {
 // Load team members
 async function loadTeamMembers() {
 	try {
+		console.log('Loading team members...');
 		const response = await fetchFromApi(ENDPOINTS.TEAM);
+		console.log('Team response:', response);
+
 		if (response && response.data) {
 			const teamContainer = document.querySelector('.carousel-team');
+			console.log('Team container:', teamContainer);
+
 			if (teamContainer) {
 				teamContainer.innerHTML = ''; // Clear existing content
 				response.data.forEach((member) => {
+					console.log('Processing team member:', member);
 					// Construct the image URL properly
 					let imageUrl;
 					if (member.image) {
@@ -397,7 +280,7 @@ async function loadTeamMembers() {
 					`;
 					teamContainer.appendChild(memberElement);
 				});
-				initializeTeamCarousel();
+				initializeCarousel('.carousel-team');
 			}
 		}
 	} catch (error) {
@@ -412,12 +295,18 @@ async function loadTeamMembers() {
 // Load gallery images
 async function loadGalleryImages() {
 	try {
+		console.log('Loading gallery images...');
 		const response = await fetchFromApi(ENDPOINTS.GALLERY);
+		console.log('Gallery response:', response);
+
 		if (response && response.data) {
 			const galleryContainer = document.querySelector('.carousel-gallery');
+			console.log('Gallery container:', galleryContainer);
+
 			if (galleryContainer) {
 				galleryContainer.innerHTML = ''; // Clear existing content
 				response.data.forEach((image) => {
+					console.log('Processing gallery image:', image);
 					// Construct the image URL properly
 					let imageUrl;
 					if (image.url) {
@@ -443,7 +332,23 @@ async function loadGalleryImages() {
 					`;
 					galleryContainer.appendChild(imageElement);
 				});
-				initializeGalleryCarousel();
+				initializeCarousel('.carousel-gallery');
+
+				// Initialize the lightbox for gallery images
+				$('.image-popup').magnificPopup({
+					type: 'image',
+					closeOnContentClick: true,
+					closeBtnInside: false,
+					fixedContentPos: true,
+					mainClass: 'mfp-no-margins mfp-with-zoom',
+					image: {
+						verticalFit: true,
+					},
+					zoom: {
+						enabled: true,
+						duration: 300,
+					},
+				});
 			}
 		}
 	} catch (error) {
@@ -458,12 +363,18 @@ async function loadGalleryImages() {
 // Load latest events
 async function loadLatestEvents() {
 	try {
+		console.log('Loading events...');
 		const response = await fetchFromApi(ENDPOINTS.EVENTS);
+		console.log('Events response:', response);
+
 		if (response && response.data) {
 			const eventsContainer = document.querySelector('.carousel-events');
+			console.log('Events container:', eventsContainer);
+
 			if (eventsContainer) {
 				eventsContainer.innerHTML = ''; // Clear existing content
 				response.data.forEach((event) => {
+					console.log('Processing event:', event);
 					// Construct the image URL properly
 					let imageUrl;
 					if (event.image) {
@@ -508,7 +419,7 @@ async function loadLatestEvents() {
 					`;
 					eventsContainer.appendChild(eventElement);
 				});
-				initializeEventsCarousel();
+				initializeCarousel('.carousel-events');
 			}
 		}
 	} catch (error) {
@@ -665,6 +576,7 @@ function calculateProgress(cause) {
 
 // Initialize all sections when DOM is loaded
 document.addEventListener('DOMContentLoaded', async () => {
+	console.log('DOM loaded, initializing sections...');
 	try {
 		await Promise.all([
 			loadLatestCauses(),
@@ -673,6 +585,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 			loadGalleryImages(),
 			loadLatestEvents(),
 		]);
+		console.log('All sections initialized');
 	} catch (error) {
 		console.error('Error initializing page:', error);
 	}
