@@ -8,6 +8,7 @@ import {
 	volunteerAPI,
 	donationAPI,
 } from './api.js';
+import { API_BASE_URL } from './api.js';
 
 document.addEventListener('DOMContentLoaded', async function () {
 	try {

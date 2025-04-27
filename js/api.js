@@ -385,18 +385,18 @@ const blogAPI = {
 // Team API
 const teamAPI = {
 	getAll: async () => {
-		const response = await fetch(`${API_BASE_URL}/team`);
+		const response = await fetch(`${API_BASE_URL}/teams`);
 		return handleResponse(response);
 	},
 
 	getById: async (id) => {
-		const response = await fetch(`${API_BASE_URL}/team/${id}`);
+		const response = await fetch(`${API_BASE_URL}/teams/${id}`);
 		return handleResponse(response);
 	},
 
 	create: async (formData) => {
 		const token = localStorage.getItem('token');
-		const response = await fetch(`${API_BASE_URL}/team`, {
+		const response = await fetch(`${API_BASE_URL}/teams`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -409,7 +409,7 @@ const teamAPI = {
 
 	update: async (id, formData) => {
 		const token = localStorage.getItem('token');
-		const response = await fetch(`${API_BASE_URL}/team/${id}`, {
+		const response = await fetch(`${API_BASE_URL}/teams/${id}`, {
 			method: 'PUT',
 			headers: {
 				'Content-Type': 'application/json',
@@ -422,7 +422,7 @@ const teamAPI = {
 
 	delete: async (id) => {
 		const token = localStorage.getItem('token');
-		const response = await fetch(`${API_BASE_URL}/team/${id}`, {
+		const response = await fetch(`${API_BASE_URL}/teams/${id}`, {
 			method: 'DELETE',
 			headers: {
 				Authorization: token ? `Bearer ${token}` : '',
@@ -435,18 +435,18 @@ const teamAPI = {
 // Gallery API
 const galleryAPI = {
 	getAll: async () => {
-		const response = await fetch(`${API_BASE_URL}/gallery`);
+		const response = await fetch(`${API_BASE_URL}/galleries`);
 		return handleResponse(response);
 	},
 
 	getById: async (id) => {
-		const response = await fetch(`${API_BASE_URL}/gallery/${id}`);
+		const response = await fetch(`${API_BASE_URL}/galleries/${id}`);
 		return handleResponse(response);
 	},
 
 	create: async (formData) => {
 		const token = localStorage.getItem('token');
-		const response = await fetch(`${API_BASE_URL}/gallery`, {
+		const response = await fetch(`${API_BASE_URL}/galleries`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -459,7 +459,7 @@ const galleryAPI = {
 
 	update: async (id, formData) => {
 		const token = localStorage.getItem('token');
-		const response = await fetch(`${API_BASE_URL}/gallery/${id}`, {
+		const response = await fetch(`${API_BASE_URL}/galleries/${id}`, {
 			method: 'PUT',
 			headers: {
 				'Content-Type': 'application/json',
@@ -472,7 +472,7 @@ const galleryAPI = {
 
 	delete: async (id) => {
 		const token = localStorage.getItem('token');
-		const response = await fetch(`${API_BASE_URL}/gallery/${id}`, {
+		const response = await fetch(`${API_BASE_URL}/galleries/${id}`, {
 			method: 'DELETE',
 			headers: {
 				Authorization: token ? `Bearer ${token}` : '',
@@ -493,4 +493,5 @@ export {
 	blogAPI,
 	teamAPI,
 	galleryAPI,
+	API_BASE_URL,
 };
