@@ -1,15 +1,15 @@
 // API Configuration
-const API_BASE_URL = 'https://buyesi.onrender.com/api';
+const API_BASE_URL = 'https://buyesi.onrender.com';
 
 // API Endpoints
 const ENDPOINTS = {
 	BLOGS: `${API_BASE_URL}/blogs`,
 	CAUSES: `${API_BASE_URL}/causes`,
-	TEAM: `${API_BASE_URL}/team`,
-	GALLERY: `${API_BASE_URL}/gallery`,
+	TEAM: `${API_BASE_URL}/teams`,
+	GALLERY: `${API_BASE_URL}/galleries`,
 	EVENTS: `${API_BASE_URL}/events`,
 	CONTACT: `${API_BASE_URL}/contact`,
-	VOLUNTEER: `${API_BASE_URL}/volunteer`,
+	VOLUNTEER: `${API_BASE_URL}/volunteers`,
 };
 
 // API Response Handler
