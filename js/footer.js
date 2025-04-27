@@ -1,6 +1,9 @@
 // Import API modules
 import { blogAPI } from './api.js';
 
+// Get API_BASE_URL from window object
+const API_BASE_URL = window.API_BASE_URL;
+
 document.addEventListener('DOMContentLoaded', async function () {
 	try {
 		// Get the footer blog section with multiple selector options

@@ -1,5 +1,8 @@
 // Import API modules
-import { causeAPI, API_BASE_URL } from './api.js';
+import { causeAPI } from './api.js';
+
+// Get API_BASE_URL from window object
+const API_BASE_URL = window.API_BASE_URL;
 
 document.addEventListener('DOMContentLoaded', async function () {
 	try {

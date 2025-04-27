@@ -4,6 +4,9 @@ const API_BASE_URL =
 		? 'http://localhost:5000/api'
 		: 'https://buyesi.onrender.com/api';
 
+// Expose API_BASE_URL to window object
+window.API_BASE_URL = API_BASE_URL;
+
 // Helper function to handle API responses
 const handleResponse = async (response) => {
 	console.log(`API Response from ${response.url}:`, {
@@ -488,10 +491,9 @@ export {
 	donationAPI,
 	contactAPI,
 	volunteerAPI,
-	eventAPI,
-	causeAPI,
 	blogAPI,
-	teamAPI,
+	eventAPI,
 	galleryAPI,
-	API_BASE_URL,
+	teamAPI,
+	causeAPI,
 };
