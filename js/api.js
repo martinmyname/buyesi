@@ -282,16 +282,60 @@ const eventAPI = {
 	},
 };
 
-// Blog API
-const blogAPI = {
+// Cause API
+const causeAPI = {
 	getAll: async () => {
+		const response = await fetch(`${API_BASE_URL}/causes`);
+		return handleResponse(response);
+	},
+
+	getById: async (id) => {
+		const response = await fetch(`${API_BASE_URL}/causes/${id}`);
+		return handleResponse(response);
+	},
+
+	create: async (formData) => {
 		const token = localStorage.getItem('token');
-		const response = await fetch(`${API_BASE_URL}/blogs`, {
-			method: 'GET',
+		const response = await fetch(`${API_BASE_URL}/causes`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: token ? `Bearer ${token}` : '',
+			},
+			body: JSON.stringify(formData),
+		});
+		return handleResponse(response);
+	},
+
+	update: async (id, formData) => {
+		const token = localStorage.getItem('token');
+		const response = await fetch(`${API_BASE_URL}/causes/${id}`, {
+			method: 'PUT',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: token ? `Bearer ${token}` : '',
+			},
+			body: JSON.stringify(formData),
+		});
+		return handleResponse(response);
+	},
+
+	delete: async (id) => {
+		const token = localStorage.getItem('token');
+		const response = await fetch(`${API_BASE_URL}/causes/${id}`, {
+			method: 'DELETE',
 			headers: {
 				Authorization: token ? `Bearer ${token}` : '',
 			},
 		});
+		return handleResponse(response);
+	},
+};
+
+// Blog API
+const blogAPI = {
+	getAll: async () => {
+		const response = await fetch(`${API_BASE_URL}/blogs`);
 		return handleResponse(response);
 	},
 
@@ -305,9 +349,10 @@ const blogAPI = {
 		const response = await fetch(`${API_BASE_URL}/blogs`, {
 			method: 'POST',
 			headers: {
+				'Content-Type': 'application/json',
 				Authorization: token ? `Bearer ${token}` : '',
 			},
-			body: formData,
+			body: JSON.stringify(formData),
 		});
 		return handleResponse(response);
 	},
@@ -317,9 +362,10 @@ const blogAPI = {
 		const response = await fetch(`${API_BASE_URL}/blogs/${id}`, {
 			method: 'PUT',
 			headers: {
+				'Content-Type': 'application/json',
 				Authorization: token ? `Bearer ${token}` : '',
 			},
-			body: formData,
+			body: JSON.stringify(formData),
 		});
 		return handleResponse(response);
 	},
@@ -336,46 +382,47 @@ const blogAPI = {
 	},
 };
 
-// Gallery API
-const galleryAPI = {
+// Team API
+const teamAPI = {
 	getAll: async () => {
-		const token = localStorage.getItem('token');
-		const response = await fetch(`${API_BASE_URL}/galleries`, {
-			method: 'GET',
-			headers: {
-				Authorization: token ? `Bearer ${token}` : '',
-			},
-		});
+		const response = await fetch(`${API_BASE_URL}/team`);
+		return handleResponse(response);
+	},
+
+	getById: async (id) => {
+		const response = await fetch(`${API_BASE_URL}/team/${id}`);
 		return handleResponse(response);
 	},
 
 	create: async (formData) => {
 		const token = localStorage.getItem('token');
-		const response = await fetch(`${API_BASE_URL}/galleries`, {
+		const response = await fetch(`${API_BASE_URL}/team`, {
 			method: 'POST',
 			headers: {
+				'Content-Type': 'application/json',
 				Authorization: token ? `Bearer ${token}` : '',
 			},
-			body: formData,
+			body: JSON.stringify(formData),
 		});
 		return handleResponse(response);
 	},
 
 	update: async (id, formData) => {
 		const token = localStorage.getItem('token');
-		const response = await fetch(`${API_BASE_URL}/galleries/${id}`, {
+		const response = await fetch(`${API_BASE_URL}/team/${id}`, {
 			method: 'PUT',
 			headers: {
+				'Content-Type': 'application/json',
 				Authorization: token ? `Bearer ${token}` : '',
 			},
-			body: formData,
+			body: JSON.stringify(formData),
 		});
 		return handleResponse(response);
 	},
 
 	delete: async (id) => {
 		const token = localStorage.getItem('token');
-		const response = await fetch(`${API_BASE_URL}/galleries/${id}`, {
+		const response = await fetch(`${API_BASE_URL}/team/${id}`, {
 			method: 'DELETE',
 			headers: {
 				Authorization: token ? `Bearer ${token}` : '',
@@ -383,4 +430,67 @@ const galleryAPI = {
 		});
 		return handleResponse(response);
 	},
+};
+
+// Gallery API
+const galleryAPI = {
+	getAll: async () => {
+		const response = await fetch(`${API_BASE_URL}/gallery`);
+		return handleResponse(response);
+	},
+
+	getById: async (id) => {
+		const response = await fetch(`${API_BASE_URL}/gallery/${id}`);
+		return handleResponse(response);
+	},
+
+	create: async (formData) => {
+		const token = localStorage.getItem('token');
+		const response = await fetch(`${API_BASE_URL}/gallery`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: token ? `Bearer ${token}` : '',
+			},
+			body: JSON.stringify(formData),
+		});
+		return handleResponse(response);
+	},
+
+	update: async (id, formData) => {
+		const token = localStorage.getItem('token');
+		const response = await fetch(`${API_BASE_URL}/gallery/${id}`, {
+			method: 'PUT',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: token ? `Bearer ${token}` : '',
+			},
+			body: JSON.stringify(formData),
+		});
+		return handleResponse(response);
+	},
+
+	delete: async (id) => {
+		const token = localStorage.getItem('token');
+		const response = await fetch(`${API_BASE_URL}/gallery/${id}`, {
+			method: 'DELETE',
+			headers: {
+				Authorization: token ? `Bearer ${token}` : '',
+			},
+		});
+		return handleResponse(response);
+	},
+};
+
+// Export all APIs
+export {
+	authAPI,
+	donationAPI,
+	contactAPI,
+	volunteerAPI,
+	eventAPI,
+	causeAPI,
+	blogAPI,
+	teamAPI,
+	galleryAPI,
 };

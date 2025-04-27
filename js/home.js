@@ -1,3 +1,14 @@
+// Import API modules
+import {
+	causeAPI,
+	blogAPI,
+	teamAPI,
+	galleryAPI,
+	eventAPI,
+	volunteerAPI,
+	donationAPI,
+} from './api.js';
+
 document.addEventListener('DOMContentLoaded', async function () {
 	try {
 		// Load latest causes for the carousel
@@ -43,7 +54,7 @@ async function loadLatestCauses() {
 
 		// Fetch causes from the API
 		console.log('Fetching causes...');
-		const response = await window.API.causeAPI.getAll();
+		const response = await causeAPI.getAll();
 		console.log('API Response:', response);
 
 		// Handle both array response and object with data property
@@ -90,9 +101,9 @@ async function loadLatestCauses() {
 				if (cause.image.startsWith('http')) {
 					imageUrl = cause.image;
 				} else if (cause.image.includes('/uploads/')) {
-					imageUrl = `http://localhost:5000${cause.image}`;
+					imageUrl = `${API_BASE_URL}${cause.image}`;
 				} else {
-					imageUrl = `http://localhost:5000/uploads/general/${cause.image}`;
+					imageUrl = `${API_BASE_URL}/uploads/general/${cause.image}`;
 				}
 				console.log('Image URL for', cause.title, ':', imageUrl);
 			} else {
@@ -175,7 +186,7 @@ async function loadLatestBlogs() {
 
 		// Fetch blogs from the API
 		console.log('Fetching blogs...');
-		const response = await window.API.blogAPI.getAll();
+		const response = await blogAPI.getAll();
 		console.log('API Response:', response);
 
 		// Handle both array response and object with data property
@@ -216,9 +227,9 @@ async function loadLatestBlogs() {
 				if (blog.image.startsWith('http')) {
 					imageUrl = blog.image;
 				} else if (blog.image.includes('/uploads/')) {
-					imageUrl = `http://localhost:5000${blog.image}`;
+					imageUrl = `${API_BASE_URL}${blog.image}`;
 				} else {
-					imageUrl = `http://localhost:5000/uploads/blog/${blog.image}`;
+					imageUrl = `${API_BASE_URL}/uploads/blog/${blog.image}`;
 				}
 				console.log('Image URL for', blog.title, ':', imageUrl);
 			} else {
@@ -321,7 +332,7 @@ async function loadTeamMembers() {
 
 		// Fetch team members from the API
 		console.log('Fetching team members...');
-		const response = await window.API.teamAPI.getAll();
+		const response = await teamAPI.getAll();
 		console.log('API Response:', response);
 
 		// Handle both array response and object with data property
@@ -359,30 +370,54 @@ async function loadTeamMembers() {
 				if (member.image.startsWith('http')) {
 					imageUrl = member.image;
 				} else if (member.image.includes('/uploads/')) {
-					imageUrl = `http://localhost:5000${member.image}`;
+					imageUrl = `${API_BASE_URL}${member.image}`;
 				} else {
-					imageUrl = `http://localhost:5000/uploads/team/${member.image}`;
+					imageUrl = `${API_BASE_URL}/uploads/team/${member.image}`;
 				}
 				console.log('Image URL for', member.name, ':', imageUrl);
 			} else {
-				imageUrl = 'images/person-default.jpg';
+				imageUrl = 'images/team-default.jpg';
 			}
 
 			const memberHTML = `
-				<div class="item">
-					<div class="staff" style="padding: calc(1rem * 1); width: 100%;">
-						<div class="d-flex mb-4">
-							<div class="img" style="background-image: url(${imageUrl});"></div>
-							<div class="info ml-4">
-								<h3><a href="teacher-single.html?id=${member._id}">${member.name}</a></h3>
-								<span class="position">${member.position}</span>
-								${
-									member.bio
-										? `<p class="mt-2">${member.bio.substring(0, 50)}${
-												member.bio.length > 50 ? '...' : ''
-										  }</p>`
-										: ''
-								}
+				<div class="col-md-6 col-lg-3 ftco-animate">
+					<div class="staff">
+						<div class="img-wrap d-flex align-items-stretch">
+							<div class="img align-self-stretch" style="background-image: url(${imageUrl});"></div>
+						</div>
+						<div class="text pt-3 text-center">
+							<h3>${member.name}</h3>
+							<span class="position mb-2">${member.position}</span>
+							<div class="faded">
+								<p>${member.bio || ''}</p>
+								<ul class="ftco-social text-center">
+									${
+										member.socialLinks
+											? `
+										${
+											member.socialLinks.facebook
+												? `<li class="ftco-animate"><a href="${member.socialLinks.facebook}"><span class="icon-facebook"></span></a></li>`
+												: ''
+										}
+										${
+											member.socialLinks.twitter
+												? `<li class="ftco-animate"><a href="${member.socialLinks.twitter}"><span class="icon-twitter"></span></a></li>`
+												: ''
+										}
+										${
+											member.socialLinks.instagram
+												? `<li class="ftco-animate"><a href="${member.socialLinks.instagram}"><span class="icon-instagram"></span></a></li>`
+												: ''
+										}
+										${
+											member.socialLinks.linkedin
+												? `<li class="ftco-animate"><a href="${member.socialLinks.linkedin}"><span class="icon-linkedin"></span></a></li>`
+												: ''
+										}
+									`
+											: ''
+									}
+								</ul>
 							</div>
 						</div>
 					</div>
@@ -453,16 +488,16 @@ async function loadGalleryImages() {
 
 		// Fetch gallery images from the API
 		console.log('Fetching gallery images...');
-		const response = await window.API.galleryAPI.getAll();
+		const response = await galleryAPI.getAll();
 		console.log('API Response:', response);
 
 		// Handle both array response and object with data property
-		const galleryItems = Array.isArray(response)
+		const galleryImages = Array.isArray(response)
 			? response
 			: response.data || [];
-		console.log('Processed gallery items:', galleryItems);
+		console.log('Processed gallery images:', galleryImages);
 
-		if (!galleryItems || !galleryItems.length) {
+		if (!galleryImages || !galleryImages.length) {
 			gallerySection.innerHTML =
 				'<div class="col-12 text-center"><p>No gallery images found.</p></div>';
 			return;
@@ -471,102 +506,51 @@ async function loadGalleryImages() {
 		// Clear any existing content
 		gallerySection.innerHTML = '';
 
-		// Create a container for the carousel
-		const galleryCarouselContainer = document.createElement('div');
-		galleryCarouselContainer.className = 'col-md-12 ftco-animate';
-
-		// Create carousel element
-		const galleryCarousel = document.createElement('div');
-		galleryCarousel.className = 'carousel-gallery owl-carousel';
-		galleryCarouselContainer.appendChild(galleryCarousel);
-
-		// Append the carousel container to the section
-		gallerySection.appendChild(galleryCarouselContainer);
-
-		// Render each gallery item
-		galleryItems.forEach((item) => {
+		// Render each gallery image
+		galleryImages.forEach((image) => {
+			// Construct the image URL properly
 			let imageUrl;
-			if (item.image) {
-				if (item.image.startsWith('http')) {
-					imageUrl = item.image;
-				} else if (item.image.includes('/uploads/')) {
-					imageUrl = `http://localhost:5000${item.image}`;
+			if (image.url) {
+				if (image.url.startsWith('http')) {
+					imageUrl = image.url;
+				} else if (image.url.includes('/uploads/')) {
+					imageUrl = `${API_BASE_URL}${image.url}`;
 				} else {
-					imageUrl = `http://localhost:5000/uploads/gallery/${item.image}`;
+					imageUrl = `${API_BASE_URL}/uploads/gallery/${image.url}`;
 				}
-				console.log('Image URL for gallery item:', imageUrl);
+				console.log('Image URL for gallery:', imageUrl);
 			} else {
 				imageUrl = 'images/gallery-default.jpg';
 			}
 
-			const galleryItemHTML = `
-				<div class="item">
-					<a href="${imageUrl}" class="gallery image-popup d-flex justify-content-center align-items-center img ftco-animate" style="background-image: url(${imageUrl});">
-						<div class="icon d-flex justify-content-center align-items-center">
-							<span class="icon-search"></span>
+			const imageHTML = `
+				<div class="col-md-4 ftco-animate">
+					<a href="${imageUrl}" class="gallery image-popup img d-flex align-items-center" style="background-image: url(${imageUrl});">
+						<div class="icon mb-4 d-flex align-items-center justify-content-center">
+							<span class="icon-instagram"></span>
 						</div>
 					</a>
 				</div>
 			`;
 
-			galleryCarousel.innerHTML += galleryItemHTML;
+			gallerySection.innerHTML += imageHTML;
 		});
 
-		// Initialize owl carousel
-		$('.carousel-gallery').owlCarousel({
-			autoplay: true,
-			center: false,
-			loop: true,
-			items: 1,
-			margin: 0,
-			stagePadding: 0,
-			nav: true,
-			navText: [
-				'<span class="ion-ios-arrow-back">',
-				'<span class="ion-ios-arrow-forward">',
-			],
-			responsive: {
-				0: {
-					items: 1,
-					stagePadding: 0,
-				},
-				600: {
-					items: 2,
-					stagePadding: 0,
-				},
-				1000: {
-					items: 3,
-					stagePadding: 0,
-				},
-				1200: {
-					items: 4,
-					stagePadding: 0,
-				},
-			},
-		});
-
-		// Initialize magnific popup for gallery
-		$('.gallery').magnificPopup({
+		// Initialize the lightbox
+		$('.image-popup').magnificPopup({
 			type: 'image',
-			gallery: {
-				enabled: true,
+			closeOnContentClick: true,
+			closeBtnInside: false,
+			fixedContentPos: true,
+			mainClass: 'mfp-no-margins mfp-with-zoom',
+			image: {
+				verticalFit: true,
 			},
 			zoom: {
 				enabled: true,
 				duration: 300,
-				easing: 'ease-in-out',
 			},
 		});
-
-		// Initialize animations
-		if (typeof $.fn.waypoint !== 'undefined') {
-			$('.ftco-animate').waypoint(
-				function () {
-					$(this.element).addClass('fadeInUp ftco-animated');
-				},
-				{ offset: '95%' }
-			);
-		}
 	} catch (error) {
 		console.error('Failed to load gallery images:', error);
 	}
@@ -590,7 +574,7 @@ async function loadLatestEvents() {
 
 		// Fetch events from the API
 		console.log('Fetching events...');
-		const response = await window.API.eventAPI.getAll();
+		const response = await eventAPI.getAll();
 		console.log('API Response:', response);
 
 		// Handle both array response and object with data property
@@ -639,9 +623,9 @@ async function loadLatestEvents() {
 				if (event.image.startsWith('http')) {
 					imageUrl = event.image;
 				} else if (event.image.includes('/uploads/')) {
-					imageUrl = `http://localhost:5000${event.image}`;
+					imageUrl = `${API_BASE_URL}${event.image}`;
 				} else {
-					imageUrl = `http://localhost:5000/uploads/events/${event.image}`;
+					imageUrl = `${API_BASE_URL}/uploads/events/${event.image}`;
 				}
 				console.log('Image URL for', event.title, ':', imageUrl);
 			} else {
@@ -650,37 +634,30 @@ async function loadLatestEvents() {
 
 			const eventHTML = `
 				<div class="item">
-					<div class="blog-entry align-self-stretch">
-						<a href="event-single.html?id=${
-							event._id
-						}" class="block-20" style="background-image: url('${imageUrl}');">
-						</a>
-						<div class="text p-4 d-block">
-							<div class="meta mb-3">
-								<div><a href="#">${formattedDate}</a></div>
-								<div><a href="#">${event.organizer || 'Admin'}</a></div>
-								<div><a href="#" class="meta-chat"><span class="icon-chat"></span> ${
-									event.attendees?.length || 0
-								}</a></div>
-							</div>
-							<h3 class="heading mb-4"><a href="event-single.html?id=${event._id}">${
+					<div class="col-md-4 ftco-animate">
+						<div class="event-entry">
+							<a href="event-single.html?id=${
+								event._id
+							}" class="img" style="background-image: url(${imageUrl});"></a>
+							<div class="text p-4 p-md-5">
+								<div class="meta">
+									<div><a href="#">${formattedDate}</a></div>
+									<div><a href="#">${event.time || 'TBA'}</a></div>
+									<div><a href="#">${event.location || 'TBA'}</a></div>
+								</div>
+								<h3 class="mb-3"><a href="event-single.html?id=${event._id}">${
 				event.title
 			}</a></h3>
-							<p class="time-loc">
-								<span class="mr-2"><i class="icon-clock-o"></i> ${event.startTime} - ${
-				event.endTime
-			}</span>
-								<span><i class="icon-map-o"></i> ${event.location}</span>
-							</p>
-							<p>${
-								event.description
-									? event.description.substring(0, 100) +
-									  (event.description.length > 100 ? '...' : '')
-									: ''
-							}</p>
-							<p><a href="event-single.html?id=${
-								event._id
-							}">Join Event <i class="ion-ios-arrow-forward"></i></a></p>
+								<p>${
+									event.description
+										? event.description.substring(0, 100) +
+										  (event.description.length > 100 ? '...' : '')
+										: ''
+								}</p>
+								<p><a href="event-single.html?id=${
+									event._id
+								}" class="btn btn-primary">Read More</a></p>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -733,220 +710,129 @@ async function loadLatestEvents() {
 }
 
 function setupVolunteerForm() {
-	const volunteerForm = document.querySelector('.volunter-form');
+	const form = document.getElementById('volunteer-form');
+	if (!form) return;
 
-	if (volunteerForm) {
-		volunteerForm.addEventListener('submit', async function (e) {
-			e.preventDefault();
+	form.addEventListener('submit', async (e) => {
+		e.preventDefault();
 
-			// Get form data
-			const formElements = volunteerForm.elements;
-			const name = formElements[0].value.trim();
-			const email = formElements[1].value.trim();
-			const message = formElements[2].value.trim();
+		const submitButton = form.querySelector('button[type="submit"]');
+		const originalButtonText = submitButton.innerHTML;
+		submitButton.disabled = true;
+		submitButton.innerHTML =
+			'<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Submitting...';
 
-			// Form validation
-			if (!name || !email || !message) {
-				showAlert(
-					'Please fill in all required fields (name, email, and message)',
-					'danger',
-					volunteerForm
-				);
-				return;
-			}
+		try {
+			const formData = new FormData(form);
+			const volunteerData = {
+				name: formData.get('name'),
+				email: formData.get('email'),
+				phone: formData.get('phone'),
+				message: formData.get('message'),
+			};
 
-			// Email validation
-			const emailPattern = /^\S+@\S+\.\S+$/;
-			if (!emailPattern.test(email)) {
-				showAlert(
-					'Please enter a valid email address',
-					'danger',
-					volunteerForm
-				);
-				return;
-			}
-
-			// Disable submit button and show loading state
-			const submitBtn = volunteerForm.querySelector('input[type="submit"]');
-			const originalBtnValue = submitBtn.value;
-			submitBtn.value = 'Sending...';
-			submitBtn.disabled = true;
-
-			try {
-				// Register volunteer through the API
-				const response = await window.API.volunteerAPI.register({
-					name,
-					email,
-					message,
-				});
-
-				// Clear form
-				volunteerForm.reset();
-
-				// Show success message
-				showAlert(
-					'Thank you for volunteering! We will contact you soon.',
-					'success',
-					volunteerForm
-				);
-			} catch (error) {
-				console.error('Failed to register volunteer:', error);
-
-				// Check for the special EMAIL_ERROR flag
-				const errorMessage = error.message || '';
-				if (
-					errorMessage.startsWith('EMAIL_ERROR:') ||
-					errorMessage.includes('email') ||
-					errorMessage.includes('smtp') ||
-					errorMessage.includes('nodemailer') ||
-					errorMessage.includes('mail') ||
-					errorMessage.includes('login')
-				) {
-					// Still clear the form and show success message because the volunteer was registered
-					volunteerForm.reset();
-					showAlert(
-						'Thank you for volunteering! We will contact you soon.',
-						'success',
-						volunteerForm
-					);
-				} else {
-					// For other errors, show the error message
-					showAlert(
-						'Failed to register. Please try again later.',
-						'danger',
-						volunteerForm
-					);
-				}
-			} finally {
-				// Restore submit button
-				submitBtn.value = originalBtnValue;
-				submitBtn.disabled = false;
-			}
-		});
-	}
+			await volunteerAPI.register(volunteerData);
+			showAlert(
+				'Thank you for your interest in volunteering! We will contact you soon.',
+				'success',
+				form
+			);
+			form.reset();
+		} catch (error) {
+			console.error('Error submitting volunteer form:', error);
+			showAlert(
+				error.message || 'Failed to submit volunteer form. Please try again.',
+				'danger',
+				form
+			);
+		} finally {
+			submitButton.disabled = false;
+			submitButton.innerHTML = originalButtonText;
+		}
+	});
 }
 
 function setupDonationForm() {
-	const donationForm = document.querySelector('.donation-form');
+	const form = document.getElementById('donation-form');
+	if (!form) return;
 
-	if (donationForm) {
-		donationForm.addEventListener('submit', async function (e) {
-			e.preventDefault();
+	form.addEventListener('submit', async (e) => {
+		e.preventDefault();
 
-			// Get form data
-			const amount = document.getElementById('amount').value;
-			const name = document.getElementById('fullName').value;
-			const email = document.getElementById('donorEmail').value;
+		const submitButton = form.querySelector('button[type="submit"]');
+		const originalButtonText = submitButton.innerHTML;
+		submitButton.disabled = true;
+		submitButton.innerHTML =
+			'<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
 
-			// Form validation
-			if (!amount || !name || !email) {
-				showAlert('Please fill in all required fields', 'danger', donationForm);
-				return;
-			}
+		try {
+			const formData = new FormData(form);
+			const donationData = {
+				amount: parseFloat(formData.get('amount')),
+				name: formData.get('name'),
+				email: formData.get('email'),
+				message: formData.get('message'),
+			};
 
-			// Validate amount is a positive number
-			if (isNaN(amount) || parseFloat(amount) <= 0) {
-				showAlert(
-					'Please enter a valid donation amount',
-					'danger',
-					donationForm
-				);
-				return;
-			}
-
-			// Disable submit button and show loading state
-			const submitBtn = donationForm.querySelector('input[type="submit"]');
-			const originalBtnValue = submitBtn.value;
-			submitBtn.value = 'Processing...';
-			submitBtn.disabled = true;
-
-			try {
-				// Create donation through the API
-				const response = await window.API.donationAPI.create({
-					amount: parseFloat(amount),
-					name,
-					email,
-					// Add any other fields you capture in your form
-				});
-
-				// Clear form
-				donationForm.reset();
-
-				// Show success message
-				showAlert('Thank you for your donation!', 'success', donationForm);
-
-				// Optionally redirect to a payment gateway if your backend returns a payment URL
-				if (response.paymentUrl) {
-					window.location.href = response.paymentUrl;
-				}
-			} catch (error) {
-				console.error('Failed to process donation:', error);
-				showAlert(
-					'Failed to process donation. Please try again later.',
-					'danger',
-					donationForm
-				);
-			} finally {
-				// Restore submit button
-				submitBtn.value = originalBtnValue;
-				submitBtn.disabled = false;
-			}
-		});
-	}
+			await donationAPI.create(donationData);
+			showAlert(
+				'Thank you for your donation! We appreciate your support.',
+				'success',
+				form
+			);
+			form.reset();
+		} catch (error) {
+			console.error('Error submitting donation form:', error);
+			showAlert(
+				error.message || 'Failed to process donation. Please try again.',
+				'danger',
+				form
+			);
+		} finally {
+			submitButton.disabled = false;
+			submitButton.innerHTML = originalButtonText;
+		}
+	});
 }
 
-// Helper function to show alerts
 function showAlert(message, type, targetForm) {
 	const alertDiv = document.createElement('div');
-	alertDiv.className = `alert alert-${type} mt-3`;
-	alertDiv.textContent = message;
+	alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+	alertDiv.role = 'alert';
+	alertDiv.innerHTML = `
+		${message}
+		<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		</button>
+	`;
 
-	// Insert alert before the form or after it
 	if (targetForm) {
-		targetForm.parentNode.insertBefore(alertDiv, targetForm.nextSibling);
+		targetForm.insertAdjacentElement('beforebegin', alertDiv);
+	} else {
+		document.body.insertAdjacentElement('afterbegin', alertDiv);
 	}
 
-	// Auto remove after 5 seconds
+	// Auto-dismiss after 5 seconds
 	setTimeout(() => {
 		alertDiv.remove();
 	}, 5000);
 }
 
-// Helper function to format time ago
 function formatTimeAgo(dateString) {
 	const date = new Date(dateString);
 	const now = new Date();
-	const diffInSeconds = Math.floor((now - date) / 1000);
+	const seconds = Math.floor((now - date) / 1000);
+	const minutes = Math.floor(seconds / 60);
+	const hours = Math.floor(minutes / 60);
+	const days = Math.floor(hours / 24);
 
-	if (diffInSeconds < 60) {
-		return 'just now';
+	if (days > 0) {
+		return `${days} day${days === 1 ? '' : 's'} ago`;
+	} else if (hours > 0) {
+		return `${hours} hour${hours === 1 ? '' : 's'} ago`;
+	} else if (minutes > 0) {
+		return `${minutes} minute${minutes === 1 ? '' : 's'} ago`;
+	} else {
+		return 'Just now';
 	}
-
-	const diffInMinutes = Math.floor(diffInSeconds / 60);
-	if (diffInMinutes < 60) {
-		return `${diffInMinutes}m ago`;
-	}
-
-	const diffInHours = Math.floor(diffInMinutes / 60);
-	if (diffInHours < 24) {
-		return `${diffInHours}h ago`;
-	}
-
-	const diffInDays = Math.floor(diffInHours / 24);
-	if (diffInDays < 7) {
-		return `${diffInDays}d ago`;
-	}
-
-	const diffInWeeks = Math.floor(diffInDays / 7);
-	if (diffInWeeks < 4) {
-		return `${diffInWeeks}w ago`;
-	}
-
-	const diffInMonths = Math.floor(diffInDays / 30);
-	if (diffInMonths < 12) {
-		return `${diffInMonths}mo ago`;
-	}
-
-	const diffInYears = Math.floor(diffInDays / 365);
-	return `${diffInYears}y ago`;
 }

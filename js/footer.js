@@ -1,9 +1,14 @@
+// Import API modules
+import { blogAPI } from './api.js';
+
 document.addEventListener('DOMContentLoaded', async function () {
 	try {
 		// Get the footer blog section with multiple selector options
 		let footerBlogSection = document.querySelector('#recent-blog-posts');
 		if (!footerBlogSection) {
-			footerBlogSection = document.querySelector('.ftco-footer-widget.mb-4 div h2.ftco-heading-2:contains("Recent Blog")').parentElement;
+			footerBlogSection = document.querySelector(
+				'.ftco-footer-widget.mb-4 div h2.ftco-heading-2:contains("Recent Blog")'
+			).parentElement;
 		}
 		if (!footerBlogSection) {
 			footerBlogSection = document.querySelector('.ftco-footer-widget.mb-4');
@@ -28,12 +33,12 @@ document.addEventListener('DOMContentLoaded', async function () {
 		footerBlogSection.innerHTML += loadingHTML;
 
 		// Fetch blogs from the API
-		const response = await fetch('http://localhost:5000/api/blogs');
-		const data = await response.json();
-		const blogs = Array.isArray(data) ? data : data.data || [];
+		const response = await blogAPI.getAll();
+		const blogs = Array.isArray(response) ? response : response.data || [];
 
 		if (!blogs || !blogs.length) {
-			footerBlogSection.innerHTML = '<h2 class="ftco-heading-2">Recent Blog</h2><p>No blog posts available.</p>';
+			footerBlogSection.innerHTML =
+				'<h2 class="ftco-heading-2">Recent Blog</h2><p>No blog posts available.</p>';
 			return;
 		}
 
@@ -60,10 +65,9 @@ document.addEventListener('DOMContentLoaded', async function () {
 				if (blog.image.startsWith('http')) {
 					imageUrl = blog.image;
 				} else if (blog.image.includes('/uploads/')) {
-					// If the path already contains /uploads/, don't add it again
-					imageUrl = `http://localhost:5000${blog.image}`;
+					imageUrl = `${API_BASE_URL}${blog.image}`;
 				} else {
-					imageUrl = `http://localhost:5000/uploads/blog/${blog.image}`;
+					imageUrl = `${API_BASE_URL}/uploads/blog/${blog.image}`;
 				}
 			} else if (blog.imageUrl) {
 				imageUrl = blog.imageUrl;
@@ -110,13 +114,16 @@ document.addEventListener('DOMContentLoaded', async function () {
 		console.error('Failed to load blogs for footer:', error);
 		let footerBlogSection = document.querySelector('#recent-blog-posts');
 		if (!footerBlogSection) {
-			footerBlogSection = document.querySelector('.ftco-footer-widget.mb-4 div h2.ftco-heading-2:contains("Recent Blog")').parentElement;
+			footerBlogSection = document.querySelector(
+				'.ftco-footer-widget.mb-4 div h2.ftco-heading-2:contains("Recent Blog")'
+			).parentElement;
 		}
 		if (!footerBlogSection) {
 			footerBlogSection = document.querySelector('.ftco-footer-widget.mb-4');
 		}
 		if (footerBlogSection) {
-			footerBlogSection.innerHTML = '<h2 class="ftco-heading-2">Recent Blog</h2><p>Unable to load blog posts.</p>';
+			footerBlogSection.innerHTML =
+				'<h2 class="ftco-heading-2">Recent Blog</h2><p>Unable to load blog posts.</p>';
 		}
 	}
 });
