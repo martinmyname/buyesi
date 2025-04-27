@@ -20,6 +20,14 @@ const handleApiResponse = async (response) => {
 	return await response.json();
 };
 
+// Add the missing handleResponse function that's used by all API methods
+const handleResponse = async (response) => {
+	if (!response.ok) {
+		throw new Error(`HTTP error! status: ${response.status}`);
+	}
+	return await response.json();
+};
+
 // API Error Handler
 const handleApiError = (error) => {
 	console.error('API Error:', error);

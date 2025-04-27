@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
 async function loadCauses() {
 	try {
-		const causesContainer = document.querySelector('#causes-container');
+		const causesContainer = document.querySelector('.causes-container');
 		if (!causesContainer) {
 			console.error('Causes container not found');
 			return;
@@ -105,7 +105,7 @@ async function loadCauses() {
 		}
 	} catch (error) {
 		console.error('Failed to load causes:', error);
-		const causesContainer = document.querySelector('#causes-container');
+		const causesContainer = document.querySelector('.causes-container');
 		if (causesContainer) {
 			causesContainer.innerHTML =
 				'<div class="col-12 text-center"><p>Failed to load causes. Please try again later.</p></div>';

@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
 async function loadEvents() {
 	try {
-		const eventsContainer = document.querySelector('#events-container');
+		const eventsContainer = document.querySelector('.events-container');
 		if (!eventsContainer) {
 			console.error('Events container not found');
 			return;
@@ -112,7 +112,7 @@ async function loadEvents() {
 		}
 	} catch (error) {
 		console.error('Failed to load events:', error);
-		const eventsContainer = document.querySelector('#events-container');
+		const eventsContainer = document.querySelector('.events-container');
 		if (eventsContainer) {
 			eventsContainer.innerHTML =
 				'<div class="col-12 text-center"><p>Failed to load events. Please try again later.</p></div>';

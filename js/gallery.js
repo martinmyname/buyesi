@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
 async function loadGalleryImages() {
 	try {
-		const galleryContainer = document.querySelector('#gallery-container');
+		const galleryContainer = document.querySelector('.gallery-container');
 		if (!galleryContainer) {
 			console.error('Gallery container not found');
 			return;
@@ -91,7 +91,7 @@ async function loadGalleryImages() {
 		});
 	} catch (error) {
 		console.error('Failed to load gallery images:', error);
-		const galleryContainer = document.querySelector('#gallery-container');
+		const galleryContainer = document.querySelector('.gallery-container');
 		if (galleryContainer) {
 			galleryContainer.innerHTML =
 				'<div class="col-12 text-center"><p>Failed to load gallery images. Please try again later.</p></div>';

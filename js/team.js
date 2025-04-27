@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
 async function loadTeamMembers() {
 	try {
-		const teamContainer = document.querySelector('#team-container');
+		const teamContainer = document.querySelector('.team-container');
 		if (!teamContainer) {
 			console.error('Team container not found');
 			return;
@@ -110,7 +110,7 @@ async function loadTeamMembers() {
 		});
 	} catch (error) {
 		console.error('Failed to load team members:', error);
-		const teamContainer = document.querySelector('#team-container');
+		const teamContainer = document.querySelector('.team-container');
 		if (teamContainer) {
 			teamContainer.innerHTML =
 				'<div class="col-12 text-center"><p>Failed to load team members. Please try again later.</p></div>';

@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
 async function loadBlogs() {
 	try {
-		const blogsContainer = document.querySelector('#blogs-container');
+		const blogsContainer = document.querySelector('.blogs-container');
 		if (!blogsContainer) {
 			console.error('Blogs container not found');
 			return;
