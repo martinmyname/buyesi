@@ -1,19 +1,34 @@
+// Import API modules
+import { eventAPI, API_BASE_URL } from './api.js';
+
 document.addEventListener('DOMContentLoaded', async function () {
 	try {
-		// Get the container where events will be displayed
-		const eventsContainer = document.querySelector('.row.events-container');
+		await loadEvents();
+	} catch (error) {
+		console.error('Error loading events:', error);
+	}
+});
 
+async function loadEvents() {
+	try {
+		const eventsContainer = document.querySelector('#events-container');
 		if (!eventsContainer) {
-			console.error('Events container not found in the DOM');
+			console.error('Events container not found');
 			return;
 		}
 
-		// Clear any existing content
+		// Add loading state
 		eventsContainer.innerHTML =
 			'<div class="col-12 text-center"><div class="spinner-border text-primary" role="status"><span class="sr-only">Loading...</span></div></div>';
 
 		// Fetch events from the API
-		const events = await window.API.eventAPI.getAll();
+		console.log('Fetching events...');
+		const response = await eventAPI.getAll();
+		console.log('API Response:', response);
+
+		// Handle both array response and object with data property
+		const events = Array.isArray(response) ? response : response.data || [];
+		console.log('Processed events:', events);
 
 		if (!events || !events.length) {
 			eventsContainer.innerHTML =
@@ -21,11 +36,11 @@ document.addEventListener('DOMContentLoaded', async function () {
 			return;
 		}
 
-		// Clear the loading indicator
-		eventsContainer.innerHTML = '';
-
-		// Sort events by date (most recent first)
+		// Sort by date (most recent first)
 		events.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+		// Clear any existing content
+		eventsContainer.innerHTML = '';
 
 		// Render each event
 		events.forEach((event) => {
@@ -42,51 +57,43 @@ document.addEventListener('DOMContentLoaded', async function () {
 				if (event.image.startsWith('http')) {
 					imageUrl = event.image;
 				} else if (event.image.includes('/uploads/')) {
-					// If the path already contains /uploads/, don't add it again
-					imageUrl = `http://localhost:5000${event.image}`;
+					imageUrl = `${API_BASE_URL}${event.image}`;
 				} else {
-					imageUrl = `http://localhost:5000/uploads/events/${event.image}`;
+					imageUrl = `${API_BASE_URL}/uploads/events/${event.image}`;
 				}
 				console.log('Image URL for', event.title, ':', imageUrl);
-			} else if (event.imageUrl) {
-				imageUrl = event.imageUrl;
 			} else {
 				imageUrl = 'images/event-default.jpg';
 			}
 
 			const eventHTML = `
-        <div class="col-md-4 d-flex ftco-animate">
-          <div class="blog-entry align-self-stretch">
-            <a href="event-single.html?id=${
+				<div class="col-md-4 ftco-animate">
+					<div class="event-entry">
+						<a href="event-single.html?id=${
 							event._id
-						}" class="block-20" style="background-image: url('${imageUrl}');">
-            </a>
-            <div class="text p-4 d-block">
-              <div class="meta mb-3">
-                <div><a href="#">${formattedDate}</a></div>
-                <div><a href="#">${event.location || 'TBD'}</a></div>
-              </div>
-              <h3 class="heading mb-4"><a href="event-single.html?id=${
-								event._id
-							}">${event.title}</a></h3>
-              <p class="time-loc"><span class="mr-2"><i class="icon-clock-o"></i> ${
-								event.time || 'TBD'
-							}</span> <span><i class="icon-map-o"></i> ${
-				event.location || 'TBD'
-			}</span></p>
-              <p>${
+						}" class="img" style="background-image: url(${imageUrl});"></a>
+						<div class="text p-4 p-md-5">
+							<div class="meta">
+								<div><a href="#">${formattedDate}</a></div>
+								<div><a href="#">${event.time || 'TBA'}</a></div>
+								<div><a href="#">${event.location || 'TBA'}</a></div>
+							</div>
+							<h3 class="mb-3"><a href="event-single.html?id=${event._id}">${
+				event.title
+			}</a></h3>
+							<p>${
 								event.description
-									? event.description.substring(0, 120) +
-									  (event.description.length > 120 ? '...' : '')
+									? event.description.substring(0, 100) +
+									  (event.description.length > 100 ? '...' : '')
 									: ''
 							}</p>
-              <p><a href="event-single.html?id=${
+							<p><a href="event-single.html?id=${
 								event._id
-							}">Join Event <i class="ion-ios-arrow-forward"></i></a></p>
-            </div>
-          </div>
-        </div>
-      `;
+							}" class="btn btn-primary">Read More</a></p>
+						</div>
+					</div>
+				</div>
+			`;
 
 			eventsContainer.innerHTML += eventHTML;
 		});
@@ -101,10 +108,11 @@ document.addEventListener('DOMContentLoaded', async function () {
 			);
 		}
 	} catch (error) {
-		console.error('Failed to load events:', error.message, error.stack);
-		const eventsContainer = document.querySelector('.row.events-container');
+		console.error('Failed to load events:', error);
+		const eventsContainer = document.querySelector('#events-container');
 		if (eventsContainer) {
-			eventsContainer.innerHTML = `<div class="col-12 text-center"><p>Error loading events. Please try again later.</p></div>`;
+			eventsContainer.innerHTML =
+				'<div class="col-12 text-center"><p>Failed to load events. Please try again later.</p></div>';
 		}
 	}
-});
+}
