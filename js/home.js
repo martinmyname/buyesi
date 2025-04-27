@@ -71,6 +71,60 @@ function initializeCarousel(selector) {
 	});
 }
 
+// Create carousel container
+function createCarouselContainer(sectionId, title) {
+	const section = document.getElementById(sectionId);
+	if (!section) {
+		console.error(`Section with ID ${sectionId} not found`);
+		return null;
+	}
+
+	// Instead of recreating the entire structure, find the existing carousel container
+	const existingCarousel = section.querySelector(
+		`.carousel-${sectionId.split('-')[0]}`
+	);
+
+	if (existingCarousel) {
+		console.log(`Found existing carousel for ${sectionId}:`, existingCarousel);
+		// Clear existing items but keep the carousel structure
+		existingCarousel.innerHTML = '';
+		return existingCarousel;
+	} else {
+		console.error(`Carousel container not found in section ${sectionId}`);
+
+		// If no existing carousel found (fallback), create one
+		console.log(`Creating new carousel container for ${sectionId}`);
+		const container = document.createElement('div');
+		container.className = 'container';
+		container.innerHTML = `
+			<div class="row justify-content-center mb-5 pb-3">
+				<div class="col-md-7 heading-section text-center">
+					<h2 class="mb-4">${title}</h2>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<div class="carousel-${sectionId.split('-')[0]} owl-carousel"></div>
+				</div>
+			</div>
+		`;
+
+		// Clear existing content and append new container
+		section.innerHTML = '';
+		section.appendChild(container);
+
+		return section.querySelector(`.carousel-${sectionId.split('-')[0]}`);
+	}
+}
+
+// Get data from response
+function getDataFromResponse(response) {
+	if (Array.isArray(response)) {
+		return response;
+	}
+	return response?.data || [];
+}
+
 // Load latest causes
 async function loadLatestCauses() {
 	try {
@@ -78,59 +132,69 @@ async function loadLatestCauses() {
 		const response = await fetchFromApi(ENDPOINTS.CAUSES);
 		console.log('Causes response:', response);
 
-		if (response && response.data) {
-			const causesContainer = document.querySelector('.carousel-cause');
-			console.log('Causes container:', causesContainer);
+		const causes = getDataFromResponse(response);
+		console.log('Number of causes loaded:', causes.length);
 
-			if (causesContainer) {
-				causesContainer.innerHTML = ''; // Clear existing content
-				response.data.forEach((cause) => {
-					console.log('Processing cause:', cause);
-					// Construct the image URL properly
-					let imageUrl;
-					if (cause.image) {
-						if (cause.image.startsWith('http')) {
-							imageUrl = cause.image;
-						} else if (cause.image.includes('/uploads/')) {
-							imageUrl = `${API_BASE_URL}${cause.image}`;
-						} else {
-							imageUrl = `${API_BASE_URL}/uploads/causes/${cause.image}`;
-						}
-					} else {
-						imageUrl = 'images/cause-default.jpg';
-					}
+		// Get the existing carousel container element directly
+		const causesContainer = document.querySelector(
+			'#causes-section .carousel-cause'
+		);
+		console.log('Direct selector for causes container:', causesContainer);
 
-					const causeElement = document.createElement('div');
-					causeElement.className = 'item';
-					causeElement.innerHTML = `
-						<div class="cause-entry">
-							<a href="cause-single.html?id=${
-								cause._id
-							}" class="img" style="background-image: url(${imageUrl});"></a>
-							<div class="text p-3 p-md-4">
-								<h3><a href="cause-single.html?id=${cause._id}">${cause.title}</a></h3>
-								<p>${cause.description.substring(0, 100)}${
-						cause.description.length > 100 ? '...' : ''
-					}</p>
-								<span class="donation-time mb-3 d-block">Last donation ${formatTimeAgo(
-									cause.updatedAt
-								)}</span>
-								<div class="progress custom-progress-success">
-									<div class="progress-bar bg-primary" role="progressbar" style="width: ${calculateProgress(
-										cause
-									)}%" 
-										 aria-valuenow="${calculateProgress(
-												cause
-											)}" aria-valuemin="0" aria-valuemax="100"></div>
-								</div>
-								<span class="fund-raised d-block">$${cause.raisedAmount.toLocaleString()} raised of $${cause.targetAmount.toLocaleString()}</span>
+		if (!causesContainer) {
+			console.error('Could not find causes carousel container');
+			return;
+		}
+
+		// Clear existing content
+		causesContainer.innerHTML = '';
+
+		if (causes.length > 0) {
+			causes.forEach((cause, index) => {
+				console.log(
+					`Adding cause ${index + 1}/${causes.length} to DOM:`,
+					cause.title
+				);
+				const causeElement = document.createElement('div');
+				causeElement.className = 'item';
+				causeElement.innerHTML = `
+					<div class="cause-entry">
+						<a href="cause-single.html?id=${
+							cause._id
+						}" class="img" style="background-image: url(${getImageUrl(
+					cause.image,
+					'causes'
+				)});"></a>
+						<div class="text p-3 p-md-4">
+							<h3><a href="cause-single.html?id=${cause._id}">${cause.title}</a></h3>
+							<p>${cause.description.substring(0, 100)}${
+					cause.description.length > 100 ? '...' : ''
+				}</p>
+							<span class="donation-time mb-3 d-block">Last donation ${formatTimeAgo(
+								cause.updatedAt
+							)}</span>
+							<div class="progress custom-progress-success">
+								<div class="progress-bar bg-primary" role="progressbar" style="width: ${calculateProgress(
+									cause
+								)}%" 
+									 aria-valuenow="${calculateProgress(
+											cause
+										)}" aria-valuemin="0" aria-valuemax="100"></div>
 							</div>
+							<span class="fund-raised d-block">$${cause.raisedAmount.toLocaleString()} raised of $${cause.targetAmount.toLocaleString()}</span>
 						</div>
-					`;
-					causesContainer.appendChild(causeElement);
-				});
-				initializeCarousel('.carousel-cause');
-			}
+					</div>
+				`;
+				causesContainer.appendChild(causeElement);
+				console.log(`Cause ${index + 1} appended to container`);
+			});
+
+			console.log('All causes added to container, initializing carousel');
+			initializeCarousel('.carousel-cause');
+			console.log('Carousel initialized for causes');
+		} else {
+			console.warn('No causes data available');
+			showErrorMessage('causes-section', 'No causes available at this time.');
 		}
 	} catch (error) {
 		console.error('Failed to load causes:', error);
@@ -145,59 +209,69 @@ async function loadLatestBlogs() {
 		const response = await fetchFromApi(ENDPOINTS.BLOGS);
 		console.log('Blogs response:', response);
 
-		if (response && response.data) {
-			const blogContainer = document.querySelector('.carousel-blog');
-			console.log('Blog container:', blogContainer);
+		const blogs = getDataFromResponse(response);
+		console.log('Number of blogs loaded:', blogs.length);
 
-			if (blogContainer) {
-				blogContainer.innerHTML = ''; // Clear existing content
-				response.data.forEach((blog) => {
-					console.log('Processing blog:', blog);
-					// Construct the image URL properly
-					let imageUrl;
-					if (blog.image) {
-						if (blog.image.startsWith('http')) {
-							imageUrl = blog.image;
-						} else if (blog.image.includes('/uploads/')) {
-							imageUrl = `${API_BASE_URL}${blog.image}`;
-						} else {
-							imageUrl = `${API_BASE_URL}/uploads/blog/${blog.image}`;
-						}
-					} else {
-						imageUrl = 'images/blog-default.jpg';
-					}
+		// Get the existing carousel container element directly
+		const blogContainer = document.querySelector(
+			'#blog-section .carousel-blog'
+		);
+		console.log('Direct selector for blog container:', blogContainer);
 
-					const blogElement = document.createElement('div');
-					blogElement.className = 'item';
-					blogElement.innerHTML = `
-						<div class="blog-entry align-self-stretch">
-							<a href="blog-single.html?id=${
-								blog._id
-							}" class="block-20" style="background-image: url('${imageUrl}');"></a>
-							<div class="text p-4 d-block">
-								<div class="meta mb-3">
-									<div><a href="#">${new Date(blog.createdAt).toLocaleDateString()}</a></div>
-									<div><a href="#">${blog.author || 'Admin'}</a></div>
-									<div><a href="#" class="meta-chat"><span class="icon-chat"></span> ${
-										blog.comments?.length || 0
-									}</a></div>
-								</div>
-								<h3 class="heading mt-3"><a href="blog-single.html?id=${blog._id}">${
-						blog.title
-					}</a></h3>
-								<p>${
-									blog.content
-										? blog.content.substring(0, 150) +
-										  (blog.content.length > 150 ? '...' : '')
-										: ''
-								}</p>
+		if (!blogContainer) {
+			console.error('Could not find blog carousel container');
+			return;
+		}
+
+		// Clear existing content
+		blogContainer.innerHTML = '';
+
+		if (blogs.length > 0) {
+			blogs.forEach((blog, index) => {
+				console.log(
+					`Adding blog ${index + 1}/${blogs.length} to DOM:`,
+					blog.title
+				);
+				const blogElement = document.createElement('div');
+				blogElement.className = 'item';
+				blogElement.innerHTML = `
+					<div class="blog-entry align-self-stretch">
+						<a href="blog-single.html?id=${
+							blog._id
+						}" class="block-20" style="background-image: url('${getImageUrl(
+					blog.image,
+					'blog'
+				)}');"></a>
+						<div class="text p-4 d-block">
+							<div class="meta mb-3">
+								<div><a href="#">${new Date(blog.createdAt).toLocaleDateString()}</a></div>
+								<div><a href="#">${blog.author || 'Admin'}</a></div>
+								<div><a href="#" class="meta-chat"><span class="icon-chat"></span> ${
+									blog.comments?.length || 0
+								}</a></div>
 							</div>
-						</div>
-					`;
-					blogContainer.appendChild(blogElement);
-				});
-				initializeCarousel('.carousel-blog');
-			}
+							<h3 class="heading mt-3"><a href="blog-single.html?id=${blog._id}">${
+					blog.title
+				}</a></h3>
+							<p>${
+								blog.content
+									? blog.content.substring(0, 150) +
+									  (blog.content.length > 150 ? '...' : '')
+									: ''
+							}</p>
+					</div>
+				</div>
+			`;
+				blogContainer.appendChild(blogElement);
+				console.log(`Blog ${index + 1} appended to container`);
+			});
+
+			console.log('All blogs added to container, initializing carousel');
+			initializeCarousel('.carousel-blog');
+			console.log('Carousel initialized for blogs');
+		} else {
+			console.warn('No blogs data available');
+			showErrorMessage('blog-section', 'No blog posts available at this time.');
 		}
 	} catch (error) {
 		console.error('Failed to load blogs:', error);
@@ -212,76 +286,88 @@ async function loadTeamMembers() {
 		const response = await fetchFromApi(ENDPOINTS.TEAM);
 		console.log('Team response:', response);
 
-		if (response && response.data) {
-			const teamContainer = document.querySelector('.carousel-team');
-			console.log('Team container:', teamContainer);
+		const teamMembers = getDataFromResponse(response);
+		console.log('Number of team members loaded:', teamMembers.length);
 
-			if (teamContainer) {
-				teamContainer.innerHTML = ''; // Clear existing content
-				response.data.forEach((member) => {
-					console.log('Processing team member:', member);
-					// Construct the image URL properly
-					let imageUrl;
-					if (member.image) {
-						if (member.image.startsWith('http')) {
-							imageUrl = member.image;
-						} else if (member.image.includes('/uploads/')) {
-							imageUrl = `${API_BASE_URL}${member.image}`;
-						} else {
-							imageUrl = `${API_BASE_URL}/uploads/team/${member.image}`;
-						}
-					} else {
-						imageUrl = 'images/team-default.jpg';
-					}
+		// Get the existing carousel container element directly
+		const teamContainer = document.querySelector(
+			'#team-section .carousel-team'
+		);
+		console.log('Direct selector for team container:', teamContainer);
 
-					const memberElement = document.createElement('div');
-					memberElement.className = 'item';
-					memberElement.innerHTML = `
-						<div class="staff">
-							<div class="img-wrap d-flex align-items-stretch">
-								<div class="img align-self-stretch" style="background-image: url(${imageUrl});"></div>
-							</div>
-							<div class="text pt-3 text-center">
-								<h3>${member.name}</h3>
-								<span class="position mb-2">${member.position}</span>
-								<div class="faded">
-									<p>${member.bio || ''}</p>
-									<ul class="ftco-social text-center">
+		if (!teamContainer) {
+			console.error('Could not find team carousel container');
+			return;
+		}
+
+		// Clear existing content
+		teamContainer.innerHTML = '';
+
+		if (teamMembers.length > 0) {
+			teamMembers.forEach((member, index) => {
+				console.log(
+					`Adding team member ${index + 1}/${teamMembers.length} to DOM:`,
+					member.name
+				);
+				const memberElement = document.createElement('div');
+				memberElement.className = 'item';
+				memberElement.innerHTML = `
+					<div class="staff">
+						<div class="img-wrap d-flex align-items-stretch">
+							<div class="img align-self-stretch" style="background-image: url(${getImageUrl(
+								member.image,
+								'team'
+							)});"></div>
+						</div>
+						<div class="text pt-3 text-center">
+							<h3>${member.name}</h3>
+							<span class="position mb-2">${member.position}</span>
+							<div class="faded">
+								<p>${member.bio || ''}</p>
+								<ul class="ftco-social text-center">
+									${
+										member.socialLinks
+											? `
 										${
-											member.socialLinks
-												? `
-											${
-												member.socialLinks.facebook
-													? `<li class="ftco-animate"><a href="${member.socialLinks.facebook}"><span class="icon-facebook"></span></a></li>`
-													: ''
-											}
-											${
-												member.socialLinks.twitter
-													? `<li class="ftco-animate"><a href="${member.socialLinks.twitter}"><span class="icon-twitter"></span></a></li>`
-													: ''
-											}
-											${
-												member.socialLinks.instagram
-													? `<li class="ftco-animate"><a href="${member.socialLinks.instagram}"><span class="icon-instagram"></span></a></li>`
-													: ''
-											}
-											${
-												member.socialLinks.linkedin
-													? `<li class="ftco-animate"><a href="${member.socialLinks.linkedin}"><span class="icon-linkedin"></span></a></li>`
-													: ''
-											}
-										`
+											member.socialLinks.facebook
+												? `<li class="ftco-animate"><a href="${member.socialLinks.facebook}"><span class="icon-facebook"></span></a></li>`
 												: ''
 										}
-									</ul>
-								</div>
-							</div>
+										${
+											member.socialLinks.twitter
+												? `<li class="ftco-animate"><a href="${member.socialLinks.twitter}"><span class="icon-twitter"></span></a></li>`
+												: ''
+										}
+										${
+											member.socialLinks.instagram
+												? `<li class="ftco-animate"><a href="${member.socialLinks.instagram}"><span class="icon-instagram"></span></a></li>`
+												: ''
+										}
+										${
+											member.socialLinks.linkedin
+												? `<li class="ftco-animate"><a href="${member.socialLinks.linkedin}"><span class="icon-linkedin"></span></a></li>`
+												: ''
+										}
+									`
+											: ''
+									}
+								</ul>
 						</div>
-					`;
-					teamContainer.appendChild(memberElement);
-				});
-				initializeCarousel('.carousel-team');
-			}
+					</div>
+				`;
+				teamContainer.appendChild(memberElement);
+				console.log(`Team member ${index + 1} appended to container`);
+			});
+
+			console.log('All team members added to container, initializing carousel');
+			initializeCarousel('.carousel-team');
+			console.log('Carousel initialized for team');
+		} else {
+			console.warn('No team members data available');
+			showErrorMessage(
+				'team-section',
+				'No team members available at this time.'
+			);
 		}
 	} catch (error) {
 		console.error('Failed to load team members:', error);
@@ -299,57 +385,74 @@ async function loadGalleryImages() {
 		const response = await fetchFromApi(ENDPOINTS.GALLERY);
 		console.log('Gallery response:', response);
 
-		if (response && response.data) {
-			const galleryContainer = document.querySelector('.carousel-gallery');
-			console.log('Gallery container:', galleryContainer);
+		const galleryImages = getDataFromResponse(response);
+		console.log('Number of gallery images loaded:', galleryImages.length);
 
-			if (galleryContainer) {
-				galleryContainer.innerHTML = ''; // Clear existing content
-				response.data.forEach((image) => {
-					console.log('Processing gallery image:', image);
-					// Construct the image URL properly
-					let imageUrl;
-					if (image.url) {
-						if (image.url.startsWith('http')) {
-							imageUrl = image.url;
-						} else if (image.url.includes('/uploads/')) {
-							imageUrl = `${API_BASE_URL}${image.url}`;
-						} else {
-							imageUrl = `${API_BASE_URL}/uploads/gallery/${image.url}`;
-						}
-					} else {
-						imageUrl = 'images/gallery-default.jpg';
-					}
+		// Get the existing carousel container element directly
+		const galleryContainer = document.querySelector(
+			'#gallery-section .carousel-gallery'
+		);
+		console.log('Direct selector for gallery container:', galleryContainer);
 
-					const imageElement = document.createElement('div');
-					imageElement.className = 'item';
-					imageElement.innerHTML = `
-						<a href="${imageUrl}" class="gallery image-popup img d-flex align-items-center" style="background-image: url(${imageUrl});">
-							<div class="icon mb-4 d-flex align-items-center justify-content-center">
-								<span class="icon-instagram"></span>
-							</div>
-						</a>
-					`;
-					galleryContainer.appendChild(imageElement);
-				});
-				initializeCarousel('.carousel-gallery');
+		if (!galleryContainer) {
+			console.error('Could not find gallery carousel container');
+			return;
+		}
 
-				// Initialize the lightbox for gallery images
-				$('.image-popup').magnificPopup({
-					type: 'image',
-					closeOnContentClick: true,
-					closeBtnInside: false,
-					fixedContentPos: true,
-					mainClass: 'mfp-no-margins mfp-with-zoom',
-					image: {
-						verticalFit: true,
-					},
-					zoom: {
-						enabled: true,
-						duration: 300,
-					},
-				});
-			}
+		// Clear existing content
+		galleryContainer.innerHTML = '';
+
+		if (galleryImages.length > 0) {
+			galleryImages.forEach((image, index) => {
+				console.log(
+					`Adding gallery image ${index + 1}/${galleryImages.length} to DOM`
+				);
+				const imageElement = document.createElement('div');
+				imageElement.className = 'item';
+				imageElement.innerHTML = `
+					<a href="${getImageUrl(
+						image.url,
+						'gallery'
+					)}" class="gallery image-popup img d-flex align-items-center" style="background-image: url(${getImageUrl(
+					image.url,
+					'gallery'
+				)});">
+						<div class="icon mb-4 d-flex align-items-center justify-content-center">
+							<span class="icon-instagram"></span>
+						</div>
+					</a>
+				`;
+				galleryContainer.appendChild(imageElement);
+				console.log(`Gallery image ${index + 1} appended to container`);
+			});
+
+			console.log(
+				'All gallery images added to container, initializing carousel'
+			);
+			initializeCarousel('.carousel-gallery');
+			console.log('Carousel initialized for gallery');
+
+			// Initialize the lightbox for gallery images
+			$('.image-popup').magnificPopup({
+				type: 'image',
+				closeOnContentClick: true,
+				closeBtnInside: false,
+				fixedContentPos: true,
+				mainClass: 'mfp-no-margins mfp-with-zoom',
+				image: {
+					verticalFit: true,
+				},
+				zoom: {
+					enabled: true,
+					duration: 300,
+				},
+			});
+		} else {
+			console.warn('No gallery images data available');
+			showErrorMessage(
+				'gallery-section',
+				'No gallery images available at this time.'
+			);
 		}
 	} catch (error) {
 		console.error('Failed to load gallery images:', error);
@@ -367,60 +470,70 @@ async function loadLatestEvents() {
 		const response = await fetchFromApi(ENDPOINTS.EVENTS);
 		console.log('Events response:', response);
 
-		if (response && response.data) {
-			const eventsContainer = document.querySelector('.carousel-events');
-			console.log('Events container:', eventsContainer);
+		const events = getDataFromResponse(response);
+		console.log('Number of events loaded:', events.length);
 
-			if (eventsContainer) {
-				eventsContainer.innerHTML = ''; // Clear existing content
-				response.data.forEach((event) => {
-					console.log('Processing event:', event);
-					// Construct the image URL properly
-					let imageUrl;
-					if (event.image) {
-						if (event.image.startsWith('http')) {
-							imageUrl = event.image;
-						} else if (event.image.includes('/uploads/')) {
-							imageUrl = `${API_BASE_URL}${event.image}`;
-						} else {
-							imageUrl = `${API_BASE_URL}/uploads/events/${event.image}`;
-						}
-					} else {
-						imageUrl = 'images/event-default.jpg';
-					}
+		// Get the existing carousel container element directly
+		const eventsContainer = document.querySelector(
+			'#events-section .carousel-events'
+		);
+		console.log('Direct selector for events container:', eventsContainer);
 
-					const eventElement = document.createElement('div');
-					eventElement.className = 'item';
-					eventElement.innerHTML = `
-						<div class="event-entry">
-							<a href="event-single.html?id=${
-								event._id
-							}" class="img" style="background-image: url(${imageUrl});"></a>
-							<div class="text p-4 p-md-5">
-								<div class="meta">
-									<div><a href="#">${new Date(event.date).toLocaleDateString()}</a></div>
-									<div><a href="#">${event.time || 'TBA'}</a></div>
-									<div><a href="#">${event.location || 'TBA'}</a></div>
-								</div>
-								<h3 class="mb-3"><a href="event-single.html?id=${event._id}">${
-						event.title
-					}</a></h3>
-								<p>${
-									event.description
-										? event.description.substring(0, 100) +
-										  (event.description.length > 100 ? '...' : '')
-										: ''
-								}</p>
-								<p><a href="event-single.html?id=${
-									event._id
-								}" class="btn btn-primary">Read More</a></p>
+		if (!eventsContainer) {
+			console.error('Could not find events carousel container');
+			return;
+		}
+
+		// Clear existing content
+		eventsContainer.innerHTML = '';
+
+		if (events.length > 0) {
+			events.forEach((event, index) => {
+				console.log(
+					`Adding event ${index + 1}/${events.length} to DOM:`,
+					event.title
+				);
+				const eventElement = document.createElement('div');
+				eventElement.className = 'item';
+				eventElement.innerHTML = `
+					<div class="event-entry">
+						<a href="event-single.html?id=${
+							event._id
+						}" class="img" style="background-image: url(${getImageUrl(
+					event.image,
+					'events'
+				)});"></a>
+						<div class="text p-4 p-md-5">
+							<div class="meta">
+								<div><a href="#">${new Date(event.date).toLocaleDateString()}</a></div>
+								<div><a href="#">${event.time || 'TBA'}</a></div>
+								<div><a href="#">${event.location || 'TBA'}</a></div>
 							</div>
-						</div>
-					`;
-					eventsContainer.appendChild(eventElement);
-				});
-				initializeCarousel('.carousel-events');
-			}
+							<h3 class="mb-3"><a href="event-single.html?id=${event._id}">${
+					event.title
+				}</a></h3>
+							<p>${
+								event.description
+									? event.description.substring(0, 100) +
+									  (event.description.length > 100 ? '...' : '')
+									: ''
+							}</p>
+							<p><a href="event-single.html?id=${
+								event._id
+							}" class="btn btn-primary">Read More</a></p>
+					</div>
+				</div>
+			`;
+				eventsContainer.appendChild(eventElement);
+				console.log(`Event ${index + 1} appended to container`);
+			});
+
+			console.log('All events added to container, initializing carousel');
+			initializeCarousel('.carousel-events');
+			console.log('Carousel initialized for events');
+		} else {
+			console.warn('No events data available');
+			showErrorMessage('events-section', 'No events available at this time.');
 		}
 	} catch (error) {
 		console.error('Failed to load events:', error);
@@ -574,19 +687,15 @@ function calculateProgress(cause) {
 	return Math.min(100, Math.round((raised / target) * 100));
 }
 
-// Initialize all sections when DOM is loaded
-document.addEventListener('DOMContentLoaded', async () => {
-	console.log('DOM loaded, initializing sections...');
-	try {
-		await Promise.all([
-			loadLatestCauses(),
-			loadLatestBlogs(),
-			loadTeamMembers(),
-			loadGalleryImages(),
-			loadLatestEvents(),
-		]);
-		console.log('All sections initialized');
-	} catch (error) {
-		console.error('Error initializing page:', error);
+// Helper function to get image URL
+function getImageUrl(image, type) {
+	if (!image) return `images/${type}-default.jpg`;
+
+	if (image.startsWith('http')) {
+		return image;
+	} else if (image.includes('/uploads/')) {
+		return `${API_BASE_URL}${image}`;
+	} else {
+		return `${API_BASE_URL}/uploads/${type}/${image}`;
 	}
-});
+}
