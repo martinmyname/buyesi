@@ -7,6 +7,8 @@ import {
 	eventAPI,
 	volunteerAPI,
 	donationAPI,
+	ENDPOINTS,
+	fetchFromApi,
 } from './api.js';
 import { API_BASE_URL } from './api.js';
 
@@ -55,7 +57,7 @@ async function loadLatestCauses() {
 
 		// Fetch causes from the API
 		console.log('Fetching causes...');
-		const response = await causeAPI.getAll();
+		const response = await fetchFromApi(ENDPOINTS.CAUSES);
 		console.log('API Response:', response);
 
 		// Handle both array response and object with data property
@@ -187,7 +189,7 @@ async function loadLatestBlogs() {
 
 		// Fetch blogs from the API
 		console.log('Fetching blogs...');
-		const response = await blogAPI.getAll();
+		const response = await fetchFromApi(ENDPOINTS.BLOGS);
 		console.log('API Response:', response);
 
 		// Handle both array response and object with data property
@@ -333,7 +335,7 @@ async function loadTeamMembers() {
 
 		// Fetch team members from the API
 		console.log('Fetching team members...');
-		const response = await teamAPI.getAll();
+		const response = await fetchFromApi(ENDPOINTS.TEAM);
 		console.log('API Response:', response);
 
 		// Handle both array response and object with data property
@@ -489,7 +491,7 @@ async function loadGalleryImages() {
 
 		// Fetch gallery images from the API
 		console.log('Fetching gallery images...');
-		const response = await galleryAPI.getAll();
+		const response = await fetchFromApi(ENDPOINTS.GALLERY);
 		console.log('API Response:', response);
 
 		// Handle both array response and object with data property
@@ -575,7 +577,7 @@ async function loadLatestEvents() {
 
 		// Fetch events from the API
 		console.log('Fetching events...');
-		const response = await eventAPI.getAll();
+		const response = await fetchFromApi(ENDPOINTS.EVENTS);
 		console.log('API Response:', response);
 
 		// Handle both array response and object with data property
