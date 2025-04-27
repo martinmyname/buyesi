@@ -1,5 +1,5 @@
 // API Configuration
-const API_BASE_URL = 'https://buyesi.onrender.com';
+const API_BASE_URL = 'https://buyesi.onrender.com/api';
 
 // API Endpoints
 const ENDPOINTS = {

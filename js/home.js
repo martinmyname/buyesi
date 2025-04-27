@@ -46,7 +46,47 @@ async function loadLatestCauses() {
 			const causesContainer = document.querySelector('.carousel-cause');
 			if (causesContainer) {
 				response.data.forEach((cause) => {
-					const causeElement = createCauseElement(cause);
+					// Construct the image URL properly
+					let imageUrl;
+					if (cause.image) {
+						if (cause.image.startsWith('http')) {
+							imageUrl = cause.image;
+						} else if (cause.image.includes('/uploads/')) {
+							imageUrl = `${API_BASE_URL}${cause.image}`;
+						} else {
+							imageUrl = `${API_BASE_URL}/uploads/causes/${cause.image}`;
+						}
+					} else {
+						imageUrl = 'images/cause-default.jpg';
+					}
+
+					const causeElement = document.createElement('div');
+					causeElement.className = 'item';
+					causeElement.innerHTML = `
+						<div class="cause-entry">
+							<a href="cause-single.html?id=${
+								cause._id
+							}" class="img" style="background-image: url(${imageUrl});"></a>
+							<div class="text p-3 p-md-4">
+								<h3><a href="cause-single.html?id=${cause._id}">${cause.title}</a></h3>
+								<p>${cause.description.substring(0, 100)}${
+						cause.description.length > 100 ? '...' : ''
+					}</p>
+								<span class="donation-time mb-3 d-block">Last donation ${formatTimeAgo(
+									cause.updatedAt
+								)}</span>
+								<div class="progress custom-progress-success">
+									<div class="progress-bar bg-primary" role="progressbar" style="width: ${calculateProgress(
+										cause
+									)}%" 
+										 aria-valuenow="${calculateProgress(
+												cause
+											)}" aria-valuemin="0" aria-valuemax="100"></div>
+								</div>
+								<span class="fund-raised d-block">$${cause.raisedAmount.toLocaleString()} raised of $${cause.targetAmount.toLocaleString()}</span>
+							</div>
+						</div>
+					`;
 					causesContainer.appendChild(causeElement);
 				});
 				initializeCausesCarousel();
@@ -65,7 +105,47 @@ async function loadLatestBlogs() {
 			const blogContainer = document.querySelector('.carousel-blog');
 			if (blogContainer) {
 				response.data.forEach((blog) => {
-					const blogElement = createBlogElement(blog);
+					// Construct the image URL properly
+					let imageUrl;
+					if (blog.image) {
+						if (blog.image.startsWith('http')) {
+							imageUrl = blog.image;
+						} else if (blog.image.includes('/uploads/')) {
+							imageUrl = `${API_BASE_URL}${blog.image}`;
+						} else {
+							imageUrl = `${API_BASE_URL}/uploads/blog/${blog.image}`;
+						}
+					} else {
+						imageUrl = 'images/blog-default.jpg';
+					}
+
+					const blogElement = document.createElement('div');
+					blogElement.className = 'item';
+					blogElement.innerHTML = `
+						<div class="blog-entry align-self-stretch">
+							<a href="blog-single.html?id=${
+								blog._id
+							}" class="block-20" style="background-image: url('${imageUrl}');"></a>
+							<div class="text p-4 d-block">
+								<div class="meta mb-3">
+									<div><a href="#">${new Date(blog.createdAt).toLocaleDateString()}</a></div>
+									<div><a href="#">${blog.author || 'Admin'}</a></div>
+									<div><a href="#" class="meta-chat"><span class="icon-chat"></span> ${
+										blog.comments?.length || 0
+									}</a></div>
+								</div>
+								<h3 class="heading mt-3"><a href="blog-single.html?id=${blog._id}">${
+						blog.title
+					}</a></h3>
+								<p>${
+									blog.content
+										? blog.content.substring(0, 150) +
+										  (blog.content.length > 150 ? '...' : '')
+										: ''
+								}</p>
+							</div>
+						</div>
+					`;
 					blogContainer.appendChild(blogElement);
 				});
 				initializeBlogCarousel();
@@ -84,7 +164,64 @@ async function loadTeamMembers() {
 			const teamContainer = document.querySelector('.carousel-team');
 			if (teamContainer) {
 				response.data.forEach((member) => {
-					const memberElement = createTeamElement(member);
+					// Construct the image URL properly
+					let imageUrl;
+					if (member.image) {
+						if (member.image.startsWith('http')) {
+							imageUrl = member.image;
+						} else if (member.image.includes('/uploads/')) {
+							imageUrl = `${API_BASE_URL}${member.image}`;
+						} else {
+							imageUrl = `${API_BASE_URL}/uploads/team/${member.image}`;
+						}
+					} else {
+						imageUrl = 'images/team-default.jpg';
+					}
+
+					const memberElement = document.createElement('div');
+					memberElement.className = 'item';
+					memberElement.innerHTML = `
+						<div class="staff">
+							<div class="img-wrap d-flex align-items-stretch">
+								<div class="img align-self-stretch" style="background-image: url(${imageUrl});"></div>
+							</div>
+							<div class="text pt-3 text-center">
+								<h3>${member.name}</h3>
+								<span class="position mb-2">${member.position}</span>
+								<div class="faded">
+									<p>${member.bio || ''}</p>
+									<ul class="ftco-social text-center">
+										${
+											member.socialLinks
+												? `
+											${
+												member.socialLinks.facebook
+													? `<li class="ftco-animate"><a href="${member.socialLinks.facebook}"><span class="icon-facebook"></span></a></li>`
+													: ''
+											}
+											${
+												member.socialLinks.twitter
+													? `<li class="ftco-animate"><a href="${member.socialLinks.twitter}"><span class="icon-twitter"></span></a></li>`
+													: ''
+											}
+											${
+												member.socialLinks.instagram
+													? `<li class="ftco-animate"><a href="${member.socialLinks.instagram}"><span class="icon-instagram"></span></a></li>`
+													: ''
+											}
+											${
+												member.socialLinks.linkedin
+													? `<li class="ftco-animate"><a href="${member.socialLinks.linkedin}"><span class="icon-linkedin"></span></a></li>`
+													: ''
+											}
+										`
+												: ''
+										}
+									</ul>
+								</div>
+							</div>
+						</div>
+					`;
 					teamContainer.appendChild(memberElement);
 				});
 				initializeTeamCarousel();
@@ -106,7 +243,29 @@ async function loadGalleryImages() {
 			const galleryContainer = document.querySelector('.carousel-gallery');
 			if (galleryContainer) {
 				response.data.forEach((image) => {
-					const imageElement = createGalleryElement(image);
+					// Construct the image URL properly
+					let imageUrl;
+					if (image.url) {
+						if (image.url.startsWith('http')) {
+							imageUrl = image.url;
+						} else if (image.url.includes('/uploads/')) {
+							imageUrl = `${API_BASE_URL}${image.url}`;
+						} else {
+							imageUrl = `${API_BASE_URL}/uploads/gallery/${image.url}`;
+						}
+					} else {
+						imageUrl = 'images/gallery-default.jpg';
+					}
+
+					const imageElement = document.createElement('div');
+					imageElement.className = 'item';
+					imageElement.innerHTML = `
+						<a href="${imageUrl}" class="gallery image-popup img d-flex align-items-center" style="background-image: url(${imageUrl});">
+							<div class="icon mb-4 d-flex align-items-center justify-content-center">
+								<span class="icon-instagram"></span>
+							</div>
+						</a>
+					`;
 					galleryContainer.appendChild(imageElement);
 				});
 				initializeGalleryCarousel();
@@ -128,7 +287,48 @@ async function loadLatestEvents() {
 			const eventsContainer = document.querySelector('.carousel-events');
 			if (eventsContainer) {
 				response.data.forEach((event) => {
-					const eventElement = createEventElement(event);
+					// Construct the image URL properly
+					let imageUrl;
+					if (event.image) {
+						if (event.image.startsWith('http')) {
+							imageUrl = event.image;
+						} else if (event.image.includes('/uploads/')) {
+							imageUrl = `${API_BASE_URL}${event.image}`;
+						} else {
+							imageUrl = `${API_BASE_URL}/uploads/events/${event.image}`;
+						}
+					} else {
+						imageUrl = 'images/event-default.jpg';
+					}
+
+					const eventElement = document.createElement('div');
+					eventElement.className = 'item';
+					eventElement.innerHTML = `
+						<div class="event-entry">
+							<a href="event-single.html?id=${
+								event._id
+							}" class="img" style="background-image: url(${imageUrl});"></a>
+							<div class="text p-4 p-md-5">
+								<div class="meta">
+									<div><a href="#">${new Date(event.date).toLocaleDateString()}</a></div>
+									<div><a href="#">${event.time || 'TBA'}</a></div>
+									<div><a href="#">${event.location || 'TBA'}</a></div>
+								</div>
+								<h3 class="mb-3"><a href="event-single.html?id=${event._id}">${
+						event.title
+					}</a></h3>
+								<p>${
+									event.description
+										? event.description.substring(0, 100) +
+										  (event.description.length > 100 ? '...' : '')
+										: ''
+								}</p>
+								<p><a href="event-single.html?id=${
+									event._id
+								}" class="btn btn-primary">Read More</a></p>
+							</div>
+						</div>
+					`;
 					eventsContainer.appendChild(eventElement);
 				});
 				initializeEventsCarousel();
@@ -277,6 +477,13 @@ function showErrorMessage(sectionId, message) {
 		errorDiv.textContent = message;
 		section.querySelector('.row').appendChild(errorDiv);
 	}
+}
+
+// Helper function to calculate progress percentage
+function calculateProgress(cause) {
+	const raised = cause.raisedAmount || 0;
+	const target = cause.targetAmount || 1;
+	return Math.min(100, Math.round((raised / target) * 100));
 }
 
 // Initialize all sections when DOM is loaded
