@@ -1,3 +1,50 @@
+// Initialize API object if it doesn't exist
+if (!window.API) {
+	window.API = {
+		auth: {
+			isAuthenticated: () => !!localStorage.getItem('token'),
+			getCurrentUser: () => JSON.parse(localStorage.getItem('user')),
+			logout: () => {
+				localStorage.removeItem('token');
+				localStorage.removeItem('user');
+			},
+		},
+		donationAPI: {
+			getAll: async () => {
+				const token = localStorage.getItem('token');
+				const response = await fetch('https://buyesi.onrender.com/donations', {
+					headers: {
+						Authorization: token ? `Bearer ${token}` : '',
+					},
+				});
+				return response.json();
+			},
+		},
+		volunteerAPI: {
+			getAll: async () => {
+				const token = localStorage.getItem('token');
+				const response = await fetch('https://buyesi.onrender.com/volunteers', {
+					headers: {
+						Authorization: token ? `Bearer ${token}` : '',
+					},
+				});
+				return response.json();
+			},
+		},
+		causeAPI: {
+			getAll: async () => {
+				const token = localStorage.getItem('token');
+				const response = await fetch('https://buyesi.onrender.com/causes', {
+					headers: {
+						Authorization: token ? `Bearer ${token}` : '',
+					},
+				});
+				return response.json();
+			},
+		},
+	};
+}
+
 // Admin Dashboard Functions
 class AdminDashboard {
 	constructor() {
