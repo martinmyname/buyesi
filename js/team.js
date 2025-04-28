@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
 async function loadTeamMembers() {
 	try {
+		// Use more specific selector for the team container
 		const teamContainer = document.querySelector('.team-container');
 		if (!teamContainer) {
 			console.error('Team container not found');
@@ -26,13 +27,14 @@ async function loadTeamMembers() {
 
 		// Fetch team members from the API
 		console.log('Fetching team members...');
-		const response = await teamAPI.getAll();
+		const response = await fetch(`${API_BASE_URL}/teams`);
 		console.log('API Response:', response);
 
-		// Handle both array response and object with data property
-		const teamMembers = Array.isArray(response)
-			? response
-			: response.data || [];
+		if (!response.ok) {
+			throw new Error(`HTTP error! status: ${response.status}`);
+		}
+
+		const teamMembers = await response.json();
 		console.log('Processed team members:', teamMembers);
 
 		if (!teamMembers || !teamMembers.length) {
@@ -51,10 +53,13 @@ async function loadTeamMembers() {
 			if (member.image) {
 				if (member.image.startsWith('http')) {
 					imageUrl = member.image;
-				} else if (member.image.includes('/uploads/')) {
-					imageUrl = `${API_BASE_URL}${member.image}`;
+				} else if (member.image.startsWith('/uploads/')) {
+					// Remove 'api' from the path if it exists
+					imageUrl = `${API_BASE_URL.replace('/api', '')}${member.image}`;
 				} else {
-					imageUrl = `${API_BASE_URL}/uploads/team/${member.image}`;
+					imageUrl = `${API_BASE_URL.replace('/api', '')}/uploads/team/${
+						member.image
+					}`;
 				}
 				console.log('Image URL for', member.name, ':', imageUrl);
 			} else {
@@ -65,7 +70,9 @@ async function loadTeamMembers() {
 				<div class="col-md-6 col-lg-3 ftco-animate">
 					<div class="staff">
 						<div class="img-wrap d-flex align-items-stretch">
-							<div class="img align-self-stretch" style="background-image: url(${imageUrl});"></div>
+							<img src="${imageUrl}" alt="${
+				member.name
+			}" class="img align-self-stretch" style="width: 100%; height: 300px; object-fit: cover;">
 						</div>
 						<div class="text pt-3 text-center">
 							<h3>${member.name}</h3>
@@ -74,26 +81,26 @@ async function loadTeamMembers() {
 								<p>${member.bio || ''}</p>
 								<ul class="ftco-social text-center">
 									${
-										member.socialLinks
+										member.socialMedia
 											? `
 										${
-											member.socialLinks.facebook
-												? `<li class="ftco-animate"><a href="${member.socialLinks.facebook}"><span class="icon-facebook"></span></a></li>`
+											member.socialMedia.facebook
+												? `<li class="ftco-animate"><a href="${member.socialMedia.facebook}"><span class="icon-facebook"></span></a></li>`
 												: ''
 										}
 										${
-											member.socialLinks.twitter
-												? `<li class="ftco-animate"><a href="${member.socialLinks.twitter}"><span class="icon-twitter"></span></a></li>`
+											member.socialMedia.twitter
+												? `<li class="ftco-animate"><a href="${member.socialMedia.twitter}"><span class="icon-twitter"></span></a></li>`
 												: ''
 										}
 										${
-											member.socialLinks.instagram
-												? `<li class="ftco-animate"><a href="${member.socialLinks.instagram}"><span class="icon-instagram"></span></a></li>`
+											member.socialMedia.instagram
+												? `<li class="ftco-animate"><a href="${member.socialMedia.instagram}"><span class="icon-instagram"></span></a></li>`
 												: ''
 										}
 										${
-											member.socialLinks.linkedin
-												? `<li class="ftco-animate"><a href="${member.socialLinks.linkedin}"><span class="icon-linkedin"></span></a></li>`
+											member.socialMedia.linkedin
+												? `<li class="ftco-animate"><a href="${member.socialMedia.linkedin}"><span class="icon-linkedin"></span></a></li>`
 												: ''
 										}
 									`
@@ -108,6 +115,11 @@ async function loadTeamMembers() {
 
 			teamContainer.innerHTML += memberHTML;
 		});
+
+		// Initialize any necessary animations or effects after rendering
+		if (typeof AOS !== 'undefined') {
+			AOS.refresh();
+		}
 	} catch (error) {
 		console.error('Failed to load team members:', error);
 		const teamContainer = document.querySelector('.team-container');
