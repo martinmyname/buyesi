@@ -33,14 +33,14 @@ router.post(
 	'/team',
 	protect,
 	authorize('admin'),
-	...cloudinaryUpload.single('image'),
+	cloudinaryUpload.single('image'),
 	addTeamMember
 );
 router.put(
 	'/team/:id',
 	protect,
 	authorize('admin'),
-	...cloudinaryUpload.single('image'),
+	cloudinaryUpload.single('image'),
 	updateTeamMember
 );
 router.delete('/team/:id', protect, authorize('admin'), deleteTeamMember);
@@ -50,14 +50,14 @@ router.post(
 	'/blog',
 	protect,
 	authorize('admin'),
-	...cloudinaryUpload.single('image'),
+	cloudinaryUpload.single('image'),
 	addBlogPost
 );
 router.put(
 	'/blog/:id',
 	protect,
 	authorize('admin'),
-	...cloudinaryUpload.single('image'),
+	cloudinaryUpload.single('image'),
 	updateBlogPost
 );
 router.delete('/blog/:id', protect, authorize('admin'), deleteBlogPost);
@@ -67,14 +67,14 @@ router.post(
 	'/events',
 	protect,
 	authorize('admin'),
-	...cloudinaryUpload.single('image'),
+	cloudinaryUpload.single('image'),
 	addEvent
 );
 router.put(
 	'/events/:id',
 	protect,
 	authorize('admin'),
-	...cloudinaryUpload.single('image'),
+	cloudinaryUpload.single('image'),
 	updateEvent
 );
 router.delete('/events/:id', protect, authorize('admin'), deleteEvent);
@@ -84,7 +84,7 @@ router.post(
 	'/gallery',
 	protect,
 	authorize('admin'),
-	...cloudinaryUpload.single('image'),
+	cloudinaryUpload.single('image'),
 	addGalleryImage
 );
 router.delete('/gallery/:id', protect, authorize('admin'), deleteGalleryImage);
@@ -94,14 +94,14 @@ router.post(
 	'/causes',
 	protect,
 	authorize('admin'),
-	...cloudinaryUpload.single('image'),
+	cloudinaryUpload.single('image'),
 	addCause
 );
 router.put(
 	'/causes/:id',
 	protect,
 	authorize('admin'),
-	...cloudinaryUpload.single('image'),
+	cloudinaryUpload.single('image'),
 	updateCause
 );
 router.delete('/causes/:id', protect, authorize('admin'), deleteCause);
