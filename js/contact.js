@@ -1,3 +1,6 @@
+// Import API modules
+import { contactAPI, volunteerAPI } from '../api.js';
+
 document.addEventListener('DOMContentLoaded', function () {
 	const contactForm = document.getElementById('contactForm');
 
@@ -25,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			try {
 				// Send message to the API
-				const response = await window.API.contactAPI.sendMessage({
+				const response = await contactAPI.sendMessage({
 					name,
 					email,
 					subject,
@@ -90,7 +93,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			try {
 				// Register volunteer through the API
-				const response = await window.API.volunteerAPI.register({
+				const response = await volunteerAPI.register({
 					name,
 					email,
 					message,

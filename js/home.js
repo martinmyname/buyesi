@@ -1,18 +1,98 @@
-// Access the API objects from the window.API namespace instead of redeclaring them
-const {
-	causeAPI: cause,
-	blogAPI: blog,
-	teamAPI: team,
-	galleryAPI: gallery,
-	eventAPI: event,
-	volunteerAPI: volunteer,
-	donationAPI: donation,
+// Access the API objects from the window.API namespace safely
+let causeAPI,
+	blogAPI,
+	teamAPI,
+	galleryAPI,
+	eventAPI,
+	volunteerAPI,
+	donationAPI,
 	ENDPOINTS,
 	fetchFromApi,
-	BASE_URL: API_BASE_URL,
-} = window.API;
+	API_BASE_URL;
+
+// Wait for API to be available with timeout and retry
+function waitForAPI(maxAttempts = 10, interval = 500) {
+	let attempts = 0;
+
+	return new Promise((resolve, reject) => {
+		function checkAPI() {
+			console.log(
+				`Checking for API availability (attempt ${
+					attempts + 1
+				}/${maxAttempts})...`
+			);
+
+			if (window.API) {
+				console.log('API found:', Object.keys(window.API));
+				resolve(window.API);
+				return;
+			}
+
+			attempts++;
+			if (attempts >= maxAttempts) {
+				reject(new Error('API not available after maximum attempts'));
+				return;
+			}
+
+			setTimeout(checkAPI, interval);
+		}
+
+		checkAPI();
+	});
+}
+
+// Setup API references when they become available
+function setupAPIReferences(api) {
+	if (!api) return false;
+
+	try {
+		causeAPI = api.causeAPI;
+		blogAPI = api.blogAPI;
+		teamAPI = api.teamAPI;
+		galleryAPI = api.galleryAPI;
+		eventAPI = api.eventAPI;
+		volunteerAPI = api.volunteerAPI;
+		donationAPI = api.donationAPI;
+		ENDPOINTS = api.ENDPOINTS;
+		fetchFromApi = api.fetchFromApi;
+		API_BASE_URL = api.BASE_URL;
+
+		console.log('API references set up successfully');
+		return true;
+	} catch (error) {
+		console.error('Error setting up API references:', error);
+		return false;
+	}
+}
 
 document.addEventListener('DOMContentLoaded', async function () {
+	console.log('DOMContentLoaded event fired in home.js');
+
+	try {
+		// Wait for the API to be available
+		const api = await waitForAPI();
+
+		// Set up API references
+		if (setupAPIReferences(api)) {
+			console.log('API references available, initializing home page');
+			initializeHomePage();
+		} else {
+			console.error('Failed to set up API references');
+			showErrorMessage(
+				'causes-section',
+				'API initialization failed. Please refresh the page.'
+			);
+		}
+	} catch (error) {
+		console.error('Error waiting for API:', error.message);
+		showErrorMessage(
+			'causes-section',
+			'API connection failed. Please refresh the page.'
+		);
+	}
+});
+
+async function initializeHomePage() {
 	try {
 		// Load latest causes for the carousel
 		await loadLatestCauses();
@@ -37,7 +117,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 	} catch (error) {
 		console.error('Error loading home page data:', error);
 	}
-});
+}
 
 // Initialize carousel
 function initializeCarousel(selector) {
@@ -129,10 +209,48 @@ function getDataFromResponse(response) {
 async function loadLatestCauses() {
 	try {
 		console.log('Loading causes...');
-		const response = await fetchFromApi(ENDPOINTS.CAUSES);
-		console.log('Causes response:', response);
+		console.log('ENDPOINTS.CAUSES:', ENDPOINTS.CAUSES);
 
-		const causes = getDataFromResponse(response);
+		if (!window.API) {
+			console.error('window.API is not defined');
+			return;
+		}
+
+		console.log('window.API available:', Object.keys(window.API));
+
+		// Try different approaches to fetch causes
+		let response;
+		let causes = [];
+
+		try {
+			console.log('Trying fetchFromApi...');
+			response = await fetchFromApi(ENDPOINTS.CAUSES);
+			console.log('fetchFromApi response:', response);
+			causes = getDataFromResponse(response);
+		} catch (fetchError) {
+			console.error('Error using fetchFromApi:', fetchError);
+
+			try {
+				console.log('Trying direct fetch...');
+				const directResponse = await fetch(ENDPOINTS.CAUSES);
+				const data = await directResponse.json();
+				console.log('Direct fetch response:', data);
+				causes = getDataFromResponse(data);
+			} catch (directFetchError) {
+				console.error('Error with direct fetch:', directFetchError);
+
+				try {
+					console.log('Trying causeAPI.getAll()...');
+					const apiResponse = await causeAPI.getAll();
+					console.log('causeAPI.getAll() response:', apiResponse);
+					causes = getDataFromResponse(apiResponse);
+				} catch (apiError) {
+					console.error('Error with causeAPI.getAll():', apiError);
+					throw new Error('All methods to fetch causes failed');
+				}
+			}
+		}
+
 		console.log('Number of causes loaded:', causes.length);
 
 		// Get the existing carousel container element directly
@@ -181,7 +299,9 @@ async function loadLatestCauses() {
 											cause
 										)}" aria-valuemin="0" aria-valuemax="100"></div>
 							</div>
-							<span class="fund-raised d-block">$${cause.raisedAmount.toLocaleString()} raised of $${cause.targetAmount.toLocaleString()}</span>
+							<span class="fund-raised d-block">$${
+								cause.raisedAmount?.toLocaleString() || 0
+							} raised of $${cause.targetAmount?.toLocaleString() || 0}</span>
 						</div>
 					</div>
 				`;
@@ -543,55 +663,129 @@ async function loadLatestEvents() {
 
 function setupVolunteerForm() {
 	const form = document.getElementById('volunteer-form');
-	if (!form) return;
-
-	form.addEventListener('submit', async (e) => {
-		e.preventDefault();
-
-		const submitButton = form.querySelector('button[type="submit"]');
-		const originalButtonText = submitButton.innerHTML;
-		submitButton.disabled = true;
-		submitButton.innerHTML =
-			'<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Submitting...';
-
-		try {
-			const formData = new FormData(form);
-			const volunteerData = {
-				name: formData.get('name'),
-				email: formData.get('email'),
-				phone: formData.get('phone'),
-				message: formData.get('message'),
-			};
-
-			await volunteer.register(volunteerData);
-			showAlert(
-				'Thank you for your interest in volunteering! We will contact you soon.',
-				'success',
-				form
+	if (!form) {
+		// Try to find the form with ID 'volunteer' instead
+		const altForm = document.getElementById('volunteer');
+		if (altForm) {
+			console.log('Found volunteer form with ID "volunteer"');
+			setupFormSubmission(altForm);
+		} else {
+			console.error(
+				'Volunteer form not found with ID "volunteer-form" or "volunteer"'
 			);
-			form.reset();
-		} catch (error) {
-			console.error('Error submitting volunteer form:', error);
-			showAlert(
-				error.message || 'Failed to submit volunteer form. Please try again.',
-				'danger',
-				form
-			);
-		} finally {
-			submitButton.disabled = false;
-			submitButton.innerHTML = originalButtonText;
 		}
-	});
+	} else {
+		console.log('Found volunteer form with ID "volunteer-form"');
+		setupFormSubmission(form);
+	}
+
+	function setupFormSubmission(formElement) {
+		formElement.addEventListener('submit', async (e) => {
+			e.preventDefault();
+
+			const submitButton = formElement.querySelector('button[type="submit"]');
+			if (!submitButton) {
+				const inputSubmit = formElement.querySelector('input[type="submit"]');
+				if (inputSubmit) {
+					const originalButtonText = inputSubmit.value;
+					inputSubmit.disabled = true;
+					inputSubmit.value = 'Submitting...';
+
+					try {
+						const formData = new FormData(formElement);
+						const volunteerData = {
+							name:
+								formData.get('name') ||
+								formElement.querySelector('input[placeholder="Your Name"]')
+									.value,
+							email:
+								formData.get('email') ||
+								formElement.querySelector('input[placeholder="Your Email"]')
+									.value,
+							phone: formData.get('phone') || '',
+							message:
+								formData.get('message') ||
+								formElement.querySelector('textarea').value,
+						};
+
+						console.log('Submitting volunteer data:', volunteerData);
+						await volunteerAPI.register(volunteerData);
+						showAlert(
+							'Thank you for your interest in volunteering! We will contact you soon.',
+							'success',
+							formElement
+						);
+						formElement.reset();
+					} catch (error) {
+						console.error('Error submitting volunteer form:', error);
+						showAlert(
+							error.message ||
+								'Failed to submit volunteer form. Please try again.',
+							'danger',
+							formElement
+						);
+					} finally {
+						inputSubmit.disabled = false;
+						inputSubmit.value = originalButtonText;
+					}
+				}
+			} else {
+				const originalButtonText = submitButton.innerHTML;
+				submitButton.disabled = true;
+				submitButton.innerHTML =
+					'<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Submitting...';
+
+				try {
+					const formData = new FormData(formElement);
+					const volunteerData = {
+						name: formData.get('name'),
+						email: formData.get('email'),
+						phone: formData.get('phone') || '',
+						message: formData.get('message'),
+					};
+
+					console.log('Submitting volunteer data:', volunteerData);
+					await volunteerAPI.register(volunteerData);
+					showAlert(
+						'Thank you for your interest in volunteering! We will contact you soon.',
+						'success',
+						formElement
+					);
+					formElement.reset();
+				} catch (error) {
+					console.error('Error submitting volunteer form:', error);
+					showAlert(
+						error.message ||
+							'Failed to submit volunteer form. Please try again.',
+						'danger',
+						formElement
+					);
+				} finally {
+					submitButton.disabled = false;
+					submitButton.innerHTML = originalButtonText;
+				}
+			}
+		});
+	}
 }
 
 function setupDonationForm() {
 	const form = document.getElementById('donation-form');
-	if (!form) return;
+	if (!form) {
+		console.error('Donation form not found with ID "donation-form"');
+		return;
+	}
 
+	console.log('Found donation form with ID "donation-form"');
 	form.addEventListener('submit', async (e) => {
 		e.preventDefault();
 
 		const submitButton = form.querySelector('button[type="submit"]');
+		if (!submitButton) {
+			console.error('Submit button not found in donation form');
+			return;
+		}
+
 		const originalButtonText = submitButton.innerHTML;
 		submitButton.disabled = true;
 		submitButton.innerHTML =
@@ -603,10 +797,11 @@ function setupDonationForm() {
 				amount: parseFloat(formData.get('amount')),
 				name: formData.get('name'),
 				email: formData.get('email'),
-				message: formData.get('message'),
+				message: formData.get('message') || '',
 			};
 
-			await donation.create(donationData);
+			console.log('Submitting donation data:', donationData);
+			await donationAPI.create(donationData);
 			showAlert(
 				'Thank you for your donation! We appreciate your support.',
 				'success',

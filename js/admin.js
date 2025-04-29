@@ -728,10 +728,14 @@ class AdminDashboard {
 				image: imageUrl, // Use the image URL we verified above
 				imageUrl: imageUrl, // Also send as imageUrl in case backend expects this field name
 				photo: imageUrl, // Also send as photo in case backend expects this field name
+				featuredImage: imageUrl, // Also send as featuredImage in case backend expects this field name
 			};
 
 			// Log the data being sent for debugging
-			console.log('Sending team data:', teamData);
+			console.log(
+				'Team Member Data to be sent:',
+				JSON.stringify(teamData, null, 2)
+			);
 
 			const token = this.getAuthToken();
 			let response;
@@ -839,7 +843,13 @@ class AdminDashboard {
 			// Validate required fields
 			const title = formData.get('title');
 			const content = formData.get('content');
-			const image = formData.get('image');
+
+			// Check if we have the image value in the hidden input field
+			let imageUrl = $('#blogImageUrl').val();
+			// Fallback to form data if needed
+			if (!imageUrl) {
+				imageUrl = formData.get('image');
+			}
 
 			if (!title || !content) {
 				this.showError('Title and Content are required fields');
@@ -847,7 +857,7 @@ class AdminDashboard {
 			}
 
 			// For new blog posts, image is required
-			if (!isEdit && !image) {
+			if (!isEdit && !imageUrl) {
 				this.showError(
 					'Featured Image is required. Please upload an image before submitting.'
 				);
@@ -892,11 +902,17 @@ class AdminDashboard {
 					? form.elements['featured'].checked
 					: false,
 				author: authorId,
-				image: formData.get('image'), // Changed from imageUrl to image to match backend expectation
+				image: imageUrl, // Use the image URL we verified above
+				imageUrl: imageUrl, // Also send as imageUrl in case backend expects this field name
+				photo: imageUrl, // Also send as photo in case backend expects this field name
+				featuredImage: imageUrl, // Also send as featuredImage in case backend expects this field name
 			};
 
 			// Log the data being sent for debugging
-			console.log('Sending blog data:', blogData);
+			console.log(
+				'Blog Post Data to be sent:',
+				JSON.stringify(blogData, null, 2)
+			);
 
 			const token = this.getAuthToken();
 			let response;
@@ -1009,7 +1025,13 @@ class AdminDashboard {
 			const endDate = formData.get('endDate');
 			const location = formData.get('location');
 			const description = formData.get('description');
-			const image = formData.get('image');
+
+			// Check if we have the image value in the hidden input field
+			let imageUrl = $('#eventImageUrl').val();
+			// Fallback to form data if needed
+			if (!imageUrl) {
+				imageUrl = formData.get('image');
+			}
 
 			if (!title || !startDate || !endDate || !location || !description) {
 				this.showError('Please fill all required fields');
@@ -1017,7 +1039,7 @@ class AdminDashboard {
 			}
 
 			// For new events, image is required
-			if (!isEdit && !image) {
+			if (!isEdit && !imageUrl) {
 				this.showError('Please upload an event image');
 				// Highlight the image upload section
 				$('#eventImageUpload').addClass('border border-danger p-2');
@@ -1040,8 +1062,14 @@ class AdminDashboard {
 				featured: form.elements['eventFeatured'].checked,
 				registrationRequired: form.elements['registrationRequired'].checked,
 				maximumAttendees: parseInt(formData.get('maximumAttendees') || '0'),
-				image: formData.get('image'), // Changed from imageUrl to image to match backend expectation
+				image: imageUrl, // Use the image URL we verified above
+				imageUrl: imageUrl, // Also send as imageUrl in case backend expects this field name
+				photo: imageUrl, // Also send as photo in case backend expects this field name
+				featuredImage: imageUrl, // Also send as featuredImage in case backend expects this field name
 			};
+
+			// Log the data being sent for debugging
+			console.log('Event Data to be sent:', JSON.stringify(eventData, null, 2));
 
 			const token = this.getAuthToken();
 			let response;
@@ -1161,7 +1189,13 @@ class AdminDashboard {
 			// Validate required fields
 			const title = formData.get('title');
 			const description = formData.get('description');
-			const image = formData.get('image');
+
+			// Check if we have the image value in the hidden input field
+			let imageUrl = $('#galleryImageUrl').val();
+			// Fallback to form data if needed
+			if (!imageUrl) {
+				imageUrl = formData.get('image');
+			}
 
 			if (!title || !description) {
 				this.showError('Title and Description are required fields');
@@ -1169,7 +1203,7 @@ class AdminDashboard {
 			}
 
 			// Image is required
-			if (!image) {
+			if (!imageUrl) {
 				this.showError('Please upload a gallery image');
 				// Highlight the image upload section
 				$('#galleryImageUpload').addClass('border border-danger p-2');
@@ -1183,8 +1217,17 @@ class AdminDashboard {
 			const galleryData = {
 				title: formData.get('title'),
 				description: formData.get('description'),
-				image: formData.get('image'), // Changed from imageUrl to image to match backend expectation
+				image: imageUrl, // Use the image URL we verified above
+				imageUrl: imageUrl, // Also send as imageUrl in case backend expects this field name
+				photo: imageUrl, // Also send as photo in case backend expects this field name
+				featuredImage: imageUrl, // Also send as featuredImage in case backend expects this field name
 			};
+
+			// Log the data being sent for debugging
+			console.log(
+				'Gallery Image Data to be sent:',
+				JSON.stringify(galleryData, null, 2)
+			);
 
 			const token = this.getAuthToken();
 			let response = await fetch(
@@ -1248,7 +1291,16 @@ class AdminDashboard {
 			const title = formData.get('title');
 			const description = formData.get('description');
 			const targetAmount = parseFloat(formData.get('targetAmount'));
-			const image = formData.get('image');
+
+			// Check if we have the image value in the hidden input field
+			let imageUrl = $('#causeImageUrl').val();
+			// Fallback to form data if needed
+			if (!imageUrl) {
+				imageUrl = formData.get('image');
+			}
+
+			// Log the image URL for debugging
+			console.log('Cause Image URL from form:', imageUrl);
 
 			if (!title || !description || isNaN(targetAmount)) {
 				this.showError(
@@ -1258,7 +1310,7 @@ class AdminDashboard {
 			}
 
 			// Image is required
-			if (!image) {
+			if (!imageUrl) {
 				this.showError('Please upload a cause image');
 				// Highlight the image upload section
 				$('#causeImageUpload').addClass('border border-danger p-2');
@@ -1274,8 +1326,14 @@ class AdminDashboard {
 				description: formData.get('description'),
 				targetAmount: parseFloat(formData.get('targetAmount')),
 				raisedAmount: parseFloat(formData.get('raisedAmount') || '0'),
-				image: formData.get('image'), // Changed from imageUrl to image to match backend expectation
+				image: imageUrl, // Use the image URL we verified above
+				imageUrl: imageUrl, // Also send as imageUrl in case backend expects this field name
+				photo: imageUrl, // Also send as photo in case backend expects this field name
+				featuredImage: imageUrl, // Also send as featuredImage in case backend expects this field name
 			};
+
+			// Log the complete data object for debugging
+			console.log('Cause Data to be sent:', JSON.stringify(causeData, null, 2));
 
 			const token = this.getAuthToken();
 			let response;
@@ -1437,13 +1495,20 @@ class AdminDashboard {
 
 			teamMembers.forEach((member, index) => {
 				console.log(`Rendering team member ${index}:`, member);
-				// Check if the image is already a full URL (like from Cloudinary)
-				const imageUrl = member.image.startsWith('http')
-					? member.image
-					: `https://buyesi.onrender.com${member.image}`;
+				// Check for possible image field names
+				const imageUrl =
+					member.image ||
+					member.imageUrl ||
+					member.photo ||
+					member.featuredImage ||
+					'';
+				// If it's a full URL, use it directly; otherwise, prepend the backend URL
+				const finalImageUrl = imageUrl.startsWith('http')
+					? imageUrl
+					: `https://buyesi.onrender.com${imageUrl}`;
 				tbody.append(`
 					<tr>
-						<td><img src="${imageUrl}" alt="${
+						<td><img src="${finalImageUrl}" alt="${
 					member.name
 				}" width="50" height="50" class="rounded-circle"></td>
 						<td>${member.name}</td>
@@ -1487,6 +1552,13 @@ class AdminDashboard {
 			}
 
 			blogs.forEach((blog) => {
+				// Check for possible image field names
+				const imageUrl =
+					blog.image || blog.imageUrl || blog.photo || blog.featuredImage || '';
+				// If it's a full URL, use it directly; otherwise, prepend the backend URL
+				const finalImageUrl = imageUrl.startsWith('http')
+					? imageUrl
+					: `https://buyesi.onrender.com${imageUrl}`;
 				tbody.append(`
 					<tr>
 						<td>${blog.title}</td>
@@ -1529,6 +1601,17 @@ class AdminDashboard {
 
 			events.forEach((event, index) => {
 				console.log(`Rendering event ${index}:`, event);
+				// Check for possible image field names
+				const imageUrl =
+					event.image ||
+					event.imageUrl ||
+					event.photo ||
+					event.featuredImage ||
+					'';
+				// If it's a full URL, use it directly; otherwise, prepend the backend URL
+				const finalImageUrl = imageUrl.startsWith('http')
+					? imageUrl
+					: `https://buyesi.onrender.com${imageUrl}`;
 				tbody.append(`
 					<tr>
 						<td>${event.title}</td>
@@ -1575,12 +1658,24 @@ class AdminDashboard {
 
 			gallery.forEach((image, index) => {
 				console.log(`Rendering gallery item ${index}:`, image);
+				// Check for possible image field names
+				const imageUrl =
+					image.image ||
+					image.imageUrl ||
+					image.photo ||
+					image.featuredImage ||
+					image.url ||
+					'';
+				// If it's a full URL, use it directly; otherwise, prepend the backend URL
+				const finalImageUrl = imageUrl.startsWith('http')
+					? imageUrl
+					: `https://buyesi.onrender.com${imageUrl}`;
 				grid.append(`
 					<div class="col-md-4 mb-4">
 						<div class="card">
-							<img src="${
-								image.url || `https://buyesi.onrender.com${image.image}`
-							}" class="card-img-top" alt="${image.title || 'Gallery image'}">
+							<img src="${finalImageUrl}" class="card-img-top" alt="${
+					image.title || 'Gallery image'
+				}">
 							<div class="card-body">
 								<h5 class="card-title">${image.title || 'Untitled'}</h5>
 								<button class="btn btn-sm btn-danger delete-gallery" data-id="${
@@ -1616,6 +1711,17 @@ class AdminDashboard {
 			}
 
 			causes.forEach((cause) => {
+				// Check for possible image field names
+				const imageUrl =
+					cause.image ||
+					cause.imageUrl ||
+					cause.photo ||
+					cause.featuredImage ||
+					'';
+				// If it's a full URL, use it directly; otherwise, prepend the backend URL
+				const finalImageUrl = imageUrl.startsWith('http')
+					? imageUrl
+					: `https://buyesi.onrender.com${imageUrl}`;
 				tbody.append(`
 					<tr>
 						<td>${cause.title}</td>

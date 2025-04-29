@@ -102,27 +102,30 @@
           <div class="col-md-4">
             <div class="ftco-footer-widget mb-4">
               <h2 class="ftco-heading-2">Recent Blog</h2>
-              <div class="block-21 mb-4 d-flex">
-                <a class="blog-img mr-4" style="background-image: url(images/image_1.jpg);"></a>
-                <div class="text">
-                  <h3 class="heading"><a href="#">Sustainable Development Goal 1(SDG 1)
-                  aims to eradicate..
-</a></h3>
-                  <div class="meta">
-                    <div><a href="#"><span class="icon-calendar"></span> Dec 12, 2024</a></div>
-                    <div><a href="#"><span class="icon-person"></span> Admin</a></div>
-                    <div><a href="#"><span class="icon-chat"></span> 19</a></div>
+              <div id="recent-blog-posts">
+                <!-- Dynamic recent blog posts will be loaded here by footer.js -->
+                <div class="block-21 mb-4 d-flex">
+                  <a class="blog-img mr-4" style="background-image: url(images/image_1.jpg);"></a>
+                  <div class="text">
+                    <h3 class="heading"><a href="#">Sustainable Development Goal 1(SDG 1)
+                    aims to eradicate..
+  </a></h3>
+                    <div class="meta">
+                      <div><a href="#"><span class="icon-calendar"></span> Dec 12, 2024</a></div>
+                      <div><a href="#"><span class="icon-person"></span> Admin</a></div>
+                      <div><a href="#"><span class="icon-chat"></span> 19</a></div>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div class="block-21 mb-4 d-flex">
-                <a class="blog-img mr-4" style="background-image: url(images/image_2.jpg);"></a>
-                <div class="text">
-                  <h3 class="heading"><a href="#">In the remote village known as Mpongi , found in Pallisa District, Eastern Uganda,..</a></h3>
-                  <div class="meta">
-                    <div><a href="#"><span class="icon-calendar"></span> March 12, 2025</a></div>
-                    <div><a href="#"><span class="icon-person"></span> Admin</a></div>
-                    <div><a href="#"><span class="icon-chat"></span> 19</a></div>
+                <div class="block-21 mb-4 d-flex">
+                  <a class="blog-img mr-4" style="background-image: url(images/image_2.jpg);"></a>
+                  <div class="text">
+                    <h3 class="heading"><a href="#">In the remote village known as Mpongi , found in Pallisa District, Eastern Uganda,..</a></h3>
+                    <div class="meta">
+                      <div><a href="#"><span class="icon-calendar"></span> March 12, 2025</a></div>
+                      <div><a href="#"><span class="icon-person"></span> Admin</a></div>
+                      <div><a href="#"><span class="icon-chat"></span> 19</a></div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -192,7 +195,8 @@
   <script>
     window.API_BASE_URL = 'https://buyesi.onrender.com/api';
   </script>
-  <script src="js/api.js"></script>
+  <!-- Add type="module" to the api.js script -->
+  <script type="module" src="js/api.js"></script>
   <script type="module" src="js/blogs.js"></script>
   <script type="module" src="js/footer.js"></script>
     

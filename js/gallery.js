@@ -1,5 +1,5 @@
 // Import API modules
-import { galleryAPI } from './api.js';
+import { galleryAPI } from '../api.js';
 
 // Get API_BASE_URL from window object
 const API_BASE_URL = window.API_BASE_URL;
@@ -48,17 +48,12 @@ async function loadGalleryImages() {
 		galleryImages.forEach((image) => {
 			// Construct the image URL properly
 			let imageUrl;
-			if (image.url) {
-				if (image.url.startsWith('http')) {
-					imageUrl = image.url;
-				} else if (image.url.includes('/uploads/')) {
-					imageUrl = `${API_BASE_URL}${image.url}`;
-				} else {
-					imageUrl = `${API_BASE_URL}/uploads/gallery/${image.url}`;
-				}
+			if (image.image) {
+				imageUrl = image.image; // Use the Cloudinary URL directly from the API
 				console.log('Image URL for gallery:', imageUrl);
 			} else {
-				imageUrl = 'images/gallery-default.jpg';
+				imageUrl =
+					'https://res.cloudinary.com/demo/image/upload/v1234567890/sample.jpg'; // Use a Cloudinary fallback URL
 			}
 
 			const imageHTML = `

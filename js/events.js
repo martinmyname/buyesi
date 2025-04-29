@@ -1,5 +1,5 @@
 // Import API modules
-import { eventAPI } from './api.js';
+import { eventAPI } from '../api.js';
 
 // Get API_BASE_URL from window object
 const API_BASE_URL = window.API_BASE_URL;

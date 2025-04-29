@@ -1,5 +1,5 @@
 // Import API modules
-import { teamAPI } from './api.js';
+import { teamAPI } from '../api.js';
 
 // Get API_BASE_URL from window object
 const API_BASE_URL = window.API_BASE_URL;
@@ -27,14 +27,13 @@ async function loadTeamMembers() {
 
 		// Fetch team members from the API
 		console.log('Fetching team members...');
-		const response = await fetch(`${API_BASE_URL}/teams`);
+		const response = await teamAPI.getAll();
 		console.log('API Response:', response);
 
-		if (!response.ok) {
-			throw new Error(`HTTP error! status: ${response.status}`);
-		}
-
-		const teamMembers = await response.json();
+		// Handle both array response and object with data property
+		const teamMembers = Array.isArray(response)
+			? response
+			: response.data || [];
 		console.log('Processed team members:', teamMembers);
 
 		if (!teamMembers || !teamMembers.length) {
@@ -116,9 +115,14 @@ async function loadTeamMembers() {
 			teamContainer.innerHTML += memberHTML;
 		});
 
-		// Initialize any necessary animations or effects after rendering
-		if (typeof AOS !== 'undefined') {
-			AOS.refresh();
+		// Initialize animations
+		if (typeof $.fn.waypoint !== 'undefined') {
+			$('.ftco-animate').waypoint(
+				function () {
+					$(this.element).addClass('fadeInUp ftco-animated');
+				},
+				{ offset: '95%' }
+			);
 		}
 	} catch (error) {
 		console.error('Failed to load team members:', error);

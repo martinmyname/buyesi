@@ -10,6 +10,7 @@ const ENDPOINTS = {
 	EVENTS: `${API_BASE_URL}/events`,
 	CONTACT: `${API_BASE_URL}/contact`,
 	VOLUNTEER: `${API_BASE_URL}/volunteers`,
+	DONATIONS: `${API_BASE_URL}/donations`,
 };
 
 // API Response Handler
@@ -242,19 +243,25 @@ const eventAPI = {
 // Blog API
 const blogAPI = {
 	getAll: async () => {
-		const token = localStorage.getItem('token');
-		const response = await fetch(`${API_BASE_URL}/blogs`, {
-			method: 'GET',
-			headers: {
-				Authorization: token ? `Bearer ${token}` : '',
-			},
-		});
-		return handleResponse(response);
+		try {
+			const response = await fetch(`${API_BASE_URL}/blogs`);
+			const data = await response.json();
+			return data;
+		} catch (error) {
+			console.error('Error fetching blogs:', error);
+			throw error;
+		}
 	},
 
 	getById: async (id) => {
-		const response = await fetch(`${API_BASE_URL}/blogs/${id}`);
-		return handleResponse(response);
+		try {
+			const response = await fetch(`${API_BASE_URL}/blogs/${id}`);
+			const data = await response.json();
+			return data;
+		} catch (error) {
+			console.error(`Error fetching blog ${id}:`, error);
+			throw error;
+		}
 	},
 
 	create: async (formData) => {
@@ -293,40 +300,17 @@ const blogAPI = {
 	},
 };
 
-// Cause API
-const causeAPI = {
+// Gallery API
+const galleryAPI = {
 	getAll: async () => {
-		const token = localStorage.getItem('token');
-		const response = await fetch(`${API_BASE_URL}/causes`, {
-			method: 'GET',
-			headers: {
-				Authorization: token ? `Bearer ${token}` : '',
-			},
-		});
-		return handleResponse(response);
-	},
-
-	getById: async (id) => {
-		const response = await fetch(`${API_BASE_URL}/causes/${id}`);
+		const response = await fetch(`${API_BASE_URL}/galleries`);
 		return handleResponse(response);
 	},
 
 	create: async (formData) => {
 		const token = localStorage.getItem('token');
-		const response = await fetch(`${API_BASE_URL}/causes`, {
+		const response = await fetch(`${API_BASE_URL}/galleries`, {
 			method: 'POST',
-			headers: {
-				Authorization: token ? `Bearer ${token}` : '',
-			},
-			body: formData,
-		});
-		return handleResponse(response);
-	},
-
-	update: async (id, formData) => {
-		const token = localStorage.getItem('token');
-		const response = await fetch(`${API_BASE_URL}/causes/${id}`, {
-			method: 'PUT',
 			headers: {
 				Authorization: token ? `Bearer ${token}` : '',
 			},
@@ -337,7 +321,7 @@ const causeAPI = {
 
 	delete: async (id) => {
 		const token = localStorage.getItem('token');
-		const response = await fetch(`${API_BASE_URL}/causes/${id}`, {
+		const response = await fetch(`${API_BASE_URL}/galleries/${id}`, {
 			method: 'DELETE',
 			headers: {
 				Authorization: token ? `Bearer ${token}` : '',
@@ -350,13 +334,7 @@ const causeAPI = {
 // Team API
 const teamAPI = {
 	getAll: async () => {
-		const token = localStorage.getItem('token');
-		const response = await fetch(`${API_BASE_URL}/teams`, {
-			method: 'GET',
-			headers: {
-				Authorization: token ? `Bearer ${token}` : '',
-			},
-		});
+		const response = await fetch(`${API_BASE_URL}/teams`);
 		return handleResponse(response);
 	},
 
@@ -401,28 +379,34 @@ const teamAPI = {
 	},
 };
 
-// Gallery API
-const galleryAPI = {
+// Cause API
+const causeAPI = {
 	getAll: async () => {
-		const token = localStorage.getItem('token');
-		const response = await fetch(`${API_BASE_URL}/galleries`, {
-			method: 'GET',
-			headers: {
-				Authorization: token ? `Bearer ${token}` : '',
-			},
-		});
+		const response = await fetch(`${API_BASE_URL}/causes`);
 		return handleResponse(response);
 	},
 
 	getById: async (id) => {
-		const response = await fetch(`${API_BASE_URL}/galleries/${id}`);
+		const response = await fetch(`${API_BASE_URL}/causes/${id}`);
 		return handleResponse(response);
 	},
 
 	create: async (formData) => {
 		const token = localStorage.getItem('token');
-		const response = await fetch(`${API_BASE_URL}/galleries`, {
+		const response = await fetch(`${API_BASE_URL}/causes`, {
 			method: 'POST',
+			headers: {
+				Authorization: token ? `Bearer ${token}` : '',
+			},
+			body: formData,
+		});
+		return handleResponse(response);
+	},
+
+	update: async (id, formData) => {
+		const token = localStorage.getItem('token');
+		const response = await fetch(`${API_BASE_URL}/causes/${id}`, {
+			method: 'PUT',
 			headers: {
 				Authorization: token ? `Bearer ${token}` : '',
 			},
@@ -433,7 +417,7 @@ const galleryAPI = {
 
 	delete: async (id) => {
 		const token = localStorage.getItem('token');
-		const response = await fetch(`${API_BASE_URL}/galleries/${id}`, {
+		const response = await fetch(`${API_BASE_URL}/causes/${id}`, {
 			method: 'DELETE',
 			headers: {
 				Authorization: token ? `Bearer ${token}` : '',
@@ -445,18 +429,30 @@ const galleryAPI = {
 
 // Assign all APIs to window.API
 window.API = {
+	authAPI: authAPI,
+	causeAPI: causeAPI,
+	blogAPI: blogAPI,
+	teamAPI: teamAPI,
+	galleryAPI: galleryAPI,
+	eventAPI: eventAPI,
+	volunteerAPI: volunteerAPI,
+	donationAPI: donationAPI,
+	ENDPOINTS: ENDPOINTS,
+	fetchFromApi: fetchFromApi,
+	BASE_URL: API_BASE_URL,
+	// Also include shorter aliases for convenience
 	auth: authAPI,
-	donation: donationAPI,
-	contact: contactAPI,
-	volunteer: volunteerAPI,
-	blog: blogAPI,
-	event: eventAPI,
-	gallery: galleryAPI,
-	team: teamAPI,
 	cause: causeAPI,
-	constants: {
-		API_BASE_URL,
-		ENDPOINTS,
-	},
-	fetchFromApi,
+	blog: blogAPI,
+	team: teamAPI,
+	gallery: galleryAPI,
+	event: eventAPI,
+	volunteer: volunteerAPI,
+	donation: donationAPI,
 };
+
+// Log that the API has been initialized
+console.log('API initialized successfully with:', Object.keys(window.API));
+
+// Remove the ES module export statements as they're causing syntax errors
+// Regular script tags don't support ES module syntax

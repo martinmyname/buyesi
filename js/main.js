@@ -1,11 +1,11 @@
 // Initialize AOS with modern configuration
-AOS.init({
-	duration: 800,
-	easing: 'ease',
-	once: true,
-	mirror: false,
-	disable: 'mobile',
-});
+// AOS.init({
+// 	duration: 800,
+// 	easing: 'ease',
+// 	once: true,
+// 	mirror: false,
+// 	disable: 'mobile',
+// });
 
 // Counter animation
 const counterAnimation = () => {
@@ -43,14 +43,14 @@ document.querySelectorAll('.counter-wrap').forEach((counter) => {
 (function ($) {
 	'use strict';
 
-	$(window).stellar({
-		responsive: false,
-		parallaxBackgrounds: true,
-		parallaxElements: true,
-		horizontalScrolling: false,
-		hideDistantElements: false,
-		scrollProperty: 'scroll',
-	});
+	// $(window).stellar({
+	// 	responsive: false,
+	// 	parallaxBackgrounds: true,
+	// 	parallaxElements: true,
+	// 	horizontalScrolling: false,
+	// 	hideDistantElements: false,
+	// 	scrollProperty: 'scroll',
+	// });
 
 	var fullHeight = function () {
 		$('.js-fullheight').css('height', $(window).height());
