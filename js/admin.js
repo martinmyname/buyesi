@@ -461,7 +461,7 @@ class AdminDashboard {
 								this.showError('Image upload failed. Please try again.');
 							}
 						});
-					} else {
+			} else {
 						console.error('Cloudinary upload widget not available');
 						this.showError(
 							'Image upload service is not available. Please try again later.'
@@ -711,7 +711,7 @@ class AdminDashboard {
 			const token = this.getAuthToken();
 			let response;
 
-			if (isEdit) {
+				if (isEdit) {
 				// Update existing team member
 				response = await fetch(
 					`https://buyesi.onrender.com/api/admin/team/${id}`,
@@ -724,7 +724,7 @@ class AdminDashboard {
 						body: JSON.stringify(teamData),
 					}
 				);
-			} else {
+							} else {
 				// Create new team member
 				response = await fetch('https://buyesi.onrender.com/api/admin/team', {
 					method: 'POST',
@@ -738,8 +738,8 @@ class AdminDashboard {
 
 			await this.handleApiResponse(
 				response,
-				`Team member ${isEdit ? 'updated' : 'added'} successfully`
-			);
+						`Team member ${isEdit ? 'updated' : 'added'} successfully`
+					);
 
 			// Reset form and close modal
 			$(form).trigger('reset');
@@ -747,7 +747,7 @@ class AdminDashboard {
 
 			// Reload team data
 			await this.loadTeamData();
-		} catch (error) {
+			} catch (error) {
 			console.error('Error saving team member:', error);
 			this.showError(error.message);
 		}
@@ -836,7 +836,7 @@ class AdminDashboard {
 			// Get current user for author field
 			let authorId = '';
 			try {
-				const currentUser = window.API.auth.getCurrentUser();
+			const currentUser = window.API.auth.getCurrentUser();
 				if (currentUser && currentUser._id) {
 					authorId = currentUser._id;
 				}
@@ -876,7 +876,7 @@ class AdminDashboard {
 			let response;
 
 			// Use JSON format instead of FormData since we're sending a URL, not a file
-			if (isEdit) {
+				if (isEdit) {
 				// Update existing blog post
 				response = await fetch(
 					`https://buyesi.onrender.com/api/admin/blog/${id}`,
@@ -889,7 +889,7 @@ class AdminDashboard {
 						body: JSON.stringify(blogData),
 					}
 				);
-			} else {
+							} else {
 				// Create new blog post
 				response = await fetch('https://buyesi.onrender.com/api/admin/blog', {
 					method: 'POST',
@@ -903,8 +903,8 @@ class AdminDashboard {
 
 			await this.handleApiResponse(
 				response,
-				`Blog post ${isEdit ? 'updated' : 'added'} successfully`
-			);
+						`Blog post ${isEdit ? 'updated' : 'added'} successfully`
+					);
 
 			// Reset form and close modal
 			$(form).trigger('reset');
@@ -912,7 +912,7 @@ class AdminDashboard {
 
 			// Reload blog data
 			await this.loadBlogsData();
-		} catch (error) {
+			} catch (error) {
 			console.error('Error saving blog post:', error);
 			this.showError(error.message);
 		}
@@ -1016,7 +1016,7 @@ class AdminDashboard {
 			const token = this.getAuthToken();
 			let response;
 
-			if (isEdit) {
+				if (isEdit) {
 				// Update existing event
 				response = await fetch(
 					`https://buyesi.onrender.com/api/admin/events/${id}`,
@@ -1029,7 +1029,7 @@ class AdminDashboard {
 						body: JSON.stringify(eventData),
 					}
 				);
-			} else {
+							} else {
 				// Create new event
 				response = await fetch('https://buyesi.onrender.com/api/admin/events', {
 					method: 'POST',
@@ -1043,8 +1043,8 @@ class AdminDashboard {
 
 			await this.handleApiResponse(
 				response,
-				`Event ${isEdit ? 'updated' : 'added'} successfully`
-			);
+						`Event ${isEdit ? 'updated' : 'added'} successfully`
+					);
 
 			// Reset form and close modal
 			$(form).trigger('reset');
@@ -1052,7 +1052,7 @@ class AdminDashboard {
 
 			// Reload events data
 			await this.loadEventsData();
-		} catch (error) {
+			} catch (error) {
 			console.error('Error saving event:', error);
 			this.showError(error.message);
 		}
@@ -1174,8 +1174,8 @@ class AdminDashboard {
 			$('.modal').modal('hide');
 
 			// Reload gallery data
-			await this.loadGalleryData();
-		} catch (error) {
+					await this.loadGalleryData();
+			} catch (error) {
 			console.error('Error saving gallery image:', error);
 			this.showError(error.message);
 		}
@@ -1255,8 +1255,8 @@ class AdminDashboard {
 			$('.modal').modal('hide');
 
 			// Reload causes data
-			await this.loadCausesData();
-		} catch (error) {
+					await this.loadCausesData();
+			} catch (error) {
 			console.error('Error saving cause:', error);
 			this.showError(error.message);
 		}

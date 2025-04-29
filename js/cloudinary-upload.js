@@ -1,8 +1,8 @@
 // Cloudinary Upload Utility
 
 // Cloudinary configuration
-const CLOUDINARY_CLOUD_NAME = 'dbgy1uc0i'; // Your Cloudinary cloud name
-const CLOUDINARY_UPLOAD_PRESET = 'buyesi'; // Use your custom upload preset
+const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME; // Your Cloudinary cloud name
+const CLOUDINARY_UPLOAD_PRESET = process.env.CLOUDINARY_UPLOAD_PRESET; // Use your custom upload preset
 
 // Flag to indicate Cloudinary is available
 window.CLOUDINARY_ENABLED = true;
