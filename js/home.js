@@ -1,12 +1,12 @@
 // Access the API objects from the window.API namespace instead of redeclaring them
 const {
-	cause: causeAPI,
-	blog: blogAPI,
-	team: teamAPI,
-	gallery: galleryAPI,
-	event: eventAPI,
-	volunteer: volunteerAPI,
-	donation: donationAPI,
+	causeAPI: cause,
+	blogAPI: blog,
+	teamAPI: team,
+	galleryAPI: gallery,
+	eventAPI: event,
+	volunteerAPI: volunteer,
+	donationAPI: donation,
 	ENDPOINTS,
 	fetchFromApi,
 	BASE_URL: API_BASE_URL,
@@ -563,7 +563,7 @@ function setupVolunteerForm() {
 				message: formData.get('message'),
 			};
 
-			await volunteerAPI.register(volunteerData);
+			await volunteer.register(volunteerData);
 			showAlert(
 				'Thank you for your interest in volunteering! We will contact you soon.',
 				'success',
@@ -606,7 +606,7 @@ function setupDonationForm() {
 				message: formData.get('message'),
 			};
 
-			await donationAPI.create(donationData);
+			await donation.create(donationData);
 			showAlert(
 				'Thank you for your donation! We appreciate your support.',
 				'success',

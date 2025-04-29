@@ -239,60 +239,16 @@ const eventAPI = {
 	},
 };
 
-// Cause API
-const causeAPI = {
-	getAll: async () => {
-		const response = await fetch(`${API_BASE_URL}/causes`);
-		return handleResponse(response);
-	},
-
-	getById: async (id) => {
-		const response = await fetch(`${API_BASE_URL}/causes/${id}`);
-		return handleResponse(response);
-	},
-
-	create: async (formData) => {
-		const token = localStorage.getItem('token');
-		const response = await fetch(`${API_BASE_URL}/causes`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: token ? `Bearer ${token}` : '',
-			},
-			body: JSON.stringify(formData),
-		});
-		return handleResponse(response);
-	},
-
-	update: async (id, formData) => {
-		const token = localStorage.getItem('token');
-		const response = await fetch(`${API_BASE_URL}/causes/${id}`, {
-			method: 'PUT',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: token ? `Bearer ${token}` : '',
-			},
-			body: JSON.stringify(formData),
-		});
-		return handleResponse(response);
-	},
-
-	delete: async (id) => {
-		const token = localStorage.getItem('token');
-		const response = await fetch(`${API_BASE_URL}/causes/${id}`, {
-			method: 'DELETE',
-			headers: {
-				Authorization: token ? `Bearer ${token}` : '',
-			},
-		});
-		return handleResponse(response);
-	},
-};
-
 // Blog API
 const blogAPI = {
 	getAll: async () => {
-		const response = await fetch(`${API_BASE_URL}/blogs`);
+		const token = localStorage.getItem('token');
+		const response = await fetch(`${API_BASE_URL}/blogs`, {
+			method: 'GET',
+			headers: {
+				Authorization: token ? `Bearer ${token}` : '',
+			},
+		});
 		return handleResponse(response);
 	},
 
@@ -306,10 +262,9 @@ const blogAPI = {
 		const response = await fetch(`${API_BASE_URL}/blogs`, {
 			method: 'POST',
 			headers: {
-				'Content-Type': 'application/json',
 				Authorization: token ? `Bearer ${token}` : '',
 			},
-			body: JSON.stringify(formData),
+			body: formData,
 		});
 		return handleResponse(response);
 	},
@@ -319,10 +274,9 @@ const blogAPI = {
 		const response = await fetch(`${API_BASE_URL}/blogs/${id}`, {
 			method: 'PUT',
 			headers: {
-				'Content-Type': 'application/json',
 				Authorization: token ? `Bearer ${token}` : '',
 			},
-			body: JSON.stringify(formData),
+			body: formData,
 		});
 		return handleResponse(response);
 	},
@@ -339,10 +293,70 @@ const blogAPI = {
 	},
 };
 
+// Cause API
+const causeAPI = {
+	getAll: async () => {
+		const token = localStorage.getItem('token');
+		const response = await fetch(`${API_BASE_URL}/causes`, {
+			method: 'GET',
+			headers: {
+				Authorization: token ? `Bearer ${token}` : '',
+			},
+		});
+		return handleResponse(response);
+	},
+
+	getById: async (id) => {
+		const response = await fetch(`${API_BASE_URL}/causes/${id}`);
+		return handleResponse(response);
+	},
+
+	create: async (formData) => {
+		const token = localStorage.getItem('token');
+		const response = await fetch(`${API_BASE_URL}/causes`, {
+			method: 'POST',
+			headers: {
+				Authorization: token ? `Bearer ${token}` : '',
+			},
+			body: formData,
+		});
+		return handleResponse(response);
+	},
+
+	update: async (id, formData) => {
+		const token = localStorage.getItem('token');
+		const response = await fetch(`${API_BASE_URL}/causes/${id}`, {
+			method: 'PUT',
+			headers: {
+				Authorization: token ? `Bearer ${token}` : '',
+			},
+			body: formData,
+		});
+		return handleResponse(response);
+	},
+
+	delete: async (id) => {
+		const token = localStorage.getItem('token');
+		const response = await fetch(`${API_BASE_URL}/causes/${id}`, {
+			method: 'DELETE',
+			headers: {
+				Authorization: token ? `Bearer ${token}` : '',
+			},
+		});
+		return handleResponse(response);
+	},
+};
+
 // Team API
 const teamAPI = {
 	getAll: async () => {
-		const response = await fetch(`${API_BASE_URL}/teams`);
+		const token = localStorage.getItem('token');
+		const response = await fetch(`${API_BASE_URL}/teams`, {
+			method: 'GET',
+			headers: {
+				Authorization: token ? `Bearer ${token}` : '',
+			},
+		});
 		return handleResponse(response);
 	},
 
@@ -356,10 +370,9 @@ const teamAPI = {
 		const response = await fetch(`${API_BASE_URL}/teams`, {
 			method: 'POST',
 			headers: {
-				'Content-Type': 'application/json',
 				Authorization: token ? `Bearer ${token}` : '',
 			},
-			body: JSON.stringify(formData),
+			body: formData,
 		});
 		return handleResponse(response);
 	},
@@ -369,10 +382,9 @@ const teamAPI = {
 		const response = await fetch(`${API_BASE_URL}/teams/${id}`, {
 			method: 'PUT',
 			headers: {
-				'Content-Type': 'application/json',
 				Authorization: token ? `Bearer ${token}` : '',
 			},
-			body: JSON.stringify(formData),
+			body: formData,
 		});
 		return handleResponse(response);
 	},
@@ -392,7 +404,13 @@ const teamAPI = {
 // Gallery API
 const galleryAPI = {
 	getAll: async () => {
-		const response = await fetch(`${API_BASE_URL}/galleries`);
+		const token = localStorage.getItem('token');
+		const response = await fetch(`${API_BASE_URL}/galleries`, {
+			method: 'GET',
+			headers: {
+				Authorization: token ? `Bearer ${token}` : '',
+			},
+		});
 		return handleResponse(response);
 	},
 
@@ -406,23 +424,9 @@ const galleryAPI = {
 		const response = await fetch(`${API_BASE_URL}/galleries`, {
 			method: 'POST',
 			headers: {
-				'Content-Type': 'application/json',
 				Authorization: token ? `Bearer ${token}` : '',
 			},
-			body: JSON.stringify(formData),
-		});
-		return handleResponse(response);
-	},
-
-	update: async (id, formData) => {
-		const token = localStorage.getItem('token');
-		const response = await fetch(`${API_BASE_URL}/galleries/${id}`, {
-			method: 'PUT',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: token ? `Bearer ${token}` : '',
-			},
-			body: JSON.stringify(formData),
+			body: formData,
 		});
 		return handleResponse(response);
 	},
@@ -439,18 +443,20 @@ const galleryAPI = {
 	},
 };
 
-// Export all APIs
-export {
-	authAPI,
-	donationAPI,
-	contactAPI,
-	volunteerAPI,
-	blogAPI,
-	eventAPI,
-	galleryAPI,
-	teamAPI,
-	causeAPI,
-	API_BASE_URL,
-	ENDPOINTS,
+// Assign all APIs to window.API
+window.API = {
+	auth: authAPI,
+	donation: donationAPI,
+	contact: contactAPI,
+	volunteer: volunteerAPI,
+	blog: blogAPI,
+	event: eventAPI,
+	gallery: galleryAPI,
+	team: teamAPI,
+	cause: causeAPI,
+	constants: {
+		API_BASE_URL,
+		ENDPOINTS,
+	},
 	fetchFromApi,
 };

@@ -69,6 +69,8 @@ function uploadImageToCloudinary(callback) {
 			if (!error && result && result.event === 'success') {
 				console.log('Upload successful:', result.info.secure_url);
 				if (callback) callback(null, result.info.secure_url);
+				// Close the widget after successful upload
+				cloudinary.closeUploadWidget();
 			} else if (error) {
 				console.error('Upload error:', error);
 				alert('Upload error: ' + (error.message || 'Unknown error'));

@@ -456,6 +456,13 @@ class AdminDashboard {
 									previewDiv.style.display = 'block';
 									previewDiv.innerHTML = `<img src="${url}" class="img-fluid" alt="Preview">`;
 								}
+
+								// Debug the input field
+								console.log('Hidden input updated:', {
+									id: hiddenInput.id,
+									name: hiddenInput.name,
+									value: hiddenInput.value,
+								});
 							} else if (error) {
 								console.error('Upload error:', error);
 								this.showError('Image upload failed. Please try again.');
@@ -685,7 +692,15 @@ class AdminDashboard {
 			// Validate required fields
 			const name = formData.get('name');
 			const position = formData.get('position');
-			const image = formData.get('image');
+
+			// Check if we have the image value in the hidden input field
+			let imageUrl = $('#teamImageUrl').val();
+			// Fallback to form data if needed
+			if (!imageUrl) {
+				imageUrl = formData.get('image');
+			}
+
+			console.log('Image URL from form:', imageUrl);
 
 			if (!name || !position) {
 				this.showError('Name and Position are required fields');
@@ -693,7 +708,7 @@ class AdminDashboard {
 			}
 
 			// For new team members, image is required
-			if (!isEdit && !image) {
+			if (!isEdit && !imageUrl) {
 				this.showError('Please upload an image for the team member');
 				// Highlight the image upload section
 				$('#teamImageUpload').addClass('border border-danger p-2');
@@ -710,8 +725,13 @@ class AdminDashboard {
 				description: formData.get('description') || '',
 				email: formData.get('email') || '',
 				phone: formData.get('phone') || '',
-				image: formData.get('image'), // Changed from imageUrl to image to match backend expectation
+				image: imageUrl, // Use the image URL we verified above
+				imageUrl: imageUrl, // Also send as imageUrl in case backend expects this field name
+				photo: imageUrl, // Also send as photo in case backend expects this field name
 			};
+
+			// Log the data being sent for debugging
+			console.log('Sending team data:', teamData);
 
 			const token = this.getAuthToken();
 			let response;
@@ -741,10 +761,11 @@ class AdminDashboard {
 				});
 			}
 
-			await this.handleApiResponse(
+			const responseData = await this.handleApiResponse(
 				response,
 				`Team member ${isEdit ? 'updated' : 'added'} successfully`
 			);
+			console.log('API response:', responseData);
 
 			// Reset form and close modal
 			$(form).trigger('reset');
