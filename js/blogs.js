@@ -57,7 +57,12 @@ async function loadBlogs() {
 			// Construct the image URL properly
 			let imageUrl;
 			if (blog.image) {
-				if (blog.image.startsWith('http')) {
+				// Check for Cloudinary URLs first
+				if (blog.image.includes('cloudinary.com')) {
+					imageUrl = blog.image;
+				}
+				// Then check for other external URLs
+				else if (blog.image.startsWith('http')) {
 					imageUrl = blog.image;
 				} else if (blog.image.includes('/uploads/')) {
 					imageUrl = `${API_BASE_URL}${blog.image}`;

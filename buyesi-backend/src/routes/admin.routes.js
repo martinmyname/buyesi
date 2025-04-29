@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { protect, authorize } = require('../middleware/auth');
-const upload = require('../middleware/upload');
+const { cloudinaryUpload } = require('../middleware/cloudinary');
 const {
 	addTeamMember,
 	updateTeamMember,
@@ -20,7 +20,7 @@ const {
 	getDonations,
 	getDonation,
 	getVolunteers,
-	getVolunteer
+	getVolunteer,
 } = require('../controllers/admin.controller');
 
 // Admin dashboard routes
@@ -29,27 +29,81 @@ router.get('/dashboard', protect, authorize('admin'), (req, res) => {
 });
 
 // Team management
-router.post('/team', protect, authorize('admin'), upload.single('image'), addTeamMember);
-router.put('/team/:id', protect, authorize('admin'), upload.single('image'), updateTeamMember);
+router.post(
+	'/team',
+	protect,
+	authorize('admin'),
+	cloudinaryUpload.single('image'),
+	addTeamMember
+);
+router.put(
+	'/team/:id',
+	protect,
+	authorize('admin'),
+	cloudinaryUpload.single('image'),
+	updateTeamMember
+);
 router.delete('/team/:id', protect, authorize('admin'), deleteTeamMember);
 
 // Blog management
-router.post('/blog', protect, authorize('admin'), upload.single('image'), addBlogPost);
-router.put('/blog/:id', protect, authorize('admin'), upload.single('image'), updateBlogPost);
+router.post(
+	'/blog',
+	protect,
+	authorize('admin'),
+	cloudinaryUpload.single('image'),
+	addBlogPost
+);
+router.put(
+	'/blog/:id',
+	protect,
+	authorize('admin'),
+	cloudinaryUpload.single('image'),
+	updateBlogPost
+);
 router.delete('/blog/:id', protect, authorize('admin'), deleteBlogPost);
 
 // Event management
-router.post('/events', protect, authorize('admin'), upload.single('image'), addEvent);
-router.put('/events/:id', protect, authorize('admin'), upload.single('image'), updateEvent);
+router.post(
+	'/events',
+	protect,
+	authorize('admin'),
+	cloudinaryUpload.single('image'),
+	addEvent
+);
+router.put(
+	'/events/:id',
+	protect,
+	authorize('admin'),
+	cloudinaryUpload.single('image'),
+	updateEvent
+);
 router.delete('/events/:id', protect, authorize('admin'), deleteEvent);
 
 // Gallery management
-router.post('/gallery', protect, authorize('admin'), upload.single('image'), addGalleryImage);
+router.post(
+	'/gallery',
+	protect,
+	authorize('admin'),
+	cloudinaryUpload.single('image'),
+	addGalleryImage
+);
 router.delete('/gallery/:id', protect, authorize('admin'), deleteGalleryImage);
 
 // Cause management
-router.post('/causes', protect, authorize('admin'), upload.single('image'), addCause);
-router.put('/causes/:id', protect, authorize('admin'), upload.single('image'), updateCause);
+router.post(
+	'/causes',
+	protect,
+	authorize('admin'),
+	cloudinaryUpload.single('image'),
+	addCause
+);
+router.put(
+	'/causes/:id',
+	protect,
+	authorize('admin'),
+	cloudinaryUpload.single('image'),
+	updateCause
+);
 router.delete('/causes/:id', protect, authorize('admin'), deleteCause);
 
 // Donation management

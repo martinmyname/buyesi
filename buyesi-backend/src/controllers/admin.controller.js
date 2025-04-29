@@ -11,7 +11,7 @@ exports.addTeamMember = async (req, res) => {
 	try {
 		const teamMember = await Team.create({
 			...req.body,
-			image: req.file ? req.file.filename : undefined,
+			image: req.file ? req.file.path : undefined,
 		});
 		res.status(201).json({
 			success: true,
@@ -31,7 +31,7 @@ exports.updateTeamMember = async (req, res) => {
 			req.params.id,
 			{
 				...req.body,
-				image: req.file ? req.file.filename : undefined,
+				image: req.file ? req.file.path : undefined,
 			},
 			{ new: true }
 		);
@@ -65,10 +65,28 @@ exports.deleteTeamMember = async (req, res) => {
 // Blog Management
 exports.addBlogPost = async (req, res) => {
 	try {
+		// Handle both file uploads and direct image URLs
+		let imageUrl;
+		if (req.file) {
+			// If a file was uploaded, use the file path
+			imageUrl = req.file.path;
+		} else if (req.body.image) {
+			// If an image URL was provided in the body, use that
+			imageUrl = req.body.image;
+		}
+
+		if (!imageUrl) {
+			return res.status(400).json({
+				success: false,
+				error: 'Featured image is required',
+			});
+		}
+
 		const blogPost = await Blog.create({
 			...req.body,
-			image: req.file ? req.file.filename : undefined,
+			image: imageUrl,
 		});
+
 		res.status(201).json({
 			success: true,
 			data: blogPost,
@@ -83,14 +101,21 @@ exports.addBlogPost = async (req, res) => {
 
 exports.updateBlogPost = async (req, res) => {
 	try {
-		const blogPost = await Blog.findByIdAndUpdate(
-			req.params.id,
-			{
-				...req.body,
-				image: req.file ? req.file.filename : undefined,
-			},
-			{ new: true }
-		);
+		// Handle both file uploads and direct image URLs
+		let updateData = { ...req.body };
+
+		if (req.file) {
+			// If a file was uploaded, use the file path
+			updateData.image = req.file.path;
+		} else if (req.body.image) {
+			// If image URL was provided directly, keep it
+			// No change needed, it's already in updateData
+		}
+
+		const blogPost = await Blog.findByIdAndUpdate(req.params.id, updateData, {
+			new: true,
+		});
+
 		res.status(200).json({
 			success: true,
 			data: blogPost,
@@ -123,7 +148,7 @@ exports.addEvent = async (req, res) => {
 	try {
 		const event = await Event.create({
 			...req.body,
-			image: req.file ? req.file.filename : undefined,
+			image: req.file ? req.file.path : undefined,
 		});
 		res.status(201).json({
 			success: true,
@@ -143,7 +168,7 @@ exports.updateEvent = async (req, res) => {
 			req.params.id,
 			{
 				...req.body,
-				image: req.file ? req.file.filename : undefined,
+				image: req.file ? req.file.path : undefined,
 			},
 			{ new: true }
 		);
@@ -179,7 +204,7 @@ exports.addGalleryImage = async (req, res) => {
 	try {
 		const galleryImage = await Gallery.create({
 			...req.body,
-			image: req.file ? req.file.filename : undefined,
+			image: req.file ? req.file.path : undefined,
 		});
 		res.status(201).json({
 			success: true,
@@ -213,7 +238,7 @@ exports.addCause = async (req, res) => {
 	try {
 		const cause = await Cause.create({
 			...req.body,
-			image: req.file ? req.file.filename : undefined,
+			image: req.file ? req.file.path : undefined,
 		});
 		res.status(201).json({
 			success: true,
@@ -233,7 +258,7 @@ exports.updateCause = async (req, res) => {
 			req.params.id,
 			{
 				...req.body,
-				image: req.file ? req.file.filename : undefined,
+				image: req.file ? req.file.path : undefined,
 			},
 			{ new: true }
 		);

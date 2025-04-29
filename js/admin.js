@@ -371,33 +371,22 @@ if (!window.API) {
 // Admin Dashboard Functions
 class AdminDashboard {
 	constructor() {
-		this.currentUser = null;
+		// Initialize properties
+		this.sections = {};
+		this.activeSection = 'dashboard';
+
+		// Get auth token
+		this.authToken = localStorage.getItem('token');
+
+		// Initialize the dashboard
 		this.initialize();
 	}
 
 	async initialize() {
-		// Check authentication
-		if (!window.API.auth.isAuthenticated()) {
-			try {
-				// Attempt to check if auth endpoint is available
-				const response = await fetch('https://buyesi.onrender.com/auth/check', {
-					method: 'GET',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-				});
-				if (!response.ok && response.status === 404) {
-					console.error('Authentication endpoint not found.');
-					alert(
-						'Authentication system is currently unavailable. Please contact support.'
-					);
-				}
-			} catch (error) {
-				console.error('Error checking auth endpoint:', error);
-				alert(
-					'Unable to connect to authentication system. Please try again later.'
-				);
-			}
+		// Check if user is logged in
+		this.authToken = localStorage.getItem('token');
+
+		if (!this.authToken) {
 			window.location.href = 'login.html';
 			return;
 		}
@@ -411,7 +400,7 @@ class AdminDashboard {
 		// Initialize event listeners
 		this.initializeEventListeners();
 
-		// Initialize file input preview
+		// Initialize file input previews
 		this.initializeFileInputPreviews();
 
 		// Load initial data
@@ -434,20 +423,51 @@ class AdminDashboard {
 	}
 
 	initializeFileInputPreviews() {
-		// Add event listeners to all file inputs to show image previews
-		$('input[type="file"][accept*="image"]').change(function () {
-			const preview = $(this).siblings('.preview-image');
-			const file = this.files[0];
+		// This method is no longer needed for file inputs since we're using Cloudinary
+		// Instead, we'll set up the upload buttons to show previews when images are selected
 
-			if (file) {
-				const reader = new FileReader();
-				reader.onload = function (e) {
-					preview.attr('src', e.target.result);
-					preview.show();
-				};
-				reader.readAsDataURL(file);
-			} else {
-				preview.hide();
+		// Add event listeners to the upload buttons
+		const uploadButtons = [
+			'uploadTeamImage',
+			'uploadBlogImage',
+			'uploadEventImage',
+			'uploadGalleryImage',
+			'uploadCauseImage',
+		];
+
+		uploadButtons.forEach((buttonId) => {
+			const button = document.getElementById(buttonId);
+			if (button) {
+				button.addEventListener('click', () => {
+					if (window.uploadImage) {
+						window.uploadImage((error, url) => {
+							if (!error && url) {
+								// Get the container and form ID
+								const container = button.closest('.image-upload-container');
+								const hiddenInput = container.querySelector(
+									'input[type="hidden"]'
+								);
+								const previewDiv = container.querySelector('.image-preview');
+
+								// Update hidden input and show preview
+								if (hiddenInput) hiddenInput.value = url;
+
+								if (previewDiv) {
+									previewDiv.style.display = 'block';
+									previewDiv.innerHTML = `<img src="${url}" class="img-fluid" alt="Preview">`;
+								}
+							} else if (error) {
+								console.error('Upload error:', error);
+								this.showError('Image upload failed. Please try again.');
+							}
+						});
+					} else {
+						console.error('Cloudinary upload widget not available');
+						this.showError(
+							'Image upload service is not available. Please try again later.'
+						);
+					}
+				});
 			}
 		});
 	}
@@ -673,109 +693,63 @@ class AdminDashboard {
 			}
 
 			// For new team members, image is required
-			if (!isEdit && (!image || image.name === '')) {
-				this.showError('Please select an image file');
+			if (!isEdit && !image) {
+				this.showError('Please upload an image');
 				return;
 			}
 
-			// Create FormData object for the request
-			const actualFormData = new FormData();
+			// Create data object for the request
+			const teamData = {
+				name: formData.get('name'),
+				position: formData.get('position'),
+				description: formData.get('description') || '',
+				email: formData.get('email') || '',
+				phone: formData.get('phone') || '',
+				image: formData.get('image'),
+			};
 
-			// Add all text fields
-			actualFormData.append('name', formData.get('name'));
-			actualFormData.append('position', formData.get('position'));
-			actualFormData.append('description', formData.get('description') || '');
-			actualFormData.append('email', formData.get('email') || '');
-			actualFormData.append('phone', formData.get('phone') || '');
-
-			// Add image if present
-			if (image && image.name !== '') {
-				actualFormData.append('image', image);
-			}
-
-			// Log the FormData contents for debugging
-			console.log('FormData contents:');
-			for (let pair of actualFormData.entries()) {
-				console.log(pair[0] + ': ' + pair[1]);
-			}
-
+			const token = this.getAuthToken();
 			let response;
-			try {
-				// Use XMLHttpRequest to send form data
-				if (isEdit) {
-					response = await new Promise((resolve, reject) => {
-						const xhr = new XMLHttpRequest();
-						xhr.open('PUT', `https://buyesi.onrender.com/api/admin/team/${id}`);
-						const token = localStorage.getItem('token');
-						if (token) {
-							xhr.setRequestHeader('Authorization', `Bearer ${token}`);
-						}
-						xhr.onload = () => {
-							if (xhr.status >= 200 && xhr.status < 300) {
-								try {
-									resolve(JSON.parse(xhr.responseText));
-								} catch (e) {
-									resolve({ success: true });
-								}
-							} else {
-								// Log the error response for debugging
-								console.error('Server response:', xhr.responseText);
-								reject(new Error(`HTTP error! status: ${xhr.status}`));
-							}
-						};
-						xhr.onerror = () => reject(new Error('Network error'));
-						xhr.send(actualFormData);
-					});
-				} else {
-					response = await new Promise((resolve, reject) => {
-						const xhr = new XMLHttpRequest();
-						xhr.open('POST', 'https://buyesi.onrender.com/api/admin/team');
-						const token = localStorage.getItem('token');
-						if (token) {
-							xhr.setRequestHeader('Authorization', `Bearer ${token}`);
-						}
-						xhr.onload = () => {
-							if (xhr.status >= 200 && xhr.status < 300) {
-								try {
-									resolve(JSON.parse(xhr.responseText));
-								} catch (e) {
-									resolve({ success: true });
-								}
-							} else {
-								// Log the error response for debugging
-								console.error('Server response:', xhr.responseText);
-								reject(new Error(`HTTP error! status: ${xhr.status}`));
-							}
-						};
-						xhr.onerror = () => reject(new Error('Network error'));
-						xhr.send(actualFormData);
-					});
-				}
 
-				console.log('Team submission response:', response);
-
-				if (response.success || response._id) {
-					$('#teamModal').modal('hide');
-					form.reset();
-					$(form).removeData('edit').removeData('id');
-					await this.loadTeamData();
-					this.showSuccess(
-						`Team member ${isEdit ? 'updated' : 'added'} successfully`
-					);
-				} else {
-					this.showError(
-						`Failed to ${isEdit ? 'update' : 'add'} team member: ${
-							response.error || 'Unknown error'
-						}`
-					);
-				}
-			} catch (error) {
-				console.error('Error handling team form:', error);
-				this.showError(`Failed to save team member: ${error.message}`);
+			if (isEdit) {
+				// Update existing team member
+				response = await fetch(
+					`https://buyesi.onrender.com/api/admin/team/${id}`,
+					{
+						method: 'PUT',
+						headers: {
+							'Content-Type': 'application/json',
+							Authorization: `Bearer ${token}`,
+						},
+						body: JSON.stringify(teamData),
+					}
+				);
+			} else {
+				// Create new team member
+				response = await fetch('https://buyesi.onrender.com/api/admin/team', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						Authorization: `Bearer ${token}`,
+					},
+					body: JSON.stringify(teamData),
+				});
 			}
+
+			await this.handleApiResponse(
+				response,
+				`Team member ${isEdit ? 'updated' : 'added'} successfully`
+			);
+
+			// Reset form and close modal
+			$(form).trigger('reset');
+			$('.modal').modal('hide');
+
+			// Reload team data
+			await this.loadTeamData();
 		} catch (error) {
-			console.error('Error handling team form:', error);
-			this.showError(`Failed to save team member: ${error.message}`);
+			console.error('Error saving team member:', error);
+			this.showError(error.message);
 		}
 	}
 
@@ -839,7 +813,7 @@ class AdminDashboard {
 			// Validate required fields
 			const title = formData.get('title');
 			const content = formData.get('content');
-			const image = formData.get('image');
+			const imageUrl = formData.get('image');
 
 			if (!title || !content) {
 				this.showError('Title and Content are required fields');
@@ -847,119 +821,100 @@ class AdminDashboard {
 			}
 
 			// For new blog posts, image is required
-			if (!isEdit && (!image || image.name === '')) {
-				this.showError('Please select an image file');
+			if (!isEdit && !imageUrl) {
+				this.showError(
+					'Featured Image is required. Please upload an image before submitting.'
+				);
+				// Highlight the image upload section
+				$('#blogImageUpload').addClass('border border-danger p-2');
+				setTimeout(() => {
+					$('#blogImageUpload').removeClass('border border-danger p-2');
+				}, 3000);
 				return;
 			}
 
 			// Get current user for author field
-			const currentUser = window.API.auth.getCurrentUser();
-			if (!currentUser) {
-				this.showError('User information not found. Please log in again.');
-				return;
-			}
-
-			// Create FormData object for the request
-			const actualFormData = new FormData();
-
-			// Add all text fields
-			actualFormData.append('title', formData.get('title'));
-			actualFormData.append('excerpt', formData.get('excerpt'));
-			actualFormData.append('content', formData.get('content'));
-			actualFormData.append('categories', formData.get('categories'));
-			actualFormData.append('tags', formData.get('tags'));
-			actualFormData.append('status', formData.get('status'));
-			actualFormData.append('featured', form.elements['featured'].checked);
-			actualFormData.append('author', currentUser._id); // Add author field
-
-			// Add image if present
-			if (image && image.name !== '') {
-				actualFormData.append('image', image);
-			}
-
-			// Log the FormData contents for debugging
-			console.log('FormData contents:');
-			for (let pair of actualFormData.entries()) {
-				console.log(pair[0] + ': ' + pair[1]);
-			}
-
-			let response;
+			let authorId = '';
 			try {
-				// Use XMLHttpRequest to send form data
-				if (isEdit) {
-					response = await new Promise((resolve, reject) => {
-						const xhr = new XMLHttpRequest();
-						xhr.open('PUT', `https://buyesi.onrender.com/api/admin/blog/${id}`);
-						const token = localStorage.getItem('token');
-						if (token) {
-							xhr.setRequestHeader('Authorization', `Bearer ${token}`);
-						}
-						xhr.onload = () => {
-							if (xhr.status >= 200 && xhr.status < 300) {
-								try {
-									resolve(JSON.parse(xhr.responseText));
-								} catch (e) {
-									resolve({ success: true });
-								}
-							} else {
-								// Log the error response for debugging
-								console.error('Server response:', xhr.responseText);
-								reject(new Error(`HTTP error! status: ${xhr.status}`));
-							}
-						};
-						xhr.onerror = () => reject(new Error('Network error'));
-						xhr.send(actualFormData);
-					});
-				} else {
-					response = await new Promise((resolve, reject) => {
-						const xhr = new XMLHttpRequest();
-						xhr.open('POST', 'https://buyesi.onrender.com/api/admin/blog');
-						const token = localStorage.getItem('token');
-						if (token) {
-							xhr.setRequestHeader('Authorization', `Bearer ${token}`);
-						}
-						xhr.onload = () => {
-							if (xhr.status >= 200 && xhr.status < 300) {
-								try {
-									resolve(JSON.parse(xhr.responseText));
-								} catch (e) {
-									resolve({ success: true });
-								}
-							} else {
-								// Log the error response for debugging
-								console.error('Server response:', xhr.responseText);
-								reject(new Error(`HTTP error! status: ${xhr.status}`));
-							}
-						};
-						xhr.onerror = () => reject(new Error('Network error'));
-						xhr.send(actualFormData);
-					});
+				const currentUser = window.API.auth.getCurrentUser();
+				if (currentUser && currentUser._id) {
+					authorId = currentUser._id;
 				}
-
-				console.log('Blog submission response:', response);
-
-				if (response.success || response._id) {
-					$('#blogModal').modal('hide');
-					form.reset();
-					$(form).removeData('edit').removeData('id');
-					await this.loadBlogsData();
-					this.showSuccess(
-						`Blog post ${isEdit ? 'updated' : 'added'} successfully`
-					);
-				} else {
-					this.showError(
-						`Failed to ${isEdit ? 'update' : 'add'} blog post: ${
-							response.error || 'Unknown error'
-						}`
-					);
-				}
-			} catch (error) {
-				console.error('Error handling blog form:', error);
-				this.showError(`Failed to save blog post: ${error.message}`);
+			} catch (e) {
+				console.warn('Could not get current user, using empty author ID');
 			}
+
+			// Create data object for the request
+			const blogData = {
+				title: formData.get('title'),
+				excerpt: formData.get('excerpt') || '',
+				content: formData.get('content'),
+				categories: formData.get('categories')
+					? formData
+							.get('categories')
+							.split(',')
+							.map((item) => item.trim())
+					: [],
+				tags: formData.get('tags')
+					? formData
+							.get('tags')
+							.split(',')
+							.map((item) => item.trim())
+					: [],
+				status: formData.get('status') || 'published',
+				featured: form.elements['featured']
+					? form.elements['featured'].checked
+					: false,
+				author: authorId,
+				image: imageUrl, // This will be used directly in the backend
+			};
+
+			// Log the data being sent for debugging
+			console.log('Sending blog data:', blogData);
+
+			const token = this.getAuthToken();
+			let response;
+
+			// Use JSON format instead of FormData since we're sending a URL, not a file
+			if (isEdit) {
+				// Update existing blog post
+				response = await fetch(
+					`https://buyesi.onrender.com/api/admin/blog/${id}`,
+					{
+						method: 'PUT',
+						headers: {
+							'Content-Type': 'application/json',
+							Authorization: `Bearer ${token}`,
+						},
+						body: JSON.stringify(blogData),
+					}
+				);
+			} else {
+				// Create new blog post
+				response = await fetch('https://buyesi.onrender.com/api/admin/blog', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						Authorization: `Bearer ${token}`,
+					},
+					body: JSON.stringify(blogData),
+				});
+			}
+
+			await this.handleApiResponse(
+				response,
+				`Blog post ${isEdit ? 'updated' : 'added'} successfully`
+			);
+
+			// Reset form and close modal
+			$(form).trigger('reset');
+			$('.modal').modal('hide');
+
+			// Reload blog data
+			await this.loadBlogsData();
 		} catch (error) {
-			console.error('Error handling blog form:', error);
-			this.showError(`Failed to save blog post: ${error.message}`);
+			console.error('Error saving blog post:', error);
+			this.showError(error.message);
 		}
 	}
 
@@ -1032,134 +987,74 @@ class AdminDashboard {
 			const image = formData.get('image');
 
 			if (!title || !startDate || !endDate || !location || !description) {
-				this.showError(
-					'Title, Start Date, End Date, Location, and Description are required fields'
-				);
+				this.showError('Please fill all required fields');
 				return;
 			}
 
 			// For new events, image is required
-			if (!isEdit && (!image || image.name === '')) {
-				this.showError('Please select an image file');
+			if (!isEdit && !image) {
+				this.showError('Please upload an image');
 				return;
 			}
 
-			// Create FormData object for the request
-			const actualFormData = new FormData();
+			// Create data object for the request
+			const eventData = {
+				title: formData.get('title'),
+				startDate: formData.get('startDate'),
+				endDate: formData.get('endDate'),
+				location: formData.get('location'),
+				address: formData.get('address') || '',
+				description: formData.get('description'),
+				organizer: formData.get('organizer'),
+				status: formData.get('status'),
+				featured: form.elements['eventFeatured'].checked,
+				registrationRequired: form.elements['registrationRequired'].checked,
+				maximumAttendees: parseInt(formData.get('maximumAttendees') || '0'),
+				image: formData.get('image'),
+			};
 
-			// Add all text fields
-			actualFormData.append('title', formData.get('title'));
-			actualFormData.append('startDate', formData.get('startDate'));
-			actualFormData.append('endDate', formData.get('endDate'));
-			actualFormData.append('location', formData.get('location'));
-			actualFormData.append('address', formData.get('address') || '');
-			actualFormData.append('description', formData.get('description'));
-			actualFormData.append(
-				'organizer',
-				formData.get('organizer') || 'Buyesi Youth Initiative'
-			);
-			actualFormData.append('status', formData.get('status'));
-			actualFormData.append(
-				'maximumAttendees',
-				formData.get('maximumAttendees') || '0'
-			);
-			actualFormData.append('featured', form.elements['featured'].checked);
-			actualFormData.append(
-				'registrationRequired',
-				form.elements['registrationRequired'].checked
-			);
-
-			// Add image if present
-			if (image && image.name !== '') {
-				actualFormData.append('image', image);
-			}
-
-			// Log the FormData contents for debugging
-			console.log('FormData contents:');
-			for (let pair of actualFormData.entries()) {
-				console.log(pair[0] + ': ' + pair[1]);
-			}
-
+			const token = this.getAuthToken();
 			let response;
-			try {
-				// Use XMLHttpRequest to send form data
-				if (isEdit) {
-					response = await new Promise((resolve, reject) => {
-						const xhr = new XMLHttpRequest();
-						xhr.open(
-							'PUT',
-							`https://buyesi.onrender.com/api/admin/events/${id}`
-						);
-						const token = localStorage.getItem('token');
-						if (token) {
-							xhr.setRequestHeader('Authorization', `Bearer ${token}`);
-						}
-						xhr.onload = () => {
-							if (xhr.status >= 200 && xhr.status < 300) {
-								try {
-									resolve(JSON.parse(xhr.responseText));
-								} catch (e) {
-									resolve({ success: true });
-								}
-							} else {
-								// Log the error response for debugging
-								console.error('Server response:', xhr.responseText);
-								reject(new Error(`HTTP error! status: ${xhr.status}`));
-							}
-						};
-						xhr.onerror = () => reject(new Error('Network error'));
-						xhr.send(actualFormData);
-					});
-				} else {
-					response = await new Promise((resolve, reject) => {
-						const xhr = new XMLHttpRequest();
-						xhr.open('POST', 'https://buyesi.onrender.com/api/admin/events');
-						const token = localStorage.getItem('token');
-						if (token) {
-							xhr.setRequestHeader('Authorization', `Bearer ${token}`);
-						}
-						xhr.onload = () => {
-							if (xhr.status >= 200 && xhr.status < 300) {
-								try {
-									resolve(JSON.parse(xhr.responseText));
-								} catch (e) {
-									resolve({ success: true });
-								}
-							} else {
-								// Log the error response for debugging
-								console.error('Server response:', xhr.responseText);
-								reject(new Error(`HTTP error! status: ${xhr.status}`));
-							}
-						};
-						xhr.onerror = () => reject(new Error('Network error'));
-						xhr.send(actualFormData);
-					});
-				}
 
-				console.log('Event submission response:', response);
-
-				if (response.success || response._id) {
-					$('#eventModal').modal('hide');
-					form.reset();
-					$(form).removeData('edit').removeData('id');
-					await this.loadEventsData();
-					this.showSuccess(
-						`Event ${isEdit ? 'updated' : 'added'} successfully`
-					);
-				} else {
-					this.showError(
-						`Failed to ${isEdit ? 'update' : 'add'} event: ${
-							response.error || 'Unknown error'
-						}`
-					);
-				}
-			} catch (error) {
-				console.error('Error handling event form:', error);
-				this.showError(`Failed to save event: ${error.message}`);
+			if (isEdit) {
+				// Update existing event
+				response = await fetch(
+					`https://buyesi.onrender.com/api/admin/events/${id}`,
+					{
+						method: 'PUT',
+						headers: {
+							'Content-Type': 'application/json',
+							Authorization: `Bearer ${token}`,
+						},
+						body: JSON.stringify(eventData),
+					}
+				);
+			} else {
+				// Create new event
+				response = await fetch('https://buyesi.onrender.com/api/admin/events', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						Authorization: `Bearer ${token}`,
+					},
+					body: JSON.stringify(eventData),
+				});
 			}
+
+			await this.handleApiResponse(
+				response,
+				`Event ${isEdit ? 'updated' : 'added'} successfully`
+			);
+
+			// Reset form and close modal
+			$(form).trigger('reset');
+			$('.modal').modal('hide');
+
+			// Reload events data
+			await this.loadEventsData();
 		} catch (error) {
-			console.error('Error handling event form:', error);
-			this.showError(`Failed to save event: ${error.message}`);
+			console.error('Error saving event:', error);
+			this.showError(error.message);
 		}
 	}
 
@@ -1244,73 +1139,45 @@ class AdminDashboard {
 			}
 
 			// Image is required
-			if (!image || image.name === '') {
-				this.showError('Please select an image file');
+			if (!image) {
+				this.showError('Please upload an image');
 				return;
 			}
 
-			// Create FormData object for the request
-			const actualFormData = new FormData();
+			// Create data object for the request
+			const galleryData = {
+				title: formData.get('title'),
+				description: formData.get('description'),
+				image: formData.get('image'),
+			};
 
-			// Add all text fields
-			actualFormData.append('title', formData.get('title'));
-			actualFormData.append('description', formData.get('description'));
-
-			// Add image
-			actualFormData.append('image', image);
-
-			// Log the FormData contents for debugging
-			console.log('FormData contents:');
-			for (let pair of actualFormData.entries()) {
-				console.log(pair[0] + ': ' + pair[1]);
-			}
-
-			let response;
-			try {
-				// Use XMLHttpRequest to send form data
-				response = await new Promise((resolve, reject) => {
-					const xhr = new XMLHttpRequest();
-					xhr.open('POST', 'https://buyesi.onrender.com/api/admin/gallery');
-					const token = localStorage.getItem('token');
-					if (token) {
-						xhr.setRequestHeader('Authorization', `Bearer ${token}`);
-					}
-					xhr.onload = () => {
-						if (xhr.status >= 200 && xhr.status < 300) {
-							try {
-								resolve(JSON.parse(xhr.responseText));
-							} catch (e) {
-								resolve({ success: true });
-							}
-						} else {
-							// Log the error response for debugging
-							console.error('Server response:', xhr.responseText);
-							reject(new Error(`HTTP error! status: ${xhr.status}`));
-						}
-					};
-					xhr.onerror = () => reject(new Error('Network error'));
-					xhr.send(actualFormData);
-				});
-
-				console.log('Gallery submission response:', response);
-
-				if (response.success || response._id) {
-					$('#galleryModal').modal('hide');
-					form.reset();
-					await this.loadGalleryData();
-					this.showSuccess('Gallery item added successfully');
-				} else {
-					this.showError(
-						`Failed to add gallery item: ${response.error || 'Unknown error'}`
-					);
+			const token = this.getAuthToken();
+			let response = await fetch(
+				'https://buyesi.onrender.com/api/admin/gallery',
+				{
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						Authorization: `Bearer ${token}`,
+					},
+					body: JSON.stringify(galleryData),
 				}
-			} catch (error) {
-				console.error('Error handling gallery form:', error);
-				this.showError(`Failed to save gallery item: ${error.message}`);
-			}
+			);
+
+			await this.handleApiResponse(
+				response,
+				'Gallery image added successfully'
+			);
+
+			// Reset form and close modal
+			$(form).trigger('reset');
+			$('.modal').modal('hide');
+
+			// Reload gallery data
+			await this.loadGalleryData();
 		} catch (error) {
-			console.error('Error handling gallery form:', error);
-			this.showError(`Failed to save gallery item: ${error.message}`);
+			console.error('Error saving gallery image:', error);
+			this.showError(error.message);
 		}
 	}
 
@@ -1339,131 +1206,59 @@ class AdminDashboard {
 	async handleCauseFormSubmit(form) {
 		try {
 			const formData = new FormData(form);
-			const isEdit = $(form).data('edit');
-			const id = $(form).data('id');
 
 			// Validate required fields
 			const title = formData.get('title');
 			const description = formData.get('description');
-			const targetAmount = formData.get('targetAmount');
+			const targetAmount = parseFloat(formData.get('targetAmount'));
 			const image = formData.get('image');
 
-			if (!title || !description || !targetAmount) {
+			if (!title || !description || isNaN(targetAmount)) {
 				this.showError(
 					'Title, Description, and Target Amount are required fields'
 				);
 				return;
 			}
 
-			// For new causes, image is required
-			if (!isEdit && (!image || image.name === '')) {
-				this.showError('Please select an image file');
+			// Image is required
+			if (!image) {
+				this.showError('Please upload an image');
 				return;
 			}
 
-			// Create FormData object for the request
-			const actualFormData = new FormData();
+			// Create data object for the request
+			const causeData = {
+				title: formData.get('title'),
+				description: formData.get('description'),
+				targetAmount: parseFloat(formData.get('targetAmount')),
+				raisedAmount: parseFloat(formData.get('raisedAmount') || '0'),
+				image: formData.get('image'),
+			};
 
-			// Add all text fields
-			actualFormData.append('title', formData.get('title'));
-			actualFormData.append('description', formData.get('description'));
-			actualFormData.append('targetAmount', formData.get('targetAmount'));
-			actualFormData.append(
-				'raisedAmount',
-				formData.get('raisedAmount') || '0'
+			const token = this.getAuthToken();
+			let response = await fetch(
+				'https://buyesi.onrender.com/api/admin/causes',
+				{
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						Authorization: `Bearer ${token}`,
+					},
+					body: JSON.stringify(causeData),
+				}
 			);
 
-			// Add image if present
-			if (image && image.name !== '') {
-				actualFormData.append('image', image);
-			}
+			await this.handleApiResponse(response, 'Cause added successfully');
 
-			// Log the FormData contents for debugging
-			console.log('FormData contents:');
-			for (let pair of actualFormData.entries()) {
-				console.log(pair[0] + ': ' + pair[1]);
-			}
+			// Reset form and close modal
+			$(form).trigger('reset');
+			$('.modal').modal('hide');
 
-			let response;
-			try {
-				// Use XMLHttpRequest to send form data
-				if (isEdit) {
-					response = await new Promise((resolve, reject) => {
-						const xhr = new XMLHttpRequest();
-						xhr.open(
-							'PUT',
-							`https://buyesi.onrender.com/api/admin/causes/${id}`
-						);
-						const token = localStorage.getItem('token');
-						if (token) {
-							xhr.setRequestHeader('Authorization', `Bearer ${token}`);
-						}
-						xhr.onload = () => {
-							if (xhr.status >= 200 && xhr.status < 300) {
-								try {
-									resolve(JSON.parse(xhr.responseText));
-								} catch (e) {
-									resolve({ success: true });
-								}
-							} else {
-								// Log the error response for debugging
-								console.error('Server response:', xhr.responseText);
-								reject(new Error(`HTTP error! status: ${xhr.status}`));
-							}
-						};
-						xhr.onerror = () => reject(new Error('Network error'));
-						xhr.send(actualFormData);
-					});
-				} else {
-					response = await new Promise((resolve, reject) => {
-						const xhr = new XMLHttpRequest();
-						xhr.open('POST', 'https://buyesi.onrender.com/api/admin/causes');
-						const token = localStorage.getItem('token');
-						if (token) {
-							xhr.setRequestHeader('Authorization', `Bearer ${token}`);
-						}
-						xhr.onload = () => {
-							if (xhr.status >= 200 && xhr.status < 300) {
-								try {
-									resolve(JSON.parse(xhr.responseText));
-								} catch (e) {
-									resolve({ success: true });
-								}
-							} else {
-								// Log the error response for debugging
-								console.error('Server response:', xhr.responseText);
-								reject(new Error(`HTTP error! status: ${xhr.status}`));
-							}
-						};
-						xhr.onerror = () => reject(new Error('Network error'));
-						xhr.send(actualFormData);
-					});
-				}
-
-				console.log('Cause submission response:', response);
-
-				if (response.success || response._id) {
-					$('#causeModal').modal('hide');
-					form.reset();
-					$(form).removeData('edit').removeData('id');
-					await this.loadCausesData();
-					this.showSuccess(
-						`Cause ${isEdit ? 'updated' : 'added'} successfully`
-					);
-				} else {
-					this.showError(
-						`Failed to ${isEdit ? 'update' : 'add'} cause: ${
-							response.error || 'Unknown error'
-						}`
-					);
-				}
-			} catch (error) {
-				console.error('Error handling cause form:', error);
-				this.showError(`Failed to save cause: ${error.message}`);
-			}
+			// Reload causes data
+			await this.loadCausesData();
 		} catch (error) {
-			console.error('Error handling cause form:', error);
-			this.showError(`Failed to save cause: ${error.message}`);
+			console.error('Error saving cause:', error);
+			this.showError(error.message);
 		}
 	}
 
@@ -1561,15 +1356,6 @@ class AdminDashboard {
 		}
 		successAlert.text(message).show();
 		setTimeout(() => successAlert.hide(), 5000);
-	}
-
-	convertFileToBase64(file) {
-		return new Promise((resolve, reject) => {
-			const reader = new FileReader();
-			reader.readAsDataURL(file);
-			reader.onload = () => resolve(reader.result);
-			reader.onerror = (error) => reject(error);
-		});
 	}
 
 	// Data loading methods
@@ -1859,6 +1645,39 @@ class AdminDashboard {
 		} catch (error) {
 			console.error('Error loading volunteers data:', error);
 			this.showError('Failed to load volunteers data: ' + error.message);
+		}
+	}
+
+	// Add a helper method to get the current auth token
+	getAuthToken() {
+		// Always get the latest token from localStorage
+		return localStorage.getItem('token');
+	}
+
+	// Add a helper method to handle API responses
+	async handleApiResponse(response, successMessage) {
+		if (!response.ok) {
+			let errorMessage = 'An error occurred';
+			try {
+				const errorData = await response.json();
+				errorMessage = errorData.message || errorData.error || errorMessage;
+				console.error('API error response:', errorData);
+			} catch (e) {
+				console.error('Error parsing error response:', e);
+				errorMessage = `Server returned status ${response.status}: ${response.statusText}`;
+			}
+			throw new Error(errorMessage);
+		}
+
+		if (successMessage) {
+			this.showSuccess(successMessage);
+		}
+
+		try {
+			return await response.json();
+		} catch (e) {
+			console.warn('Empty or invalid JSON response, returning empty object');
+			return {};
 		}
 	}
 }
