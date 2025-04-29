@@ -76,7 +76,7 @@ exports.addBlogPost = async (req, res) => {
 	} catch (error) {
 		res.status(400).json({
 			success: false,
-			error: error.message || 'Featured image is required',
+			error: error.message || 'Failed to create blog post',
 		});
 	}
 };
@@ -87,7 +87,7 @@ exports.updateBlogPost = async (req, res) => {
 			req.params.id,
 			{
 				...req.body,
-				image: req.file ? req.file.path : undefined,
+				image: req.file ? req.file.path : req.body.imageUrl || req.body.image,
 			},
 			{ new: true }
 		);
@@ -98,7 +98,7 @@ exports.updateBlogPost = async (req, res) => {
 	} catch (error) {
 		res.status(400).json({
 			success: false,
-			error: error.message,
+			error: error.message || 'Failed to update blog post',
 		});
 	}
 };

@@ -710,7 +710,7 @@ class AdminDashboard {
 				description: formData.get('description') || '',
 				email: formData.get('email') || '',
 				phone: formData.get('phone') || '',
-				imageUrl: formData.get('image'),
+				image: formData.get('image'), // Changed from imageUrl to image to match backend expectation
 			};
 
 			const token = this.getAuthToken();
@@ -871,7 +871,7 @@ class AdminDashboard {
 					? form.elements['featured'].checked
 					: false,
 				author: authorId,
-				imageUrl: formData.get('image'), // Send as imageUrl instead of image to potentially bypass file upload middleware
+				image: formData.get('image'), // Changed from imageUrl to image to match backend expectation
 			};
 
 			// Log the data being sent for debugging
@@ -1019,7 +1019,7 @@ class AdminDashboard {
 				featured: form.elements['eventFeatured'].checked,
 				registrationRequired: form.elements['registrationRequired'].checked,
 				maximumAttendees: parseInt(formData.get('maximumAttendees') || '0'),
-				imageUrl: formData.get('image'),
+				image: formData.get('image'), // Changed from imageUrl to image to match backend expectation
 			};
 
 			const token = this.getAuthToken();
@@ -1162,7 +1162,7 @@ class AdminDashboard {
 			const galleryData = {
 				title: formData.get('title'),
 				description: formData.get('description'),
-				imageUrl: formData.get('image'),
+				image: formData.get('image'), // Changed from imageUrl to image to match backend expectation
 			};
 
 			const token = this.getAuthToken();
@@ -1220,6 +1220,8 @@ class AdminDashboard {
 	async handleCauseFormSubmit(form) {
 		try {
 			const formData = new FormData(form);
+			const isEdit = $(form).data('edit');
+			const id = $(form).data('id');
 
 			// Validate required fields
 			const title = formData.get('title');
@@ -1251,21 +1253,34 @@ class AdminDashboard {
 				description: formData.get('description'),
 				targetAmount: parseFloat(formData.get('targetAmount')),
 				raisedAmount: parseFloat(formData.get('raisedAmount') || '0'),
-				imageUrl: formData.get('image'),
+				image: formData.get('image'), // Changed from imageUrl to image to match backend expectation
 			};
 
 			const token = this.getAuthToken();
-			let response = await fetch(
-				'https://buyesi.onrender.com/api/admin/causes',
-				{
+			let response;
+
+			if (isEdit) {
+				response = await fetch(
+					`https://buyesi.onrender.com/api/admin/causes/${id}`,
+					{
+						method: 'PUT',
+						headers: {
+							'Content-Type': 'application/json',
+							Authorization: `Bearer ${token}`,
+						},
+						body: JSON.stringify(causeData),
+					}
+				);
+			} else {
+				response = await fetch('https://buyesi.onrender.com/api/admin/causes', {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
 						Authorization: `Bearer ${token}`,
 					},
 					body: JSON.stringify(causeData),
-				}
-			);
+				});
+			}
 
 			await this.handleApiResponse(response, 'Cause added successfully');
 
@@ -1401,13 +1416,13 @@ class AdminDashboard {
 
 			teamMembers.forEach((member, index) => {
 				console.log(`Rendering team member ${index}:`, member);
+				// Check if the image is already a full URL (like from Cloudinary)
+				const imageUrl = member.image.startsWith('http')
+					? member.image
+					: `https://buyesi.onrender.com${member.image}`;
 				tbody.append(`
 					<tr>
-						<td><img src="${
-							member.image
-								? `https://buyesi.onrender.com${member.image}`
-								: 'images/person-default.jpg'
-						}" alt="${
+						<td><img src="${imageUrl}" alt="${
 					member.name
 				}" width="50" height="50" class="rounded-circle"></td>
 						<td>${member.name}</td>
