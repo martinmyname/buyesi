@@ -11,7 +11,7 @@ exports.addTeamMember = async (req, res) => {
 	try {
 		const teamMember = await Team.create({
 			...req.body,
-			image: req.file ? req.file.path : undefined,
+			image: req.file ? req.file.path : req.body.imageUrl || undefined,
 		});
 		res.status(201).json({
 			success: true,
@@ -20,7 +20,7 @@ exports.addTeamMember = async (req, res) => {
 	} catch (error) {
 		res.status(400).json({
 			success: false,
-			error: error.message,
+			error: error.message || 'Failed to create team member',
 		});
 	}
 };
@@ -31,7 +31,7 @@ exports.updateTeamMember = async (req, res) => {
 			req.params.id,
 			{
 				...req.body,
-				image: req.file ? req.file.path : undefined,
+				image: req.file ? req.file.path : req.body.imageUrl || req.body.image,
 			},
 			{ new: true }
 		);
@@ -42,7 +42,7 @@ exports.updateTeamMember = async (req, res) => {
 	} catch (error) {
 		res.status(400).json({
 			success: false,
-			error: error.message,
+			error: error.message || 'Failed to update team member',
 		});
 	}
 };
@@ -123,7 +123,7 @@ exports.addEvent = async (req, res) => {
 	try {
 		const event = await Event.create({
 			...req.body,
-			image: req.file ? req.file.path : undefined,
+			image: req.file ? req.file.path : req.body.imageUrl || undefined,
 		});
 		res.status(201).json({
 			success: true,
@@ -132,7 +132,7 @@ exports.addEvent = async (req, res) => {
 	} catch (error) {
 		res.status(400).json({
 			success: false,
-			error: error.message,
+			error: error.message || 'Failed to create event',
 		});
 	}
 };
@@ -143,7 +143,7 @@ exports.updateEvent = async (req, res) => {
 			req.params.id,
 			{
 				...req.body,
-				image: req.file ? req.file.path : undefined,
+				image: req.file ? req.file.path : req.body.imageUrl || req.body.image,
 			},
 			{ new: true }
 		);
@@ -154,7 +154,7 @@ exports.updateEvent = async (req, res) => {
 	} catch (error) {
 		res.status(400).json({
 			success: false,
-			error: error.message,
+			error: error.message || 'Failed to update event',
 		});
 	}
 };
@@ -179,7 +179,7 @@ exports.addGalleryImage = async (req, res) => {
 	try {
 		const galleryImage = await Gallery.create({
 			...req.body,
-			image: req.file ? req.file.path : undefined,
+			image: req.file ? req.file.path : req.body.imageUrl || undefined,
 		});
 		res.status(201).json({
 			success: true,
@@ -188,7 +188,7 @@ exports.addGalleryImage = async (req, res) => {
 	} catch (error) {
 		res.status(400).json({
 			success: false,
-			error: error.message,
+			error: error.message || 'Failed to add gallery image',
 		});
 	}
 };
@@ -213,7 +213,7 @@ exports.addCause = async (req, res) => {
 	try {
 		const cause = await Cause.create({
 			...req.body,
-			image: req.file ? req.file.path : undefined,
+			image: req.file ? req.file.path : req.body.imageUrl || undefined,
 		});
 		res.status(201).json({
 			success: true,
@@ -222,7 +222,7 @@ exports.addCause = async (req, res) => {
 	} catch (error) {
 		res.status(400).json({
 			success: false,
-			error: error.message,
+			error: error.message || 'Failed to create cause',
 		});
 	}
 };
@@ -233,7 +233,7 @@ exports.updateCause = async (req, res) => {
 			req.params.id,
 			{
 				...req.body,
-				image: req.file ? req.file.path : undefined,
+				image: req.file ? req.file.path : req.body.imageUrl || req.body.image,
 			},
 			{ new: true }
 		);
@@ -244,7 +244,7 @@ exports.updateCause = async (req, res) => {
 	} catch (error) {
 		res.status(400).json({
 			success: false,
-			error: error.message,
+			error: error.message || 'Failed to update cause',
 		});
 	}
 };

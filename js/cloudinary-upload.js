@@ -1,8 +1,8 @@
 // Cloudinary Upload Utility
 
 // Cloudinary configuration
-const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME; // Your Cloudinary cloud name
-const CLOUDINARY_UPLOAD_PRESET = process.env.CLOUDINARY_UPLOAD_PRESET; // Use your custom upload preset
+const CLOUDINARY_CLOUD_NAME = 'dbgy1uc0i'; // Your Cloudinary cloud name
+const CLOUDINARY_UPLOAD_PRESET = 'buyesi'; // Use your custom upload preset
 
 // Flag to indicate Cloudinary is available
 window.CLOUDINARY_ENABLED = true;
@@ -211,32 +211,15 @@ function setupFileInputUpload(inputElement, callback) {
 
 // Global function to upload images from anywhere in the application
 window.uploadImage = function (callback) {
-	// Try to use the widget first
+	// Use only the Cloudinary widget for uploads
 	try {
 		uploadImageToCloudinary(callback);
 	} catch (error) {
-		console.error('Widget upload failed, using direct upload:', error);
-
-		// Create a temporary file input
-		const fileInput = document.createElement('input');
-		fileInput.type = 'file';
-		fileInput.accept = 'image/*';
-		fileInput.style.display = 'none';
-		document.body.appendChild(fileInput);
-
-		// Set up the file input
-		setupFileInputUpload(fileInput, callback);
-
-		// Trigger the file input
-		fileInput.click();
-
-		// Clean up after upload
-		fileInput.addEventListener('change', function () {
-			// Remove after a delay to allow the upload to complete
-			setTimeout(() => {
-				document.body.removeChild(fileInput);
-			}, 5000);
-		});
+		console.error('Cloudinary widget upload failed:', error);
+		alert(
+			'Failed to initialize Cloudinary upload. Please ensure the widget is loaded correctly.'
+		);
+		if (callback) callback(error, null);
 	}
 };
 
