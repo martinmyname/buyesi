@@ -32,8 +32,9 @@ function initializeFooter() {
 	async function loadRecentBlogs() {
 		try {
 			const response = await fetchFromApi(ENDPOINTS.BLOGS);
-			if (response && response.data) {
-				const recentBlogs = response.data.slice(0, 3); // Get only 3 most recent blogs
+			if (response && (Array.isArray(response) || response.data)) {
+				const blogsData = Array.isArray(response) ? response : response.data;
+				const recentBlogs = blogsData.slice(0, 3); // Get only 3 most recent blogs
 				const blogContainer = document.getElementById('recent-blog-posts');
 
 				if (blogContainer) {

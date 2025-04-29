@@ -9,7 +9,7 @@ if (!window.API) {
 				localStorage.removeItem('user');
 			},
 		},
-		donationAPI: {
+		donation: {
 			getAll: async () => {
 				const token = localStorage.getItem('token');
 				const response = await fetch('https://buyesi.onrender.com/donations', {
@@ -20,7 +20,7 @@ if (!window.API) {
 				return response.json();
 			},
 		},
-		volunteerAPI: {
+		volunteer: {
 			getAll: async () => {
 				const token = localStorage.getItem('token');
 				const response = await fetch('https://buyesi.onrender.com/volunteers', {
@@ -44,7 +44,7 @@ if (!window.API) {
 				return response.json();
 			},
 		},
-		causeAPI: {
+		cause: {
 			getAll: async () => {
 				const token = localStorage.getItem('token');
 				const response = await fetch(
@@ -111,7 +111,7 @@ if (!window.API) {
 				return response.json();
 			},
 		},
-		teamAPI: {
+		team: {
 			getAll: async () => {
 				const token = localStorage.getItem('token');
 				const response = await fetch(
@@ -178,7 +178,7 @@ if (!window.API) {
 				return response.json();
 			},
 		},
-		blogAPI: {
+		blog: {
 			getAll: async () => {
 				const token = localStorage.getItem('token');
 				const response = await fetch(
@@ -245,7 +245,7 @@ if (!window.API) {
 				return response.json();
 			},
 		},
-		eventAPI: {
+		event: {
 			getAll: async () => {
 				const token = localStorage.getItem('token');
 				const response = await fetch(
@@ -312,7 +312,7 @@ if (!window.API) {
 				return response.json();
 			},
 		},
-		galleryAPI: {
+		gallery: {
 			getAll: async () => {
 				const token = localStorage.getItem('token');
 				const response = await fetch(
@@ -601,7 +601,7 @@ class AdminDashboard {
 			// Load donations
 			let donations = [];
 			try {
-				const donationsResponse = await window.API.donationAPI.getAll();
+				const donationsResponse = await window.API.donation.getAll();
 				donations = Array.isArray(donationsResponse)
 					? donationsResponse
 					: donationsResponse.data || [];
@@ -614,7 +614,7 @@ class AdminDashboard {
 			// Load volunteers
 			let volunteers = [];
 			try {
-				const volunteersResponse = await window.API.volunteerAPI.getAll();
+				const volunteersResponse = await window.API.volunteer.getAll();
 				volunteers = Array.isArray(volunteersResponse)
 					? volunteersResponse
 					: volunteersResponse.data || [];
@@ -627,7 +627,7 @@ class AdminDashboard {
 			// Load causes
 			let causes = [];
 			try {
-				const causesResponse = await window.API.causeAPI.getAll();
+				const causesResponse = await window.API.cause.getAll();
 				causes = Array.isArray(causesResponse)
 					? causesResponse
 					: causesResponse.data || [];
@@ -760,7 +760,7 @@ class AdminDashboard {
 
 	async editTeamMember(id) {
 		try {
-			const response = await window.API.teamAPI.getById(id);
+			const response = await window.API.team.getById(id);
 			const teamMember = response.data || response;
 
 			const form = document.getElementById('teamForm');
@@ -790,7 +790,7 @@ class AdminDashboard {
 	async deleteTeamMember(id) {
 		if (confirm('Are you sure you want to delete this team member?')) {
 			try {
-				const response = await window.API.teamAPI.delete(id);
+				const response = await window.API.team.delete(id);
 
 				if (response.success) {
 					this.showSuccess('Team member deleted successfully');
@@ -924,7 +924,7 @@ class AdminDashboard {
 
 	async editBlogPost(id) {
 		try {
-			const response = await window.API.blogAPI.getById(id);
+			const response = await window.API.blog.getById(id);
 			const blog = response.data || response;
 
 			const form = document.getElementById('blogForm');
@@ -958,7 +958,7 @@ class AdminDashboard {
 	async deleteBlogPost(id) {
 		if (confirm('Are you sure you want to delete this blog post?')) {
 			try {
-				const response = await window.API.blogAPI.delete(id);
+				const response = await window.API.blog.delete(id);
 
 				if (response.success) {
 					this.showSuccess('Blog post deleted successfully');
@@ -1069,7 +1069,7 @@ class AdminDashboard {
 
 	async editEvent(id) {
 		try {
-			const response = await window.API.eventAPI.getById(id);
+			const response = await window.API.event.getById(id);
 			const event = response.data || response;
 
 			const form = document.getElementById('eventForm');
@@ -1115,7 +1115,7 @@ class AdminDashboard {
 	async deleteEvent(id) {
 		if (confirm('Are you sure you want to delete this event?')) {
 			try {
-				const response = await window.API.eventAPI.delete(id);
+				const response = await window.API.event.delete(id);
 
 				if (response.success) {
 					this.showSuccess('Event deleted successfully');
@@ -1198,7 +1198,7 @@ class AdminDashboard {
 	async deleteGalleryItem(id) {
 		if (confirm('Are you sure you want to delete this gallery item?')) {
 			try {
-				const response = await window.API.galleryAPI.delete(id);
+				const response = await window.API.gallery.delete(id);
 
 				if (response.success) {
 					this.showSuccess('Gallery item deleted successfully');
@@ -1298,7 +1298,7 @@ class AdminDashboard {
 
 	async editCause(id) {
 		try {
-			const response = await window.API.causeAPI.getById(id);
+			const response = await window.API.cause.getById(id);
 			const cause = response.data || response;
 
 			const form = document.getElementById('causeForm');
@@ -1327,7 +1327,7 @@ class AdminDashboard {
 	async deleteCause(id) {
 		if (confirm('Are you sure you want to delete this cause?')) {
 			try {
-				const response = await window.API.causeAPI.delete(id);
+				const response = await window.API.cause.delete(id);
 
 				if (response.success) {
 					this.showSuccess('Cause deleted successfully');
@@ -1348,7 +1348,7 @@ class AdminDashboard {
 	async deleteVolunteer(id) {
 		if (confirm('Are you sure you want to delete this volunteer?')) {
 			try {
-				const response = await window.API.volunteerAPI.delete(id);
+				const response = await window.API.volunteer.delete(id);
 
 				if (response.success) {
 					this.showSuccess('Volunteer deleted successfully');
@@ -1395,7 +1395,7 @@ class AdminDashboard {
 	// Data loading methods
 	async loadTeamData() {
 		try {
-			const response = await window.API.teamAPI.getAll();
+			const response = await window.API.team.getAll();
 			console.log('Team API response:', response);
 			// Check if response is an array directly or has data property
 			const teamMembers = Array.isArray(response)
@@ -1453,7 +1453,7 @@ class AdminDashboard {
 
 	async loadBlogsData() {
 		try {
-			const response = await window.API.blogAPI.getAll();
+			const response = await window.API.blog.getAll();
 			const blogs = Array.isArray(response) ? response : response.data || [];
 			const tbody = $('#blog-table tbody');
 			tbody.empty();
@@ -1489,7 +1489,7 @@ class AdminDashboard {
 
 	async loadEventsData() {
 		try {
-			const response = await window.API.eventAPI.getAll();
+			const response = await window.API.event.getAll();
 			console.log('Events API response:', response);
 			// Check if response is an array directly or has data property
 			const events = Array.isArray(response) ? response : response.data || [];
@@ -1536,7 +1536,7 @@ class AdminDashboard {
 
 	async loadGalleryData() {
 		try {
-			const response = await window.API.galleryAPI.getAll();
+			const response = await window.API.gallery.getAll();
 			console.log('Gallery API response:', response);
 			// Check if response is an array directly or has data property
 			const gallery = Array.isArray(response) ? response : response.data || [];
@@ -1582,7 +1582,7 @@ class AdminDashboard {
 
 	async loadCausesData() {
 		try {
-			const response = await window.API.causeAPI.getAll();
+			const response = await window.API.cause.getAll();
 			const causes = Array.isArray(response) ? response : response.data || [];
 			const tbody = $('#causes-table tbody');
 			tbody.empty();
@@ -1615,7 +1615,7 @@ class AdminDashboard {
 
 	async loadDonationsData() {
 		try {
-			const response = await window.API.donationAPI.getAll();
+			const response = await window.API.donation.getAll();
 			const donations = Array.isArray(response)
 				? response
 				: response.data || [];
@@ -1647,7 +1647,7 @@ class AdminDashboard {
 
 	async loadVolunteersData() {
 		try {
-			const response = await window.API.volunteerAPI.getAll();
+			const response = await window.API.volunteer.getAll();
 			const volunteers = Array.isArray(response)
 				? response
 				: response.data || [];
@@ -1735,9 +1735,9 @@ function loadDashboardStats() {
 
 		// Fetch other data for the dashboard
 		Promise.all([
-			window.API.donationAPI.getAll(),
-			window.API.volunteerAPI.getAll(),
-			window.API.causeAPI.getAll(),
+			window.API.donation.getAll(),
+			window.API.volunteer.getAll(),
+			window.API.cause.getAll(),
 		]).then(([donationsResponse, volunteersResponse, causesResponse]) => {
 			// Display total volunteers
 			document.getElementById('volunteer-count').textContent =
