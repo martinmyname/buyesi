@@ -2,19 +2,12 @@
 // Variables are already defined in api.js and accessible via window.API
 
 // Wait for API to be available with timeout and retry
-function waitForAPI(maxAttempts = 10, interval = 500) {
+function waitForAPI(maxAttempts = 5, interval = 300) {
 	let attempts = 0;
 
 	return new Promise((resolve, reject) => {
 		function checkAPI() {
-			console.log(
-				`Checking for API availability (attempt ${
-					attempts + 1
-				}/${maxAttempts})...`
-			);
-
 			if (window.API) {
-				console.log('API found');
 				resolve(window.API);
 				return;
 			}
@@ -37,8 +30,6 @@ function setupAPIReferences(api) {
 	if (!api) return false;
 
 	try {
-		// Access API components directly from window.API
-		console.log('API references set up successfully');
 		return true;
 	} catch (error) {
 		console.error('Error setting up API references:', error);
@@ -75,39 +66,27 @@ document.addEventListener('DOMContentLoaded', async function () {
 
 async function initializeHomePage() {
 	try {
-		// Load sections sequentially from top to bottom to improve perceived loading time
-		console.log('Loading homepage content from top to bottom...');
+		// Load all sections in parallel for faster loading
+		await Promise.all([
+			loadLatestCauses(),
+			loadTeamMembers(),
+			loadGalleryImages(),
+			loadLatestBlogs(),
+			loadLatestEvents(),
+		]);
 
-		// 1. Load causes first (top section)
-		await loadLatestCauses();
-
-		// 2. Load team members (next section)
-		await loadTeamMembers();
-
-		// 3. Load gallery images
-		await loadGalleryImages();
-
-		// 4. Load blogs
-		await loadLatestBlogs();
-
-		// 5. Load events (bottom section)
-		await loadLatestEvents();
-
-		// Handle volunteer form submissions
+		// Handle forms
 		setupVolunteerForm();
-
-		// Handle donation form
 		setupDonationForm();
 	} catch (error) {
 		console.error('Error loading home page data:', error);
 	}
 }
 
-// Initialize carousel
+// Initialize carousel without animations
 function initializeCarousel(selector) {
-	console.log(`Initializing carousel for ${selector}`);
 	$(selector).owlCarousel({
-		autoplay: true,
+		autoplay: false,
 		center: true,
 		loop: true,
 		items: 1,
@@ -132,6 +111,11 @@ function initializeCarousel(selector) {
 				stagePadding: 100,
 			},
 		},
+		animateOut: false,
+		animateIn: false,
+		smartSpeed: 0,
+		mouseDrag: false,
+		touchDrag: true,
 	});
 }
 
@@ -206,11 +190,9 @@ async function loadLatestCauses() {
 		causesContainer.innerHTML = '';
 
 		if (causes.length > 0) {
-			causes.forEach((cause, index) => {
-				console.log(
-					`Adding cause ${index + 1}/${causes.length} to DOM:`,
-					cause.title
-				);
+			const fragment = document.createDocumentFragment();
+			causes.forEach((cause) => {
+				console.log(`Adding cause ${cause._id} to DOM:`, cause.title);
 				const causeElement = document.createElement('div');
 				causeElement.className = 'item';
 				causeElement.innerHTML = `
@@ -243,11 +225,9 @@ async function loadLatestCauses() {
 						</div>
 					</div>
 				`;
-				causesContainer.appendChild(causeElement);
-				console.log(`Cause ${index + 1} appended to container`);
+				fragment.appendChild(causeElement);
 			});
-
-			console.log('All causes added to container, initializing carousel');
+			causesContainer.appendChild(fragment);
 			initializeCarousel('.carousel-cause');
 			console.log('Carousel initialized for causes');
 		} else {
@@ -285,11 +265,9 @@ async function loadLatestBlogs() {
 		blogContainer.innerHTML = '';
 
 		if (blogs.length > 0) {
-			blogs.forEach((blog, index) => {
-				console.log(
-					`Adding blog ${index + 1}/${blogs.length} to DOM:`,
-					blog.title
-				);
+			const fragment = document.createDocumentFragment();
+			blogs.forEach((blog) => {
+				console.log(`Adding blog ${blog._id} to DOM:`, blog.title);
 				const blogElement = document.createElement('div');
 				blogElement.className = 'item';
 				blogElement.innerHTML = `
@@ -320,11 +298,9 @@ async function loadLatestBlogs() {
 					</div>
 				</div>
 			`;
-				blogContainer.appendChild(blogElement);
-				console.log(`Blog ${index + 1} appended to container`);
+				fragment.appendChild(blogElement);
 			});
-
-			console.log('All blogs added to container, initializing carousel');
+			blogContainer.appendChild(fragment);
 			initializeCarousel('.carousel-blog');
 			console.log('Carousel initialized for blogs');
 		} else {
@@ -362,11 +338,9 @@ async function loadTeamMembers() {
 		teamContainer.innerHTML = '';
 
 		if (teamMembers.length > 0) {
-			teamMembers.forEach((member, index) => {
-				console.log(
-					`Adding team member ${index + 1}/${teamMembers.length} to DOM:`,
-					member.name
-				);
+			const fragment = document.createDocumentFragment();
+			teamMembers.forEach((member) => {
+				console.log(`Adding team member ${member.name} to DOM:`, member.name);
 				const memberElement = document.createElement('div');
 				memberElement.className = 'item';
 				memberElement.innerHTML = `
@@ -388,22 +362,22 @@ async function loadTeamMembers() {
 											? `
 										${
 											member.socialLinks.facebook
-												? `<li class="ftco-animate"><a href="${member.socialLinks.facebook}"><span class="icon-facebook"></span></a></li>`
+												? `<li><a href="${member.socialLinks.facebook}"><span class="icon-facebook"></span></a></li>`
 												: ''
 										}
 										${
 											member.socialLinks.twitter
-												? `<li class="ftco-animate"><a href="${member.socialLinks.twitter}"><span class="icon-twitter"></span></a></li>`
+												? `<li><a href="${member.socialLinks.twitter}"><span class="icon-twitter"></span></a></li>`
 												: ''
 										}
 										${
 											member.socialLinks.instagram
-												? `<li class="ftco-animate"><a href="${member.socialLinks.instagram}"><span class="icon-instagram"></span></a></li>`
+												? `<li><a href="${member.socialLinks.instagram}"><span class="icon-instagram"></span></a></li>`
 												: ''
 										}
 										${
 											member.socialLinks.linkedin
-												? `<li class="ftco-animate"><a href="${member.socialLinks.linkedin}"><span class="icon-linkedin"></span></a></li>`
+												? `<li><a href="${member.socialLinks.linkedin}"><span class="icon-linkedin"></span></a></li>`
 												: ''
 										}
 									`
@@ -413,11 +387,9 @@ async function loadTeamMembers() {
 						</div>
 					</div>
 				`;
-				teamContainer.appendChild(memberElement);
-				console.log(`Team member ${index + 1} appended to container`);
+				fragment.appendChild(memberElement);
 			});
-
-			console.log('All team members added to container, initializing carousel');
+			teamContainer.appendChild(fragment);
 			initializeCarousel('.carousel-team');
 			console.log('Carousel initialized for team');
 		} else {
@@ -463,12 +435,11 @@ async function loadGalleryImages() {
 		galleryContainer.innerHTML = '';
 
 		if (galleryImages.length > 0) {
-			galleryImages.forEach((image, index) => {
-				console.log(
-					`Adding gallery image ${index + 1}/${galleryImages.length} to DOM`
-				);
+			const fragment = document.createDocumentFragment();
+			galleryImages.forEach((image) => {
+				console.log(`Adding gallery image ${image.image || image.url} to DOM`);
 				const imageUrl = image.image || getImageUrl(image.url, 'gallery');
-				console.log(`Gallery image ${index + 1} URL:`, imageUrl);
+				console.log(`Gallery image ${imageUrl}`);
 				const imageElement = document.createElement('div');
 				imageElement.className = 'item';
 				imageElement.innerHTML = `
@@ -478,29 +449,23 @@ async function loadGalleryImages() {
 						</div>
 					</a>
 				`;
-				galleryContainer.appendChild(imageElement);
-				console.log(`Gallery image ${index + 1} appended to container`);
+				fragment.appendChild(imageElement);
 			});
-
-			console.log(
-				'All gallery images added to container, initializing carousel'
-			);
+			galleryContainer.appendChild(fragment);
 			initializeCarousel('.carousel-gallery');
-			console.log('Carousel initialized for gallery');
 
-			// Initialize the lightbox for gallery images
+			// Initialize the lightbox for gallery images - with reduced animation
 			$('.image-popup').magnificPopup({
 				type: 'image',
 				closeOnContentClick: true,
 				closeBtnInside: false,
 				fixedContentPos: true,
-				mainClass: 'mfp-no-margins mfp-with-zoom',
+				mainClass: 'mfp-no-margins',
 				image: {
 					verticalFit: true,
 				},
 				zoom: {
-					enabled: true,
-					duration: 300,
+					enabled: false,
 				},
 			});
 		} else {
@@ -544,13 +509,11 @@ async function loadLatestEvents() {
 		eventsContainer.innerHTML = '';
 
 		if (events.length > 0) {
-			events.forEach((event, index) => {
-				console.log(
-					`Adding event ${index + 1}/${events.length} to DOM:`,
-					event.title
-				);
+			const fragment = document.createDocumentFragment();
+			events.forEach((event) => {
+				console.log(`Adding event ${event._id} to DOM:`, event.title);
 				const eventImageUrl = event.image || getImageUrl(event.image, 'events');
-				console.log(`Event ${index + 1} image URL:`, eventImageUrl);
+				console.log(`Event ${event._id} image URL:`, eventImageUrl);
 				const eventElement = document.createElement('div');
 				eventElement.className = 'item';
 				eventElement.innerHTML = `
@@ -579,11 +542,9 @@ async function loadLatestEvents() {
 					</div>
 				</div>
 			`;
-				eventsContainer.appendChild(eventElement);
-				console.log(`Event ${index + 1} appended to container`);
+				fragment.appendChild(eventElement);
 			});
-
-			console.log('All events added to container, initializing carousel');
+			eventsContainer.appendChild(fragment);
 			initializeCarousel('.carousel-events');
 			console.log('Carousel initialized for events');
 		} else {

@@ -40,14 +40,63 @@
     <link rel="stylesheet" href="css/icomoon.css">
     <link rel="stylesheet" href="css/style.min.css">
     <style>
-      /* Disable animations and transitions on initial load */
-      body.loading * {
+      /* Homepage-only performance optimizations - EXCEPT for number counters */
+      body.homepage *:not(.number) {
+        animation: none !important;
+        transition: none !important;
+        animation-duration: 0s !important;
+        transition-duration: 0s !important;
+      }
+      
+      /* Counter animations are allowed */
+      body.homepage .number {
+        animation: countUp 2s ease-out !important;
+        transition: all 0.5s ease !important;
+      }
+      
+      /* Define a simple countUp animation */
+      @keyframes countUp {
+        from { opacity: 0.5; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      
+      /* Disable owl carousel animations for homepage only */
+      body.homepage .owl-carousel {
+        transition: none !important;
+      }
+      
+      body.homepage .owl-carousel .animated {
+        animation-duration: 0s !important;
         animation: none !important;
         transition: none !important;
       }
+      
+      /* Disable AOS animations for homepage only */
+      body.homepage [data-aos] {
+        opacity: 1 !important;
+        transform: translate(0) !important;
+        transition: none !important;
+      }
+      
+      /* Remove ftco-animate class effects for homepage only */
+      body.homepage .ftco-animate {
+        opacity: 1 !important;
+        visibility: visible !important;
+        animation: none !important;
+      }
+      
+      /* Improve image loading */
+      img {
+        content-visibility: auto;
+      }
+      
+      /* Remove scrollax effects for homepage only */
+      body.homepage [data-scrollax-parent] [data-scrollax] {
+        transform: translate3d(0, 0, 0) !important;
+      }
     </style>
   </head>
-  <body class="loading">
+  <body class="homepage">
     
 <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
   <div class="container">
@@ -79,8 +128,8 @@
     <div class="hero-wrap" style="background-image: url('images/bg_7.jpg');">
       <div class="overlay"></div>
       <div class="container">
-        <div class="row no-gutters slider-text align-items-center justify-content-center" data-scrollax-parent="true">
-          <div class="col-md-8 ftco-animate text-center" data-scrollax=" properties: { translateY: '70%' }">
+        <div class="row no-gutters slider-text align-items-center justify-content-center">
+          <div class="col-md-8 text-center">
             <h1 class="mb-4">BUYESI YOUTH INITIATIVE</h1>
            
             <p class="mb-5">Bringing about social change in Rural Communities</p>
@@ -101,7 +150,7 @@
 <section class="ftco-counter ftco-intro" id="section-counter">
   <div class="container">
     <div class="row no-gutters">
-      <div class="col-md-4 d-flex justify-content-center counter-wrap ftco-animate">
+      <div class="col-md-4 d-flex justify-content-center counter-wrap">
         <div class="block-18 color-1 align-items-stretch">
           <div class="text">
             <span>Expected to Impact Over</span>
@@ -111,17 +160,17 @@
           </div>
         </div>
       </div>
-      <div class="col-md-4 d-flex justify-content-center counter-wrap ftco-animate">
+      <div class="col-md-4 d-flex justify-content-center counter-wrap">
         <div class="block-18 color-2 align-items-stretch">
           <div class="text">
             <span>Community Projects</span>
-            <strong class="number" data-number="07">0</strong>
+            <strong class="number" data-number="7">0</strong>
             <span>Active Initiatives</span>
             <p class="mt-3">From agriculture to education and healthcare</p>
           </div>
         </div>
       </div>
-      <div class="col-md-4 d-flex justify-content-center counter-wrap ftco-animate">
+      <div class="col-md-4 d-flex justify-content-center counter-wrap">
         <div class="block-18 color-3 align-items-stretch">
           <div class="text">
             <span>Volunteers</span>
@@ -406,10 +455,10 @@
               <p>"Buyesi Youth Initiative is legally registered as a Company Limited by Guarantee in Uganda. We believe that Progress is
               impossible without change, and those who cannot change their minds cannot change anything. "Bernard Shaw".</p>
               <ul class="ftco-footer-social list-unstyled float-md-left float-lft mt-5">
-                <li class="ftco-animate"><a href="https://x.com/DoughlousK9"><span class="icon-twitter"></span></a></li>
-                <li class="ftco-animate"><a href="https://www.linkedin.com/in/doughlous-koche-0034a6161/"><span class="icon-linkedin"></span></a></li>
-                <li class="ftco-animate"><a href="https://www.instagram.com/doughlouskoche/"><span class="icon-instagram"></span></a></li>
-                <li class="ftco-animate"><a href="https://wa.me/256703660479"><span class="icon-whatsapp"></span></a></li>
+                <li><a href="https://x.com/DoughlousK9"><span class="icon-twitter"></span></a></li>
+                <li><a href="https://www.linkedin.com/in/doughlous-koche-0034a6161/"><span class="icon-linkedin"></span></a></li>
+                <li><a href="https://www.instagram.com/doughlouskoche/"><span class="icon-instagram"></span></a></li>
+                <li><a href="https://wa.me/256703660479"><span class="icon-whatsapp"></span></a></li>
              
               </ul>
             </div>
@@ -437,7 +486,7 @@
           </div>
           <div class="col-md-3">
             <div class="ftco-footer-widget mb-4">
-            	<h2 class="ftco-heading-2">Have a Question?</h2>
+            	<h2 class="ftco-heading-2">Have a Questions?</h2>
             	<div class="block-23 mb-3">
 	              <ul>
 	                <li><span class="icon icon-map-marker"></span><span class="text">Puti-Puti Subcounty, Mpongi Parish,
@@ -461,7 +510,7 @@
   
 
   <!-- loader -->
-  <div id="ftco-loader" class="show fullscreen" style="display: none;"><svg class="circular" width="48px" height="48px"><circle class="path-bg" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke="#eeeeee"/><circle class="path" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke-miterlimit="10" stroke="#F96D00"/></svg></div>
+  <div id="ftco-loader" class="fullscreen" style="display: none;"><svg class="circular" width="48px" height="48px"><circle class="path-bg" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke="#eeeeee"/><circle class="path" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke-miterlimit="10" stroke="#F96D00"/></svg></div>
 
 
   <script src="js/jquery.min.js"></script>
@@ -478,23 +527,43 @@
   <!-- <script src="js/bootstrap-datepicker.js"></script> -->
   <!-- <script src="js/jquery.timepicker.min.js"></script> -->
   <script src="js/scrollax.min.js"></script>
-  <script src="js/main.js"></script>
   <script>
     window.API_BASE_URL = 'https://buyesi.onrender.com/api';
-  </script>
-  <script src="js/api.js"></script>
-  <script>
-    // Wait a moment to ensure API is initialized before loading dependent scripts
+    
+    // Run the counter animation directly for immediate visibility
     document.addEventListener('DOMContentLoaded', function() {
-      console.log('Checking API initialization');
-      if (!window.API) {
-        console.error('API not initialized properly');
-      } else {
-        console.log('API successfully initialized with:', Object.keys(window.API));
+      // Simple counter animation function
+      function animateCounter(el, start, end, duration) {
+        let startTime = null;
+        
+        // Set start value
+        el.textContent = start;
+        
+        function updateCounter(timestamp) {
+          if (!startTime) startTime = timestamp;
+          const progress = Math.min((timestamp - startTime) / duration, 1);
+          const currentValue = Math.floor(progress * (end - start) + start);
+          el.textContent = currentValue;
+          
+          if (progress < 1) {
+            window.requestAnimationFrame(updateCounter);
+          } else {
+            el.textContent = end;
+          }
+        }
+        
+        window.requestAnimationFrame(updateCounter);
       }
+      
+      // Animate each counter
+      document.querySelectorAll('.number').forEach(counter => {
+        const target = parseInt(counter.getAttribute('data-number'), 10);
+        animateCounter(counter, 0, target, 2000);
+      });
     });
   </script>
-  <!-- Load the rest of the scripts that depend on API -->
+  <script src="js/main.js"></script>
+  <script src="js/api.js"></script>
   <script src="js/home.js"></script>
   <script src="js/footer.min.js"></script>
   <!-- Commented out scripts that may not be necessary for homepage functionality -->
@@ -502,9 +571,19 @@
   <!-- <script src="js/cloudinary-upload.js"></script> -->
   <!-- <script src="js/admin-upload.js"></script> -->
   <script>
-    // Remove 'loading' class once the page is loaded to re-enable animations if needed
-    window.addEventListener('load', function() {
-      document.body.classList.remove('loading');
+    // Disable AOS animations
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.AOS) {
+        window.AOS.init({
+          disable: true
+        });
+      }
+      
+      // Hide loader immediately
+      const loader = document.getElementById('ftco-loader');
+      if (loader) {
+        loader.style.display = 'none';
+      }
     });
   </script>
     
