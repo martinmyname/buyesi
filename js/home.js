@@ -75,19 +75,22 @@ document.addEventListener('DOMContentLoaded', async function () {
 
 async function initializeHomePage() {
 	try {
-		// Load latest causes for the carousel
+		// Load sections sequentially from top to bottom to improve perceived loading time
+		console.log('Loading homepage content from top to bottom...');
+
+		// 1. Load causes first (top section)
 		await loadLatestCauses();
 
-		// Load latest blogs for the blog section
-		await loadLatestBlogs();
-
-		// Load team members
+		// 2. Load team members (next section)
 		await loadTeamMembers();
 
-		// Load gallery images
+		// 3. Load gallery images
 		await loadGalleryImages();
 
-		// Load latest events
+		// 4. Load blogs
+		await loadLatestBlogs();
+
+		// 5. Load events (bottom section)
 		await loadLatestEvents();
 
 		// Handle volunteer form submissions
