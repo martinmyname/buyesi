@@ -31,7 +31,7 @@ const handleResponse = async (response) => {
 
 // API Error Handler
 const handleApiError = (error) => {
-	console.error('API Error:', error);
+	// Silently handle error
 	return null;
 };
 
@@ -39,10 +39,6 @@ const handleApiError = (error) => {
 const fetchFromApi = async (endpoint) => {
 	try {
 		const response = await fetch(endpoint);
-		console.log(`API Response from ${endpoint}:`, {
-			status: response.status,
-			statusText: response.statusText,
-		});
 		return await handleApiResponse(response);
 	} catch (error) {
 		return handleApiError(error);

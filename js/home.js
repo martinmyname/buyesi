@@ -32,31 +32,25 @@ function setupAPIReferences(api) {
 	try {
 		return true;
 	} catch (error) {
-		console.error('Error setting up API references:', error);
 		return false;
 	}
 }
 
 document.addEventListener('DOMContentLoaded', async function () {
-	console.log('DOMContentLoaded event fired in home.js');
-
 	try {
 		// Wait for the API to be available
 		const api = await waitForAPI();
 
 		// Set up API references
 		if (setupAPIReferences(api)) {
-			console.log('API references available, initializing home page');
 			initializeHomePage();
 		} else {
-			console.error('Failed to set up API references');
 			showErrorMessage(
 				'causes-section',
 				'API initialization failed. Please refresh the page.'
 			);
 		}
 	} catch (error) {
-		console.error('Error waiting for API:', error.message);
 		showErrorMessage(
 			'causes-section',
 			'API connection failed. Please refresh the page.'
@@ -79,7 +73,7 @@ async function initializeHomePage() {
 		setupVolunteerForm();
 		setupDonationForm();
 	} catch (error) {
-		console.error('Error loading home page data:', error);
+		// Silent error handling to avoid console logs
 	}
 }
 
@@ -114,7 +108,7 @@ function initializeCarousel(selector) {
 		animateOut: false,
 		animateIn: false,
 		smartSpeed: 0,
-		mouseDrag: false,
+		mouseDrag: true,
 		touchDrag: true,
 	});
 }
@@ -130,59 +124,33 @@ function getDataFromResponse(response) {
 // Load latest causes
 async function loadLatestCauses() {
 	try {
-		console.log('Loading causes...');
-		console.log('ENDPOINTS.CAUSES:', window.API.ENDPOINTS.CAUSES);
-
-		if (!window.API) {
-			console.error('window.API is not defined');
-			return;
-		}
-
-		console.log('window.API available:', Object.keys(window.API));
-
-		// Try different approaches to fetch causes
 		let response;
 		let causes = [];
 
 		try {
-			console.log('Trying fetchFromApi...');
 			response = await window.API.fetchFromApi(window.API.ENDPOINTS.CAUSES);
-			console.log('fetchFromApi response:', response);
 			causes = getDataFromResponse(response);
 		} catch (fetchError) {
-			console.error('Error using fetchFromApi:', fetchError);
-
 			try {
-				console.log('Trying direct fetch...');
 				const directResponse = await fetch(window.API.ENDPOINTS.CAUSES);
 				const data = await directResponse.json();
-				console.log('Direct fetch response:', data);
 				causes = getDataFromResponse(data);
 			} catch (directFetchError) {
-				console.error('Error with direct fetch:', directFetchError);
-
 				try {
-					console.log('Trying causeAPI.getAll()...');
 					const apiResponse = await window.API.causeAPI.getAll();
-					console.log('causeAPI.getAll() response:', apiResponse);
 					causes = getDataFromResponse(apiResponse);
 				} catch (apiError) {
-					console.error('Error with causeAPI.getAll():', apiError);
 					throw new Error('All methods to fetch causes failed');
 				}
 			}
 		}
 
-		console.log('Number of causes loaded:', causes.length);
-
 		// Get the existing carousel container element directly
 		const causesContainer = document.querySelector(
-			'#causes-section .carousel-cause'
+			'#home-causes-wrapper .home-causes-carousel'
 		);
-		console.log('Direct selector for causes container:', causesContainer);
 
 		if (!causesContainer) {
-			console.error('Could not find causes carousel container');
 			return;
 		}
 
@@ -192,7 +160,6 @@ async function loadLatestCauses() {
 		if (causes.length > 0) {
 			const fragment = document.createDocumentFragment();
 			causes.forEach((cause) => {
-				console.log(`Adding cause ${cause._id} to DOM:`, cause.title);
 				const causeElement = document.createElement('div');
 				causeElement.className = 'item';
 				causeElement.innerHTML = `
@@ -228,14 +195,11 @@ async function loadLatestCauses() {
 				fragment.appendChild(causeElement);
 			});
 			causesContainer.appendChild(fragment);
-			initializeCarousel('.carousel-cause');
-			console.log('Carousel initialized for causes');
+			initializeCarousel('.home-causes-carousel');
 		} else {
-			console.warn('No causes data available');
 			showErrorMessage('causes-section', 'No causes available at this time.');
 		}
 	} catch (error) {
-		console.error('Failed to load causes:', error);
 		showErrorMessage('causes-section', 'Unable to load causes at this time.');
 	}
 }
@@ -243,21 +207,15 @@ async function loadLatestCauses() {
 // Load latest blogs
 async function loadLatestBlogs() {
 	try {
-		console.log('Loading blogs...');
 		const response = await window.API.fetchFromApi(window.API.ENDPOINTS.BLOGS);
-		console.log('Blogs response:', response);
-
 		const blogs = getDataFromResponse(response);
-		console.log('Number of blogs loaded:', blogs.length);
 
 		// Get the existing carousel container element directly
 		const blogContainer = document.querySelector(
 			'#blog-section .carousel-blog'
 		);
-		console.log('Direct selector for blog container:', blogContainer);
 
 		if (!blogContainer) {
-			console.error('Could not find blog carousel container');
 			return;
 		}
 
@@ -267,7 +225,6 @@ async function loadLatestBlogs() {
 		if (blogs.length > 0) {
 			const fragment = document.createDocumentFragment();
 			blogs.forEach((blog) => {
-				console.log(`Adding blog ${blog._id} to DOM:`, blog.title);
 				const blogElement = document.createElement('div');
 				blogElement.className = 'item';
 				blogElement.innerHTML = `
@@ -302,13 +259,10 @@ async function loadLatestBlogs() {
 			});
 			blogContainer.appendChild(fragment);
 			initializeCarousel('.carousel-blog');
-			console.log('Carousel initialized for blogs');
 		} else {
-			console.warn('No blogs data available');
 			showErrorMessage('blog-section', 'No blog posts available at this time.');
 		}
 	} catch (error) {
-		console.error('Failed to load blogs:', error);
 		showErrorMessage('blog-section', 'Unable to load blog posts at this time.');
 	}
 }
@@ -316,21 +270,15 @@ async function loadLatestBlogs() {
 // Load team members
 async function loadTeamMembers() {
 	try {
-		console.log('Loading team members...');
 		const response = await window.API.fetchFromApi(window.API.ENDPOINTS.TEAM);
-		console.log('Team response:', response);
-
 		const teamMembers = getDataFromResponse(response);
-		console.log('Number of team members loaded:', teamMembers.length);
 
 		// Get the existing carousel container element directly
 		const teamContainer = document.querySelector(
 			'#team-section .carousel-team'
 		);
-		console.log('Direct selector for team container:', teamContainer);
 
 		if (!teamContainer) {
-			console.error('Could not find team carousel container');
 			return;
 		}
 
@@ -340,7 +288,6 @@ async function loadTeamMembers() {
 		if (teamMembers.length > 0) {
 			const fragment = document.createDocumentFragment();
 			teamMembers.forEach((member) => {
-				console.log(`Adding team member ${member.name} to DOM:`, member.name);
 				const memberElement = document.createElement('div');
 				memberElement.className = 'item';
 				memberElement.innerHTML = `
@@ -391,16 +338,13 @@ async function loadTeamMembers() {
 			});
 			teamContainer.appendChild(fragment);
 			initializeCarousel('.carousel-team');
-			console.log('Carousel initialized for team');
 		} else {
-			console.warn('No team members data available');
 			showErrorMessage(
 				'team-section',
 				'No team members available at this time.'
 			);
 		}
 	} catch (error) {
-		console.error('Failed to load team members:', error);
 		showErrorMessage(
 			'team-section',
 			'Unable to load team members at this time.'
@@ -411,23 +355,17 @@ async function loadTeamMembers() {
 // Load gallery images
 async function loadGalleryImages() {
 	try {
-		console.log('Loading gallery images...');
 		const response = await window.API.fetchFromApi(
 			window.API.ENDPOINTS.GALLERY
 		);
-		console.log('Gallery response:', response);
-
 		const galleryImages = getDataFromResponse(response);
-		console.log('Number of gallery images loaded:', galleryImages.length);
 
 		// Get the existing carousel container element directly
 		const galleryContainer = document.querySelector(
 			'#gallery-section .carousel-gallery'
 		);
-		console.log('Direct selector for gallery container:', galleryContainer);
 
 		if (!galleryContainer) {
-			console.error('Could not find gallery carousel container');
 			return;
 		}
 
@@ -437,13 +375,11 @@ async function loadGalleryImages() {
 		if (galleryImages.length > 0) {
 			const fragment = document.createDocumentFragment();
 			galleryImages.forEach((image) => {
-				console.log(`Adding gallery image ${image.image || image.url} to DOM`);
 				const imageUrl = image.image || getImageUrl(image.url, 'gallery');
-				console.log(`Gallery image ${imageUrl}`);
 				const imageElement = document.createElement('div');
 				imageElement.className = 'item';
 				imageElement.innerHTML = `
-					<a href="${imageUrl}" class="gallery image-popup img d-flex align-items-center" style="background-image: url(${imageUrl});">
+					<a href="${imageUrl}" class="gallery image-popup img d-flex align-items-center" style="background-image: url(${imageUrl}); height: 300px; background-size: cover; background-position: center;">
 						<div class="icon mb-4 d-flex align-items-center justify-content-center">
 							<span class="icon-instagram"></span>
 						</div>
@@ -452,7 +388,9 @@ async function loadGalleryImages() {
 				fragment.appendChild(imageElement);
 			});
 			galleryContainer.appendChild(fragment);
-			initializeCarousel('.carousel-gallery');
+
+			// Updated carousel settings for better responsiveness
+			initializeGalleryCarousel('.carousel-gallery');
 
 			// Initialize the lightbox for gallery images - with reduced animation
 			$('.image-popup').magnificPopup({
@@ -469,14 +407,12 @@ async function loadGalleryImages() {
 				},
 			});
 		} else {
-			console.warn('No gallery images data available');
 			showErrorMessage(
 				'gallery-section',
 				'No gallery images available at this time.'
 			);
 		}
 	} catch (error) {
-		console.error('Failed to load gallery images:', error);
 		showErrorMessage(
 			'gallery-section',
 			'Unable to load gallery images at this time.'
@@ -484,24 +420,62 @@ async function loadGalleryImages() {
 	}
 }
 
+// Custom carousel settings for gallery to improve mobile and web display
+function initializeGalleryCarousel(selector) {
+	$(selector).owlCarousel({
+		autoplay: false,
+		center: false,
+		loop: true,
+		items: 1,
+		margin: 10,
+		stagePadding: 10,
+		nav: true,
+		navText: [
+			'<span class="ion-ios-arrow-back">',
+			'<span class="ion-ios-arrow-forward">',
+		],
+		responsive: {
+			0: {
+				items: 1,
+				stagePadding: 0,
+				margin: 5,
+			},
+			600: {
+				items: 2,
+				stagePadding: 20,
+				margin: 10,
+			},
+			1000: {
+				items: 3,
+				stagePadding: 30,
+				margin: 15,
+			},
+			1400: {
+				items: 4,
+				stagePadding: 40,
+				margin: 20,
+			},
+		},
+		animateOut: false,
+		animateIn: false,
+		smartSpeed: 0,
+		mouseDrag: true,
+		touchDrag: true,
+	});
+}
+
 // Load latest events
 async function loadLatestEvents() {
 	try {
-		console.log('Loading events...');
 		const response = await window.API.fetchFromApi(window.API.ENDPOINTS.EVENTS);
-		console.log('Events response:', response);
-
 		const events = getDataFromResponse(response);
-		console.log('Number of events loaded:', events.length);
 
 		// Get the existing carousel container element directly
 		const eventsContainer = document.querySelector(
 			'#events-section .carousel-events'
 		);
-		console.log('Direct selector for events container:', eventsContainer);
 
 		if (!eventsContainer) {
-			console.error('Could not find events carousel container');
 			return;
 		}
 
@@ -511,9 +485,7 @@ async function loadLatestEvents() {
 		if (events.length > 0) {
 			const fragment = document.createDocumentFragment();
 			events.forEach((event) => {
-				console.log(`Adding event ${event._id} to DOM:`, event.title);
 				const eventImageUrl = event.image || getImageUrl(event.image, 'events');
-				console.log(`Event ${event._id} image URL:`, eventImageUrl);
 				const eventElement = document.createElement('div');
 				eventElement.className = 'item';
 				eventElement.innerHTML = `
@@ -546,13 +518,10 @@ async function loadLatestEvents() {
 			});
 			eventsContainer.appendChild(fragment);
 			initializeCarousel('.carousel-events');
-			console.log('Carousel initialized for events');
 		} else {
-			console.warn('No events data available');
 			showErrorMessage('events-section', 'No events available at this time.');
 		}
 	} catch (error) {
-		console.error('Failed to load events:', error);
 		showErrorMessage('events-section', 'Unable to load events at this time.');
 	}
 }
@@ -563,15 +532,9 @@ function setupVolunteerForm() {
 		// Try to find the form with ID 'volunteer' instead
 		const altForm = document.getElementById('volunteer');
 		if (altForm) {
-			console.log('Found volunteer form with ID "volunteer"');
 			setupFormSubmission(altForm);
-		} else {
-			console.error(
-				'Volunteer form not found with ID "volunteer-form" or "volunteer"'
-			);
 		}
 	} else {
-		console.log('Found volunteer form with ID "volunteer-form"');
 		setupFormSubmission(form);
 	}
 
@@ -604,7 +567,6 @@ function setupVolunteerForm() {
 								formElement.querySelector('textarea').value,
 						};
 
-						console.log('Submitting volunteer data:', volunteerData);
 						await window.API.volunteerAPI.register(volunteerData);
 						showAlert(
 							'Thank you for your interest in volunteering! We will contact you soon.',
@@ -613,7 +575,6 @@ function setupVolunteerForm() {
 						);
 						formElement.reset();
 					} catch (error) {
-						console.error('Error submitting volunteer form:', error);
 						showAlert(
 							error.message ||
 								'Failed to submit volunteer form. Please try again.',
@@ -640,7 +601,6 @@ function setupVolunteerForm() {
 						message: formData.get('message'),
 					};
 
-					console.log('Submitting volunteer data:', volunteerData);
 					await window.API.volunteerAPI.register(volunteerData);
 					showAlert(
 						'Thank you for your interest in volunteering! We will contact you soon.',
@@ -649,7 +609,6 @@ function setupVolunteerForm() {
 					);
 					formElement.reset();
 				} catch (error) {
-					console.error('Error submitting volunteer form:', error);
 					showAlert(
 						error.message ||
 							'Failed to submit volunteer form. Please try again.',
@@ -668,19 +627,14 @@ function setupVolunteerForm() {
 function setupDonationForm() {
 	const form = document.getElementById('donation-form');
 	if (!form) {
-		console.log(
-			'Donation form not found with ID "donation-form". Skipping form setup.'
-		);
 		return;
 	}
 
-	console.log('Found donation form with ID "donation-form"');
 	form.addEventListener('submit', async (e) => {
 		e.preventDefault();
 
 		const submitButton = form.querySelector('button[type="submit"]');
 		if (!submitButton) {
-			console.error('Submit button not found in donation form');
 			return;
 		}
 
@@ -698,11 +652,6 @@ function setupDonationForm() {
 				message: formData.get('message') || '',
 			};
 
-			console.log('Submitting donation data:', donationData);
-			console.log(
-				'Using endpoint:',
-				window.API.ENDPOINTS.DONATIONS || 'Not defined'
-			);
 			await window.API.donationAPI.create(donationData);
 			showAlert(
 				'Thank you for your donation! We appreciate your support.',
@@ -711,8 +660,6 @@ function setupDonationForm() {
 			);
 			form.reset();
 		} catch (error) {
-			console.error('Error submitting donation form:', error);
-			console.error('Full error details:', JSON.stringify(error, null, 2));
 			showAlert(
 				error.message || 'Failed to process donation. Please try again.',
 				'danger',
@@ -748,6 +695,18 @@ function showAlert(message, type, targetForm) {
 	}, 5000);
 }
 
+// Show error message in section
+function showErrorMessage(sectionId, message) {
+	const section = document.getElementById(sectionId);
+	if (section) {
+		const errorDiv = document.createElement('div');
+		errorDiv.className = 'alert alert-warning text-center';
+		errorDiv.textContent = message;
+		section.querySelector('.row').appendChild(errorDiv);
+	}
+}
+
+// Format time ago utility
 function formatTimeAgo(dateString) {
 	const date = new Date(dateString);
 	const now = new Date();
@@ -764,17 +723,6 @@ function formatTimeAgo(dateString) {
 		return `${minutes} minute${minutes === 1 ? '' : 's'} ago`;
 	} else {
 		return 'Just now';
-	}
-}
-
-// Show error message in section
-function showErrorMessage(sectionId, message) {
-	const section = document.getElementById(sectionId);
-	if (section) {
-		const errorDiv = document.createElement('div');
-		errorDiv.className = 'alert alert-warning text-center';
-		errorDiv.textContent = message;
-		section.querySelector('.row').appendChild(errorDiv);
 	}
 }
 

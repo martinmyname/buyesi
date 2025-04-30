@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			easing: 'ease',
 			once: true,
 			mirror: false,
-			disable: isHomePage,
+			disable: isHomePage ? true : false,
 		});
 	}
 });
@@ -111,15 +111,12 @@ const observer = {
 	// loader with conditional timing
 	var loader = function () {
 		if ($('#ftco-loader').length > 0) {
-			if (isHomePage) {
-				// Hide loader immediately on homepage
-				$('#ftco-loader').removeClass('show');
-			} else {
-				// Normal loader behavior on other pages
-				setTimeout(function () {
+			setTimeout(
+				function () {
 					$('#ftco-loader').removeClass('show');
-				}, 1);
-			}
+				},
+				isHomePage ? 0 : 1
+			);
 		}
 	};
 	loader();
@@ -132,37 +129,35 @@ const observer = {
 		$.Scrollax();
 	}
 
-	// Simplified carousel initialization for homepage, normal for others
+	// Carousel initialization for all pages
 	var carousel = function () {
-		if (!isHomePage) {
-			$('.carousel-cause').owlCarousel({
-				autoplay: true,
-				center: true,
-				loop: true,
-				items: 1,
-				margin: 30,
-				stagePadding: 0,
-				nav: true,
-				navText: [
-					'<span class="ion-ios-arrow-back">',
-					'<span class="ion-ios-arrow-forward">',
-				],
-				responsive: {
-					0: {
-						items: 1,
-						stagePadding: 0,
-					},
-					600: {
-						items: 2,
-						stagePadding: 50,
-					},
-					1000: {
-						items: 3,
-						stagePadding: 100,
-					},
+		$('.carousel-cause').owlCarousel({
+			autoplay: true,
+			center: true,
+			loop: true,
+			items: 1,
+			margin: 30,
+			stagePadding: 0,
+			nav: true,
+			navText: [
+				'<span class="ion-ios-arrow-back">',
+				'<span class="ion-ios-arrow-forward">',
+			],
+			responsive: {
+				0: {
+					items: 1,
+					stagePadding: 0,
 				},
-			});
-		}
+				600: {
+					items: 2,
+					stagePadding: 50,
+				},
+				1000: {
+					items: 3,
+					stagePadding: 100,
+				},
+			},
+		});
 	};
 	carousel();
 
@@ -264,46 +259,44 @@ const observer = {
 	};
 	counter();
 
-	// Disable all content animations
+	// Content animation for all pages except homepage
 	var contentWayPoint = function () {
-		if (!isHomePage) {
-			var i = 0;
-			$('.ftco-animate').waypoint(
-				function (direction) {
-					if (
-						direction === 'down' &&
-						!$(this.element).hasClass('ftco-animated')
-					) {
-						i++;
+		var i = 0;
+		$('.ftco-animate').waypoint(
+			function (direction) {
+				if (
+					direction === 'down' &&
+					!$(this.element).hasClass('ftco-animated')
+				) {
+					i++;
 
-						$(this.element).addClass('item-animate');
-						setTimeout(function () {
-							$('body .ftco-animate.item-animate').each(function (k) {
-								var el = $(this);
-								setTimeout(
-									function () {
-										var effect = el.data('animate-effect');
-										if (effect === 'fadeIn') {
-											el.addClass('fadeIn ftco-animated');
-										} else if (effect === 'fadeInLeft') {
-											el.addClass('fadeInLeft ftco-animated');
-										} else if (effect === 'fadeInRight') {
-											el.addClass('fadeInRight ftco-animated');
-										} else {
-											el.addClass('fadeInUp ftco-animated');
-										}
-										el.removeClass('item-animate');
-									},
-									k * 50,
-									'easeInOutExpo'
-								);
-							});
-						}, 100);
-					}
-				},
-				{ offset: '95%' }
-			);
-		}
+					$(this.element).addClass('item-animate');
+					setTimeout(function () {
+						$('body .ftco-animate.item-animate').each(function (k) {
+							var el = $(this);
+							setTimeout(
+								function () {
+									var effect = el.data('animate-effect');
+									if (effect === 'fadeIn') {
+										el.addClass('fadeIn ftco-animated');
+									} else if (effect === 'fadeInLeft') {
+										el.addClass('fadeInLeft ftco-animated');
+									} else if (effect === 'fadeInRight') {
+										el.addClass('fadeInRight ftco-animated');
+									} else {
+										el.addClass('fadeInUp ftco-animated');
+									}
+									el.removeClass('item-animate');
+								},
+								k * 50,
+								'easeInOutExpo'
+							);
+						});
+					}, 100);
+				}
+			},
+			{ offset: '95%' }
+		);
 	};
 	contentWayPoint();
 
@@ -341,9 +334,9 @@ const observer = {
 		closeOnContentClick: true,
 		closeBtnInside: false,
 		fixedContentPos: true,
-		mainClass: isHomePage ? 'mfp-no-margins' : 'mfp-no-margins mfp-with-zoom',
+		mainClass: 'mfp-no-margins' + (isHomePage ? '' : ' mfp-with-zoom'),
 		gallery: {
-			enabled: !isHomePage,
+			enabled: true,
 			navigateByImgClick: true,
 			preload: [0, 1],
 		},
@@ -361,8 +354,8 @@ const observer = {
 		type: 'iframe',
 		mainClass: isHomePage ? 'mfp-no-margins' : 'mfp-fade',
 		removalDelay: isHomePage ? 0 : 160,
-		preloader: !isHomePage,
-		fixedContentPos: isHomePage,
+		preloader: true,
+		fixedContentPos: true,
 	});
 
 	// Datepicker

@@ -1,0 +1,60 @@
+/* Shared animation styles for Buyesi Website */
+
+/* Basic animation properties for all pages */
+.ftco-animate {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Allow animations to work normally on non-homepage */
+.ftco-animate:not(body.homepage *) {
+  animation: fadeInUp 0.5s ease forwards;
+}
+
+/* Disable animations only on homepage */
+body.homepage .ftco-animate {
+  animation: none !important;
+}
+
+/* Hero background displays properly on all pages */
+.hero-wrap {
+  background-position: center top !important;
+  background-size: cover !important;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+/* Counter animations allowed on all pages */
+.number {
+  animation: countUp 2s ease-out;
+  transition: all 0.5s ease;
+}
+
+/* Define a simple countUp animation */
+@keyframes countUp {
+  from { opacity: 0.5; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInUp {
+  from { 
+    opacity: 0;
+    transform: translate3d(0, 40px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Homepage-specific performance optimizations */
+body.homepage *:not(.number):not(.hero-wrap):not(.hero-wrap *) {
+  animation-duration: 0s !important;
+  transition-duration: 0s !important;
+}
+
+/* Remove scrollax effects for homepage only */
+body.homepage [data-scrollax-parent] [data-scrollax] {
+  transform: translate3d(0, 0, 0) !important;
+} 

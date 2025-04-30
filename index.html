@@ -39,13 +39,23 @@
     <link rel="stylesheet" href="css/flaticon.css">
     <link rel="stylesheet" href="css/icomoon.css">
     <link rel="stylesheet" href="css/style.min.css">
+    <link rel="stylesheet" href="css/animations.css">
     <style>
-      /* Homepage-only performance optimizations - EXCEPT for number counters */
-      body.homepage *:not(.number) {
+      /* Homepage-only performance optimizations - EXCEPT for number counters and hero section */
+      body.homepage *:not(.number):not(.hero-wrap):not(.hero-wrap *) {
         animation: none !important;
         transition: none !important;
         animation-duration: 0s !important;
         transition-duration: 0s !important;
+      }
+      
+      /* Make sure hero background displays properly */
+      .hero-wrap {
+        background-position: center top !important;
+        background-size: cover !important;
+        width: 100%;
+        height: 100%;
+        position: relative;
       }
       
       /* Counter animations are allowed */
@@ -294,9 +304,9 @@
         <p>Discover our ongoing initiatives and support our mission to empower rural communities through sustainable goat farming.</p>
       </div>
     </div>
-    <div class="row" id="causes-carousel-container">
+    <div class="row" id="home-causes-wrapper">
       <div class="col-md-12 ftco-animate">
-        <div class="carousel-cause owl-carousel">
+        <div class="home-causes-carousel owl-carousel">
           <!-- Causes will be loaded dynamically here -->
         </div>
       </div>
