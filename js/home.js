@@ -1,14 +1,5 @@
-// Access the API objects from the window.API namespace safely
-let causeAPI,
-	blogAPI,
-	teamAPI,
-	galleryAPI,
-	eventAPI,
-	volunteerAPI,
-	donationAPI,
-	ENDPOINTS,
-	fetchFromApi,
-	API_BASE_URL;
+// Remove duplicate declarations to prevent SyntaxError
+// Variables are already defined in api.js and accessible via window.API
 
 // Wait for API to be available with timeout and retry
 function waitForAPI(maxAttempts = 10, interval = 500) {
@@ -23,7 +14,7 @@ function waitForAPI(maxAttempts = 10, interval = 500) {
 			);
 
 			if (window.API) {
-				console.log('API found:', Object.keys(window.API));
+				console.log('API found');
 				resolve(window.API);
 				return;
 			}
@@ -46,17 +37,7 @@ function setupAPIReferences(api) {
 	if (!api) return false;
 
 	try {
-		causeAPI = api.causeAPI;
-		blogAPI = api.blogAPI;
-		teamAPI = api.teamAPI;
-		galleryAPI = api.galleryAPI;
-		eventAPI = api.eventAPI;
-		volunteerAPI = api.volunteerAPI;
-		donationAPI = api.donationAPI;
-		ENDPOINTS = api.ENDPOINTS;
-		fetchFromApi = api.fetchFromApi;
-		API_BASE_URL = api.BASE_URL;
-
+		// Access API components directly from window.API
 		console.log('API references set up successfully');
 		return true;
 	} catch (error) {
@@ -151,52 +132,6 @@ function initializeCarousel(selector) {
 	});
 }
 
-// Create carousel container
-function createCarouselContainer(sectionId, title) {
-	const section = document.getElementById(sectionId);
-	if (!section) {
-		console.error(`Section with ID ${sectionId} not found`);
-		return null;
-	}
-
-	// Instead of recreating the entire structure, find the existing carousel container
-	const existingCarousel = section.querySelector(
-		`.carousel-${sectionId.split('-')[0]}`
-	);
-
-	if (existingCarousel) {
-		console.log(`Found existing carousel for ${sectionId}:`, existingCarousel);
-		// Clear existing items but keep the carousel structure
-		existingCarousel.innerHTML = '';
-		return existingCarousel;
-	} else {
-		console.error(`Carousel container not found in section ${sectionId}`);
-
-		// If no existing carousel found (fallback), create one
-		console.log(`Creating new carousel container for ${sectionId}`);
-		const container = document.createElement('div');
-		container.className = 'container';
-		container.innerHTML = `
-			<div class="row justify-content-center mb-5 pb-3">
-				<div class="col-md-7 heading-section text-center">
-					<h2 class="mb-4">${title}</h2>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-md-12">
-					<div class="carousel-${sectionId.split('-')[0]} owl-carousel"></div>
-				</div>
-			</div>
-		`;
-
-		// Clear existing content and append new container
-		section.innerHTML = '';
-		section.appendChild(container);
-
-		return section.querySelector(`.carousel-${sectionId.split('-')[0]}`);
-	}
-}
-
 // Get data from response
 function getDataFromResponse(response) {
 	if (Array.isArray(response)) {
@@ -209,7 +144,7 @@ function getDataFromResponse(response) {
 async function loadLatestCauses() {
 	try {
 		console.log('Loading causes...');
-		console.log('ENDPOINTS.CAUSES:', ENDPOINTS.CAUSES);
+		console.log('ENDPOINTS.CAUSES:', window.API.ENDPOINTS.CAUSES);
 
 		if (!window.API) {
 			console.error('window.API is not defined');
@@ -224,7 +159,7 @@ async function loadLatestCauses() {
 
 		try {
 			console.log('Trying fetchFromApi...');
-			response = await fetchFromApi(ENDPOINTS.CAUSES);
+			response = await window.API.fetchFromApi(window.API.ENDPOINTS.CAUSES);
 			console.log('fetchFromApi response:', response);
 			causes = getDataFromResponse(response);
 		} catch (fetchError) {
@@ -232,7 +167,7 @@ async function loadLatestCauses() {
 
 			try {
 				console.log('Trying direct fetch...');
-				const directResponse = await fetch(ENDPOINTS.CAUSES);
+				const directResponse = await fetch(window.API.ENDPOINTS.CAUSES);
 				const data = await directResponse.json();
 				console.log('Direct fetch response:', data);
 				causes = getDataFromResponse(data);
@@ -241,7 +176,7 @@ async function loadLatestCauses() {
 
 				try {
 					console.log('Trying causeAPI.getAll()...');
-					const apiResponse = await causeAPI.getAll();
+					const apiResponse = await window.API.causeAPI.getAll();
 					console.log('causeAPI.getAll() response:', apiResponse);
 					causes = getDataFromResponse(apiResponse);
 				} catch (apiError) {
@@ -326,7 +261,7 @@ async function loadLatestCauses() {
 async function loadLatestBlogs() {
 	try {
 		console.log('Loading blogs...');
-		const response = await fetchFromApi(ENDPOINTS.BLOGS);
+		const response = await window.API.fetchFromApi(window.API.ENDPOINTS.BLOGS);
 		console.log('Blogs response:', response);
 
 		const blogs = getDataFromResponse(response);
@@ -403,7 +338,7 @@ async function loadLatestBlogs() {
 async function loadTeamMembers() {
 	try {
 		console.log('Loading team members...');
-		const response = await fetchFromApi(ENDPOINTS.TEAM);
+		const response = await window.API.fetchFromApi(window.API.ENDPOINTS.TEAM);
 		console.log('Team response:', response);
 
 		const teamMembers = getDataFromResponse(response);
@@ -502,7 +437,9 @@ async function loadTeamMembers() {
 async function loadGalleryImages() {
 	try {
 		console.log('Loading gallery images...');
-		const response = await fetchFromApi(ENDPOINTS.GALLERY);
+		const response = await window.API.fetchFromApi(
+			window.API.ENDPOINTS.GALLERY
+		);
 		console.log('Gallery response:', response);
 
 		const galleryImages = getDataFromResponse(response);
@@ -527,16 +464,12 @@ async function loadGalleryImages() {
 				console.log(
 					`Adding gallery image ${index + 1}/${galleryImages.length} to DOM`
 				);
+				const imageUrl = image.image || getImageUrl(image.url, 'gallery');
+				console.log(`Gallery image ${index + 1} URL:`, imageUrl);
 				const imageElement = document.createElement('div');
 				imageElement.className = 'item';
 				imageElement.innerHTML = `
-					<a href="${getImageUrl(
-						image.url,
-						'gallery'
-					)}" class="gallery image-popup img d-flex align-items-center" style="background-image: url(${getImageUrl(
-					image.url,
-					'gallery'
-				)});">
+					<a href="${imageUrl}" class="gallery image-popup img d-flex align-items-center" style="background-image: url(${imageUrl});">
 						<div class="icon mb-4 d-flex align-items-center justify-content-center">
 							<span class="icon-instagram"></span>
 						</div>
@@ -587,7 +520,7 @@ async function loadGalleryImages() {
 async function loadLatestEvents() {
 	try {
 		console.log('Loading events...');
-		const response = await fetchFromApi(ENDPOINTS.EVENTS);
+		const response = await window.API.fetchFromApi(window.API.ENDPOINTS.EVENTS);
 		console.log('Events response:', response);
 
 		const events = getDataFromResponse(response);
@@ -613,16 +546,15 @@ async function loadLatestEvents() {
 					`Adding event ${index + 1}/${events.length} to DOM:`,
 					event.title
 				);
+				const eventImageUrl = event.image || getImageUrl(event.image, 'events');
+				console.log(`Event ${index + 1} image URL:`, eventImageUrl);
 				const eventElement = document.createElement('div');
 				eventElement.className = 'item';
 				eventElement.innerHTML = `
 					<div class="event-entry">
 						<a href="event-single.html?id=${
 							event._id
-						}" class="img" style="background-image: url(${getImageUrl(
-					event.image,
-					'events'
-				)});"></a>
+						}" class="img" style="background-image: url(${eventImageUrl});"></a>
 						<div class="text p-4 p-md-5">
 							<div class="meta">
 								<div><a href="#">${new Date(event.date).toLocaleDateString()}</a></div>
@@ -709,7 +641,7 @@ function setupVolunteerForm() {
 						};
 
 						console.log('Submitting volunteer data:', volunteerData);
-						await volunteerAPI.register(volunteerData);
+						await window.API.volunteerAPI.register(volunteerData);
 						showAlert(
 							'Thank you for your interest in volunteering! We will contact you soon.',
 							'success',
@@ -745,7 +677,7 @@ function setupVolunteerForm() {
 					};
 
 					console.log('Submitting volunteer data:', volunteerData);
-					await volunteerAPI.register(volunteerData);
+					await window.API.volunteerAPI.register(volunteerData);
 					showAlert(
 						'Thank you for your interest in volunteering! We will contact you soon.',
 						'success',
@@ -772,7 +704,9 @@ function setupVolunteerForm() {
 function setupDonationForm() {
 	const form = document.getElementById('donation-form');
 	if (!form) {
-		console.error('Donation form not found with ID "donation-form"');
+		console.log(
+			'Donation form not found with ID "donation-form". Skipping form setup.'
+		);
 		return;
 	}
 
@@ -801,7 +735,11 @@ function setupDonationForm() {
 			};
 
 			console.log('Submitting donation data:', donationData);
-			await donationAPI.create(donationData);
+			console.log(
+				'Using endpoint:',
+				window.API.ENDPOINTS.DONATIONS || 'Not defined'
+			);
+			await window.API.donationAPI.create(donationData);
 			showAlert(
 				'Thank you for your donation! We appreciate your support.',
 				'success',
@@ -810,6 +748,7 @@ function setupDonationForm() {
 			form.reset();
 		} catch (error) {
 			console.error('Error submitting donation form:', error);
+			console.error('Full error details:', JSON.stringify(error, null, 2));
 			showAlert(
 				error.message || 'Failed to process donation. Please try again.',
 				'danger',
