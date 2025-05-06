@@ -485,7 +485,34 @@ async function loadLatestEvents() {
 		if (events.length > 0) {
 			const fragment = document.createDocumentFragment();
 			events.forEach((event) => {
-				const eventImageUrl = event.image || getImageUrl(event.image, 'events');
+				// Construct the image URL properly
+				let eventImageUrl;
+
+				// Handle various image formats
+				if (event.image) {
+					// If it's a full URL (including Cloudinary)
+					if (event.image.startsWith('http')) {
+						eventImageUrl = event.image;
+					}
+					// If it includes a path from the API
+					else if (event.image.includes('/uploads/')) {
+						eventImageUrl = `${window.API_BASE_URL}${event.image}`;
+					}
+					// If it's just a filename
+					else {
+						eventImageUrl = `${window.API_BASE_URL}/uploads/events/${event.image}`;
+					}
+				}
+				// For Cloudinary or other image hosting service
+				else if (event.imageUrl) {
+					eventImageUrl = event.imageUrl;
+				}
+				// Default image as fallback
+				else {
+					eventImageUrl = 'images/event-default.jpg';
+				}
+
+				// Create the event element
 				const eventElement = document.createElement('div');
 				eventElement.className = 'item';
 				eventElement.innerHTML = `
@@ -495,7 +522,7 @@ async function loadLatestEvents() {
 						}" class="img" style="background-image: url(${eventImageUrl});"></a>
 						<div class="text p-4 p-md-5">
 							<div class="meta">
-								<div><a href="#">${new Date(event.date).toLocaleDateString()}</a></div>
+								<div><a href="#">${formatDate(event.startDate)}</a></div>
 								<div><a href="#">${event.time || 'TBA'}</a></div>
 								<div><a href="#">${event.location || 'TBA'}</a></div>
 							</div>
@@ -511,18 +538,21 @@ async function loadLatestEvents() {
 							<p><a href="event-single.html?id=${
 								event._id
 							}" class="btn btn-primary">Read More</a></p>
+						</div>
 					</div>
-				</div>
-			`;
+				`;
 				fragment.appendChild(eventElement);
 			});
+
 			eventsContainer.appendChild(fragment);
+
+			// Initialize carousel with specific settings for events section
 			initializeCarousel('.carousel-events');
 		} else {
 			showErrorMessage('events-section', 'No events available at this time.');
 		}
 	} catch (error) {
-		showErrorMessage('events-section', 'Unable to load events at this time.');
+		console.error('Error loading latest events:', error);
 	}
 }
 
@@ -733,15 +763,35 @@ function calculateProgress(cause) {
 	return Math.min(100, Math.round((raised / target) * 100));
 }
 
+// Helper function to format dates
+function formatDate(dateString) {
+	if (!dateString) return 'TBA';
+
+	const date = new Date(dateString);
+	if (isNaN(date.getTime())) return 'TBA';
+
+	const options = {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric',
+	};
+	return date.toLocaleDateString('en-US', options);
+}
+
 // Helper function to get image URL
 function getImageUrl(image, type) {
 	if (!image) return `images/${type}-default.jpg`;
 
+	// Direct URL (including Cloudinary URLs)
 	if (image.startsWith('http')) {
 		return image;
-	} else if (image.includes('/uploads/')) {
-		return `${API_BASE_URL}${image}`;
-	} else {
-		return `${API_BASE_URL}/uploads/${type}/${image}`;
+	}
+	// Path from backend API
+	else if (image.includes('/uploads/')) {
+		return `${window.API_BASE_URL}${image}`;
+	}
+	// Just a filename
+	else {
+		return `${window.API_BASE_URL}/uploads/${type}/${image}`;
 	}
 }

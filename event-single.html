@@ -28,6 +28,45 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/single-page-fix.css">
     <link rel="stylesheet" href="css/single-page-styles.css">
+    <style>
+      /* Fix for event images not displaying properly */
+      .event-entry .img, .event-image {
+        display: block;
+        height: 400px;
+        background-size: cover;
+        background-position: center center;
+        background-repeat: no-repeat;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      
+      /* Add hover effect */
+      .event-entry .img:hover, .event-image:hover {
+        transform: scale(1.02);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      }
+      
+      /* Ensure the image is visible with a fallback background color */
+      .event-entry {
+        background: #fff;
+        overflow: hidden;
+        border-radius: 8px;
+      }
+      
+      /* Enhanced event details styling */
+      .event-details {
+        padding: 15px;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        margin-bottom: 25px;
+      }
+      
+      .event-details p {
+        margin-bottom: 5px;
+      }
+    </style>
   </head>
   <body>
     

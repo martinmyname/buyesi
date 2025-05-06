@@ -66,8 +66,45 @@
       
       /* Define a simple countUp animation */
       @keyframes countUp {
-        from { opacity: 0.5; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      
+      /* Fix for event images on homepage */
+      #events-section .event-entry .img {
+        display: block !important;
+        height: 250px !important;
+        background-size: cover !important;
+        background-position: center center !important;
+        background-repeat: no-repeat !important;
+        border-radius: 8px !important;
+        margin-bottom: 20px !important;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1) !important;
+        transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+      }
+      
+      /* Add hover effect for event images on homepage */
+      #events-section .event-entry .img:hover {
+        transform: translateY(-5px) !important;
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15) !important;
+      }
+      
+      /* Design improvements for event cards on homepage */
+      #events-section .event-entry {
+        background: #fff !important;
+        overflow: hidden !important;
+        border-radius: 8px !important;
+        transition: transform 0.3s ease !important;
+      }
+      
+      #events-section .event-entry:hover {
+        transform: translateY(-3px) !important;
       }
       
       /* Disable owl carousel animations for homepage only */
@@ -79,30 +116,6 @@
         animation-duration: 0s !important;
         animation: none !important;
         transition: none !important;
-      }
-      
-      /* Disable AOS animations for homepage only */
-      body.homepage [data-aos] {
-        opacity: 1 !important;
-        transform: translate(0) !important;
-        transition: none !important;
-      }
-      
-      /* Remove ftco-animate class effects for homepage only */
-      body.homepage .ftco-animate {
-        opacity: 1 !important;
-        visibility: visible !important;
-        animation: none !important;
-      }
-      
-      /* Improve image loading */
-      img {
-        content-visibility: auto;
-      }
-      
-      /* Remove scrollax effects for homepage only */
-      body.homepage [data-scrollax-parent] [data-scrollax] {
-        transform: translate3d(0, 0, 0) !important;
       }
     </style>
   </head>

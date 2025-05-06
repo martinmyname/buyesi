@@ -25,13 +25,10 @@ async function loadEvents() {
 			'<div class="col-12 text-center"><div class="spinner-border text-primary" role="status"><span class="sr-only">Loading...</span></div></div>';
 
 		// Fetch events from the API
-		console.log('Fetching events...');
 		const response = await eventAPI.getAll();
-		console.log('API Response:', response);
 
 		// Handle both array response and object with data property
 		const events = Array.isArray(response) ? response : response.data || [];
-		console.log('Processed events:', events);
 
 		if (!events || !events.length) {
 			eventsContainer.innerHTML =
@@ -40,14 +37,14 @@ async function loadEvents() {
 		}
 
 		// Sort by date (most recent first)
-		events.sort((a, b) => new Date(b.date) - new Date(a.date));
+		events.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
 
 		// Clear any existing content
 		eventsContainer.innerHTML = '';
 
 		// Render each event
 		events.forEach((event) => {
-			const eventDate = new Date(event.date);
+			const eventDate = new Date(event.startDate);
 			const formattedDate = eventDate.toLocaleDateString('en-US', {
 				year: 'numeric',
 				month: 'long',
@@ -57,15 +54,25 @@ async function loadEvents() {
 			// Construct the image URL properly
 			let imageUrl;
 			if (event.image) {
+				// If the image is a full URL (including Cloudinary URLs)
 				if (event.image.startsWith('http')) {
 					imageUrl = event.image;
-				} else if (event.image.includes('/uploads/')) {
-					imageUrl = `${API_BASE_URL}${event.image}`;
-				} else {
-					imageUrl = `${API_BASE_URL}/uploads/events/${event.image}`;
 				}
-				console.log('Image URL for', event.title, ':', imageUrl);
-			} else {
+				// If the image has a path from the backend API
+				else if (event.image.includes('/uploads/')) {
+					imageUrl = `${window.API_BASE_URL}${event.image}`;
+				}
+				// If it's just a filename
+				else {
+					imageUrl = `${window.API_BASE_URL}/uploads/events/${event.image}`;
+				}
+			}
+			// For Cloudinary or other image hosting service
+			else if (event.imageUrl) {
+				imageUrl = event.imageUrl;
+			}
+			// Default image
+			else {
 				imageUrl = 'images/event-default.jpg';
 			}
 
@@ -74,17 +81,17 @@ async function loadEvents() {
 					<div class="event-entry">
 						<a href="event-single.html?id=${
 							event._id
-						}" class="img" style="background-image: url(${imageUrl});"></a>
-						<div class="text p-4 p-md-5">
-							<div class="meta">
-								<div><a href="#">${formattedDate}</a></div>
-								<div><a href="#">${event.time || 'TBA'}</a></div>
-								<div><a href="#">${event.location || 'TBA'}</a></div>
+						}" class="img" style="background-image: url('${imageUrl}')"></a>
+						<div class="text p-4">
+							<div class="meta mb-3">
+								<div><span class="icon-calendar mr-2"></span>${formattedDate}</div>
+								<div><span class="icon-clock-o mr-2"></span>${event.time || 'TBA'}</div>
+								<div><span class="icon-map-o mr-2"></span>${event.location || 'TBA'}</div>
 							</div>
 							<h3 class="mb-3"><a href="event-single.html?id=${event._id}">${
 				event.title
 			}</a></h3>
-							<p>${
+							<p class="mb-4">${
 								event.description
 									? event.description.substring(0, 100) +
 									  (event.description.length > 100 ? '...' : '')

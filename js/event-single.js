@@ -36,13 +36,10 @@ document.addEventListener('DOMContentLoaded', async function () {
 			'<div class="text-center my-5"><div class="spinner-border text-primary" role="status"><span class="sr-only">Loading...</span></div></div>';
 
 		// Fetch event details from the API
-		console.log('Fetching event with ID:', eventId);
 		const response = await window.API.eventAPI.getById(eventId);
-		console.log('API Response:', response);
 
 		// Handle both direct response and object with data property
 		const event = response && response.data ? response.data : response;
-		console.log('Processed event:', event);
 
 		if (!event) {
 			showError('Event not found');
@@ -54,7 +51,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 		eventTitle.textContent = event.title;
 
 		// Format date
-		const eventDateObj = new Date(event.date);
+		const eventDateObj = new Date(event.startDate);
 		const formattedDate = eventDateObj.toLocaleDateString('en-US', {
 			year: 'numeric',
 			month: 'long',
@@ -74,17 +71,25 @@ document.addEventListener('DOMContentLoaded', async function () {
 		eventImageDiv.className = 'img event-image mb-4';
 		let imageUrl;
 		if (event.image) {
+			// Direct URL (including Cloudinary URLs)
 			if (event.image.startsWith('http')) {
 				imageUrl = event.image;
-			} else if (event.image.includes('/uploads/')) {
-				imageUrl = `http://localhost:5000${event.image}`;
-			} else {
-				imageUrl = `http://localhost:5000/uploads/events/${event.image}`;
 			}
-			console.log('Image URL for event:', imageUrl);
-		} else if (event.imageUrl) {
+			// Path from backend API
+			else if (event.image.includes('/uploads/')) {
+				imageUrl = `${window.API_BASE_URL}${event.image}`;
+			}
+			// Just a filename
+			else {
+				imageUrl = `${window.API_BASE_URL}/uploads/events/${event.image}`;
+			}
+		}
+		// For Cloudinary or other image hosting service
+		else if (event.imageUrl) {
 			imageUrl = event.imageUrl;
-		} else {
+		}
+		// Default fallback image
+		else {
 			imageUrl = 'images/event-default.jpg';
 		}
 		eventImageDiv.style.backgroundImage = `url('${imageUrl}')`;
@@ -92,42 +97,64 @@ document.addEventListener('DOMContentLoaded', async function () {
 
 		// Event Details
 		const eventDetails = document.createElement('div');
-		eventDetails.className = 'event-details mb-4';
-		const detailsRow1 = document.createElement('div');
-		detailsRow1.className = 'row';
+		eventDetails.className = 'event-details p-4 mb-4 rounded';
+
+		// Title (moved inside event details box)
+		const titleEl = document.createElement('h3');
+		titleEl.className = 'event-title mb-4';
+		titleEl.textContent = event.title;
+		eventDetails.appendChild(titleEl);
+
+		// Details with icons
+		const detailsGrid = document.createElement('div');
+		detailsGrid.className = 'row mb-3';
+
+		// Date
 		const dateCol = document.createElement('div');
-		dateCol.className = 'col-md-6';
-		dateCol.innerHTML = `<p><strong>Date:</strong> <span class="event-date">${formattedDate}</span></p>`;
+		dateCol.className = 'col-md-6 mb-3';
+		dateCol.innerHTML = `<p><span class="icon-calendar mr-2"></span><strong>Date:</strong> <span class="event-date">${formattedDate}</span></p>`;
+
+		// Location
 		const locationCol = document.createElement('div');
-		locationCol.className = 'col-md-6';
-		locationCol.innerHTML = `<p><strong>Location:</strong> <span class="event-location">${
-			event.location || 'TBD'
+		locationCol.className = 'col-md-6 mb-3';
+		locationCol.innerHTML = `<p><span class="icon-map-o mr-2"></span><strong>Location:</strong> <span class="event-location">${
+			event.location || 'TBA'
 		}</span></p>`;
-		detailsRow1.appendChild(dateCol);
-		detailsRow1.appendChild(locationCol);
 
-		const detailsRow2 = document.createElement('div');
-		detailsRow2.className = 'row';
+		// Time
 		const timeCol = document.createElement('div');
-		timeCol.className = 'col-md-6';
-		timeCol.innerHTML = `<p><strong>Time:</strong> <span class="event-time">${
-			event.time || 'TBD'
+		timeCol.className = 'col-md-6 mb-3';
+		timeCol.innerHTML = `<p><span class="icon-clock-o mr-2"></span><strong>Time:</strong> <span class="event-time">${
+			event.time || 'TBA'
 		}</span></p>`;
-		const organizerCol = document.createElement('div');
-		organizerCol.className = 'col-md-6';
-		organizerCol.innerHTML = `<p><strong>Organizer:</strong> Buyesi Youth Initiative</p>`;
-		detailsRow2.appendChild(timeCol);
-		detailsRow2.appendChild(organizerCol);
 
-		eventDetails.appendChild(detailsRow1);
-		eventDetails.appendChild(detailsRow2);
+		// Organizer
+		const organizerCol = document.createElement('div');
+		organizerCol.className = 'col-md-6 mb-3';
+		organizerCol.innerHTML = `<p><span class="icon-user mr-2"></span><strong>Organizer:</strong> Buyesi Youth Initiative</p>`;
+
+		detailsGrid.appendChild(dateCol);
+		detailsGrid.appendChild(locationCol);
+		detailsGrid.appendChild(timeCol);
+		detailsGrid.appendChild(organizerCol);
+
+		eventDetails.appendChild(detailsGrid);
 		eventEntry.appendChild(eventDetails);
 
-		// Description
+		// Description with heading
+		const descriptionSection = document.createElement('div');
+		descriptionSection.className = 'mb-5';
+		const descHeading = document.createElement('h4');
+		descHeading.className = 'mb-3 border-bottom pb-2';
+		descHeading.textContent = 'About This Event';
+		descriptionSection.appendChild(descHeading);
+
 		const eventDesc = document.createElement('div');
 		eventDesc.className = 'event-description';
-		eventDesc.innerHTML = event.description;
-		eventEntry.appendChild(eventDesc);
+		eventDesc.innerHTML =
+			event.description || 'No description available for this event.';
+		descriptionSection.appendChild(eventDesc);
+		eventEntry.appendChild(descriptionSection);
 
 		eventContainer.appendChild(eventEntry);
 
@@ -136,9 +163,6 @@ document.addEventListener('DOMContentLoaded', async function () {
 		if (registerForm) {
 			setupRegisterForm(registerForm, event);
 		}
-
-		console.log('API:', window.API);
-		console.log('teamAPI:', window.API ? window.API.teamAPI : 'undefined');
 	} catch (error) {
 		console.error('Failed to load event details:', error);
 		showError('Error loading event details. Please try again later.');
@@ -168,9 +192,8 @@ function setupRegisterForm(form, event) {
 		submitBtn.disabled = true;
 
 		try {
-			// const API_BASE_URL = 'http://localhost:5000/api';
 			const response = await fetch(
-				`${API_BASE_URL}/events/${event._id}/register`,
+				`${window.API_BASE_URL}/events/${event._id}/register`,
 				{
 					method: 'POST',
 					headers: {

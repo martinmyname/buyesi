@@ -27,6 +27,39 @@
     <link rel="stylesheet" href="css/icomoon.css">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/animations.css">
+    <style>
+      /* Fix for event images not displaying properly */
+      .event-entry .img {
+        display: block;
+        height: 300px;
+        background-size: cover;
+        background-position: center center;
+        background-repeat: no-repeat;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+      
+      /* Add hover effect */
+      .event-entry .img:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+      }
+      
+      /* Ensure the image is visible with a fallback background color */
+      .event-entry {
+        background: #fff;
+        overflow: hidden;
+        border-radius: 8px;
+        transition: transform 0.3s ease;
+      }
+      
+      /* Add hover effect to event cards */
+      .event-entry:hover {
+        transform: translateY(-3px);
+      }
+    </style>
   </head>
   <body>
     
@@ -55,7 +88,7 @@
   </nav>
     <!-- END nav -->
     
-    <div class="hero-wrap hero-wrap-2" style="background-image: url('images/bg_9.jpg');">
+    <div class="hero-wrap hero-wrap-2" style="background-image: url('images/bg_6.jpg');">
       <div class="overlay"></div>
       <div class="container">
         <div class="row no-gutters slider-text align-items-center justify-content-center" data-scrollax-parent="true">
@@ -73,7 +106,7 @@
         <div class="row justify-content-center mb-5 pb-3">
           <div class="col-md-7 heading-section ftco-animate text-center">
             <h2 class="mb-4">Our Events</h2>
-            <p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
+            <p>Join us in our upcoming events and activities to support rural communities.</p>
           </div>
         </div>
         <div class="row events-container">
