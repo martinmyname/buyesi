@@ -1,0 +1,28 @@
+# robots.txt for buyesi.org
+User-agent: *
+Allow: /
+Allow: /about.html
+Allow: /causes.html
+Allow: /team.html
+Allow: /blog.html
+Allow: /gallery.html
+Allow: /event.html
+Allow: /contact.html
+Allow: /images/
+Allow: /css/
+Allow: /js/
+
+# Disallow admin and sensitive areas
+Disallow: /admin/
+Disallow: /private/
+Disallow: /temp/
+Disallow: /cgi-bin/
+Disallow: /*.json$
+Disallow: /*.xml$
+Disallow: /*?*
+
+# Sitemap location
+Sitemap: https://buyesi.org/sitemap.xml
+
+# Crawl-delay for all bots
+Crawl-delay: 10 
